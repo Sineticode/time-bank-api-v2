@@ -1,7 +1,10 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.allopen") version "1.6.10"
     id("io.quarkus")
+    id("org.openapi.generator") version "5.4.0"
 }
 
 repositories {
@@ -24,12 +27,16 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
 }
 
-group = "org-metatavu"
+group = "fi.metatavu"
 version = "1.0.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+}
+
+sourceSets["main"].java {
+    srcDir("build/generated/api-spec/src/main/kotlin")
 }
 
 allOpen {
@@ -41,4 +48,23 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
+}
+
+val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
+    setProperty("generatorName", "kotlin-server")
+    setProperty("inputSpec",  "$rootDir/time-bank-api-spec/swagger.yaml")
+    setProperty("outputDir", "$buildDir/generated/api-spec")
+    setProperty("apiPackage", "fi.metatavu.timebank.spec")
+    setProperty("invokerPackage", "fi.metatavu.timebank.invoker")
+    setProperty("modelPackage", "fi.metatavu.timebank.model")
+
+    this.configOptions.put("library", "jaxrs-spec")
+    this.configOptions.put("dateLibrary", "java8")
+    this.configOptions.put("interfaceOnly", "true")
+    this.configOptions.put("useCoroutines", "true")
+    this.configOptions.put("enumPropertyNaming", "UPPERCASE")
+    this.configOptions.put("returnResponse", "true")
+    this.configOptions.put("useSwaggerAnnotations", "false")
+    this.configOptions.put("additionalModelTypeAnnotations", "@io.quarkus.runtime.annotations.RegisterForReflection")
+
 }
