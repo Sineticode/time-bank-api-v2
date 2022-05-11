@@ -27,7 +27,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
 }
 
-group = "fi.metatavu"
+group = "fi.metatavu.timebank"
 version = "1.0.0-SNAPSHOT"
 
 java {
