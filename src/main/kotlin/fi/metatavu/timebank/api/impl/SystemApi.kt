@@ -1,4 +1,4 @@
-package org.metatavu.api.impl
+package fi.metatavu.timebank.api.impl
 
 import fi.metatavu.timebank.spec.SystemApi
 import javax.ws.rs.core.Response
