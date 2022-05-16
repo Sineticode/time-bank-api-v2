@@ -2,10 +2,12 @@ package fi.metatavu.timebank.api.persistence.repositories
 
 import fi.metatavu.timebank.api.persistence.model.DailyEntry
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
+import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepositoryBase
+import java.util.UUID
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class DailyEntryRepository: PanacheRepository<DailyEntry> {
+class DailyEntryRepository: PanacheRepositoryBase<DailyEntry, UUID> {
 
     fun getAllEntries(): List<DailyEntry> {
         return listAll()

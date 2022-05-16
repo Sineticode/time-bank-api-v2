@@ -1,17 +1,17 @@
 package fi.metatavu.timebank.api.persistence.model
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntity
-import net.bytebuddy.implementation.bind.annotation.Empty
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.Id
 import javax.validation.constraints.NotEmpty
 
 @Entity
-class DailyEntry: PanacheEntity() {
+class DailyEntry {
 
     @NotEmpty
+    @Id
     @Column(unique = true, nullable = false)
     var entryId: UUID = UUID.randomUUID()
 

@@ -1,17 +1,18 @@
 package fi.metatavu.timebank.api.persistence.model
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntity
 import java.time.OffsetDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.Id
 import javax.validation.constraints.NotEmpty
 
 @Entity
-class Person: PanacheEntity() {
+class Person {
 
     @NotEmpty
+    @Id
     @Column(unique = true, nullable = false)
-    var personId: Long? = null
+    var personId: Long? = 0
 
     @NotEmpty
     @Column(nullable = false)
