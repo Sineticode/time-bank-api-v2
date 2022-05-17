@@ -20,7 +20,7 @@ class PersonsController {
 
     val gson: Gson = Gson()
 
-    fun getPersonTotal(personId: Int): List<DailyEntry> {
+    suspend fun getPersonTotal(personId: Int): List<DailyEntry> {
         return dailyEntryRepository.getEntriesById(personId)
     }
 
@@ -43,7 +43,7 @@ class PersonsController {
             val response = client.newCall(request).execute()
             result = response.body()?.string()
             val personsArray: Array<Person> = gson.fromJson(result, Array<Person>::class.java)
-            personsArray.map{ i -> println(i.firstName)}
+            result = personsArray.filter{ i -> i.active}
             when (response.code()) {
                 200 -> return result
                 404 -> throw Error("Bad request")

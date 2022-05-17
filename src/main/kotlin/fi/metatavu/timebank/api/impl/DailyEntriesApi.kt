@@ -12,8 +12,8 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
     @Inject
     lateinit var dailyEntryController: DailyEntryController
 
-    override fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
-        val dailyEntries: List<DailyEntry> = dailyEntryController.list()
+    override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
+        val dailyEntries: MutableList<DailyEntry>? = dailyEntryController.list()
         return createOk(dailyEntries)
     }
 }

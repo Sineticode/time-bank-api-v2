@@ -11,7 +11,7 @@ class DailyEntryController {
     @Inject
     lateinit var dailyEntryRepository: DailyEntryRepository
 
-    fun list(): List<DailyEntry> {
+    suspend fun list(): MutableList<DailyEntry>? {
         return dailyEntryRepository.getAllEntries()
     }
 }

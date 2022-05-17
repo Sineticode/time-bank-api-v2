@@ -11,8 +11,8 @@ class PersonsApi: PersonsApi, AbstractApi() {
     @Inject
     lateinit var personsController: PersonsController
 
-    override fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
-        return Response.ok(personsController.getPersonTotal(personId)).build()
+    override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
+    return Response.ok(personsController.getPersonTotal(personId)).build()
     }
 
     override suspend fun listPersons(active: Boolean?): Response {
