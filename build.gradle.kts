@@ -20,8 +20,6 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
     implementation("io.quarkus:quarkus-kotlin")
-/*    implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
-    implementation("io.quarkus:quarkus-jdbc-mysql")*/
     implementation("io.quarkus:quarkus-resteasy-reactive")
     implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
