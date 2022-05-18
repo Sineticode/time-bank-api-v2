@@ -13,7 +13,7 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
     lateinit var dailyEntryController: DailyEntryController
 
     override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
-        val dailyEntries: MutableList<DailyEntry>? = dailyEntryController.list()
+        val dailyEntries: MutableList<DailyEntry> = dailyEntryController.list(personId, before, after)
         return createOk(dailyEntries)
     }
 }
