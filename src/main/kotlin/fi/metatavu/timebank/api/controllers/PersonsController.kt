@@ -44,7 +44,7 @@ class PersonsController {
         return result
     }
     private fun filterActivePersons(persons: List<Person>): List<Person> {
-        return persons.filter{ i -> i.active!! && i.userType != "SYSTEM" }
+        return persons.filter{ i -> i.active!! && i.defaultRole != null }
     }
 
     private suspend fun calculatePersonTotalTime(personId: Int): PersonTotalTime {

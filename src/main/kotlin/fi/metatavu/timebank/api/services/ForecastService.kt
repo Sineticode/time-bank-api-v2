@@ -43,4 +43,16 @@ class ForecastService {
         return doRequest("/v2/persons")
     }
 
+    /**
+     * Gets time registrations from Forecast
+     *
+     * @OptionalParam date after in YYYYMMDD string format
+     * @return Response with time registrations data
+     */
+    fun getTimeEntries(after: String?): String? {
+        var path = "/v3/time_registrations"
+        if (after != null) path += "?date_after=$after"
+        return doRequest(path)
+    }
+
 }

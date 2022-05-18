@@ -28,10 +28,6 @@ class Person {
 
     @NotEmpty
     @Column
-    var userType: String? = ""
-
-    @NotEmpty
-    @Column
     var clientId: Int? = 0
 
     @NotEmpty

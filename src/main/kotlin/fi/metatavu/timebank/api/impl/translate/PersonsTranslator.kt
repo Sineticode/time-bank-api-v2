@@ -15,7 +15,6 @@ class PersonsTranslator {
             translatedPerson.firstName = i.first_name
             translatedPerson.lastName = i.last_name
             translatedPerson.email = i.email
-            translatedPerson.userType = i.user_type
             translatedPerson.monday = i.monday
             translatedPerson.tuesday = i.tuesday
             translatedPerson.wednesday = i.wednesday
@@ -37,7 +36,6 @@ class PersonsTranslator {
             translatedPerson.updatedAt = OffsetDateTime.parse(i.updated_at)
             filteredPersons.add(translatedPerson)
         }
-
         return filteredPersons
     }
 
@@ -48,7 +46,6 @@ data class ForecastPerson(
     val first_name: String?,
     val last_name: String?,
     val email: String?,
-    val user_type: String?,
     val monday: Int?,
     val tuesday: Int?,
     val wednesday: Int?,

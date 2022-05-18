@@ -14,7 +14,8 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     lateinit var synchronizeController: SynchronizeController
 
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
-        synchronizeController.synchronize()
-        return createOk()
+        val entries = synchronizeController.synchronize(after)
+        if (entries == 0) return createBadRequest("Nothing to synchronize!")
+        return createOk("Synchronized $entries entries from Forecast!")
     }
 }
