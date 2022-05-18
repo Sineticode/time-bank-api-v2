@@ -29,8 +29,7 @@ class SynchronizeController {
 
     suspend fun synchronize(after: LocalDate?): Int {
         val persons: List<Person> = personsController.getPersonsFromForecast(active = true)
-        val resultString = forecastService
-            .getTimeEntries(after.toString().replace("-", ""))
+        val resultString = forecastService.getTimeEntries(after)
         val forecastTimeEntryArray: Array<ForecastTimeEntry> = gson.fromJson(resultString, Array<ForecastTimeEntry>::class.java)
         val translatedEntries = dailyEntryTranslator.translateTimeEntry(forecastTimeEntryArray)
         return dailyEntryController.dailyEntryRepository.synchronizeEntries(translatedEntries, persons)

@@ -3,6 +3,7 @@ package fi.metatavu.timebank.api.services
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.eclipse.microprofile.config.ConfigProvider
+import java.time.LocalDate
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -49,9 +50,9 @@ class ForecastService {
      * @OptionalParam date after in YYYYMMDD string format
      * @return Response with time registrations data
      */
-    fun getTimeEntries(after: String?): String? {
+    fun getTimeEntries(after: LocalDate?): String? {
         var path = "/v3/time_registrations"
-        if (after != null) path += "?date_after=$after"
+        if (after != null) path += "?date_after=${after.toString().replace("-", "")}"
         return doRequest(path)
     }
 
