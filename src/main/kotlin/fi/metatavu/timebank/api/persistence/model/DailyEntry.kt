@@ -7,12 +7,14 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.validation.constraints.NotEmpty
 
+/**
+ * DailyEntry JPA entity
+ */
 @Entity
 class DailyEntry {
 
-    @NotEmpty
     @Id
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     var entryId: UUID = UUID.randomUUID()
 
     @NotEmpty

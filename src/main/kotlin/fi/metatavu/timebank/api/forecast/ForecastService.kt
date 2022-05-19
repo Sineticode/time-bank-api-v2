@@ -1,21 +1,22 @@
-package fi.metatavu.timebank.api.services
+package fi.metatavu.timebank.api.forecast
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.eclipse.microprofile.config.ConfigProvider
+import org.eclipse.microprofile.config.inject.ConfigProperty
+import javax.enterprise.context.RequestScoped
 
+/**
+ *
+ */
+@RequestScoped
 class ForecastService {
-    private val forecastBaseUrl = ConfigProvider.getConfig().getValue(
-        "forecast.base.url",
-        String::class.java
-    )
 
-    private val forecastApiKey = ConfigProvider.getConfig().getValue(
-        "forecast.api.key",
-        String::class.java
-    )
+    @ConfigProperty(name = "forecast.base.url")
+    lateinit var forecastBaseUrl: String
 
-    private var client: OkHttpClient = OkHttpClient()
+    @ConfigProperty(name = "forecast.api.key")
+    lateinit var forecastApiKey: String
+
 
     /**
      * Sends get request to Forecast API
@@ -23,12 +24,12 @@ class ForecastService {
      * @param path path for the request
      * @return Response from the request
      */
-    fun doRequest(path: String): String? {
+    private fun doRequest(path: String): String? {
+        val client = OkHttpClient()
         val request = Request.Builder().url("${forecastBaseUrl}${path}")
             .addHeader("X-FORECAST-API-KEY", forecastApiKey)
             .build()
         val response = client.newCall(request).execute()
-
         return response.body()?.string()
     }
 

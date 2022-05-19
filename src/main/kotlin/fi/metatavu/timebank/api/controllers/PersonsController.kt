@@ -1,16 +1,18 @@
 package fi.metatavu.timebank.api.controllers
 
 import com.google.gson.Gson
-import fi.metatavu.timebank.api.impl.translate.ForecastPerson
-import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
 import fi.metatavu.timebank.api.persistence.model.DailyEntry
 import fi.metatavu.timebank.api.persistence.model.Person
 import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
-import fi.metatavu.timebank.api.services.ForecastService
+import fi.metatavu.timebank.api.forecast.ForecastService
+import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import org.slf4j.Logger
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
-
+/**
+ * Controller for Person objects
+ */
 @ApplicationScoped
 class PersonsController {
 
@@ -18,31 +20,44 @@ class PersonsController {
     lateinit var dailyEntryRepository: DailyEntryRepository
 
     @Inject
-    lateinit var personsTranslator: PersonsTranslator
+    lateinit var forecastService: ForecastService
 
-    val forecastService = ForecastService()
+    @Inject
+    lateinit var logger: Logger
 
     val gson: Gson = Gson()
 
+    /**
+     * Lists persons total time
+     *
+     * @param personId personId
+     * @return List of dailyEntries
+     */
     suspend fun getPersonTotal(personId: Int): List<DailyEntry> {
         return dailyEntryRepository.getEntriesById(personId)
     }
 
-    suspend fun getPersonsFromForecast(active: Boolean?): List<Person> {
-        var result: List<Person>
-        try {
+    /**
+     * List persons data from Forecast API
+     *
+     * @return Array of forecastPersons
+     */
+    suspend fun getPersonsFromForecast(): Array<ForecastPerson> {
+        return try {
             val resultString = forecastService.getPersons()
-            val forecastPersonsArray: Array<ForecastPerson> = gson.fromJson(resultString, Array<ForecastPerson>::class.java)
-            result = personsTranslator.translatePersons(forecastPersonsArray)
-            if (active == true) result = filterActivePersons(result)
+            gson.fromJson(resultString, Array<ForecastPerson>::class.java)
         } catch (e: Error) {
-            println("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
-        return result
     }
 
-    private fun filterActivePersons(persons: List<Person>): List<Person> {
-        return persons.filter{ i -> i.active!! && i.userType != "SYSTEM"}
+    /**
+     * Filters inactive persons and system users
+     *
+     * @return List of persons
+     */
+    suspend fun filterActivePersons(persons: List<Person>): List<Person> {
+        return persons.filter{ person -> person.active!! && person.defaultRole != null}
     }
 }

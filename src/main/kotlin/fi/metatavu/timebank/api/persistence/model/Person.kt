@@ -6,7 +6,9 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.validation.constraints.NotEmpty
 
-
+/**
+ * Person JPA entity
+ */
 @Entity
 class Person {
 
@@ -26,14 +28,6 @@ class Person {
     @NotEmpty
     @Column
     var email: String? = ""
-
-    @NotEmpty
-    @Column
-    var userType: String? = ""
-
-    @NotEmpty
-    @Column
-    var clientId: Int? = 0
 
     @NotEmpty
     @Column
