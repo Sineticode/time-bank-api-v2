@@ -1,6 +1,6 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.persistence.model.DailyEntry
 import fi.metatavu.timebank.api.persistence.model.Person
 import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
@@ -25,8 +25,6 @@ class PersonsController {
     @Inject
     lateinit var logger: Logger
 
-    val gson: Gson = Gson()
-
     /**
      * Lists persons total time
      *
@@ -42,10 +40,10 @@ class PersonsController {
      *
      * @return Array of forecastPersons
      */
-    suspend fun getPersonsFromForecast(): Array<ForecastPerson> {
+    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
             val resultString = forecastService.getPersons()
-            gson.fromJson(resultString, Array<ForecastPerson>::class.java)
+            jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)

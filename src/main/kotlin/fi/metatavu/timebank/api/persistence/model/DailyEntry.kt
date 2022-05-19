@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty
 class DailyEntry {
 
     @Id
-    @Column(nullable = false)
+    @Column
     var entryId: UUID = UUID.randomUUID()
 
     @NotEmpty

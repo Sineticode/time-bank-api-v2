@@ -10,11 +10,10 @@ import javax.validation.constraints.NotEmpty
  * Person JPA entity
  */
 @Entity
-class Person {
+class Person() {
 
-    @NotEmpty
     @Id
-    @Column(unique = true)
+    @Column
     var personId: Long? = 0
 
     @NotEmpty

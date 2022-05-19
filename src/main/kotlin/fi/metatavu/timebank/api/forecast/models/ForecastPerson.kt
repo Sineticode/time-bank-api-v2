@@ -26,5 +26,8 @@ data class ForecastPerson(
     val start_date: String?,
     val end_date: String?,
     val created_at: String?,
-    val updated_at: String?
+    val updated_at: String?,
+    val department_id: Any?,
+    val permissions: List<String>,
+    val is_system_user: Boolean?
 )
