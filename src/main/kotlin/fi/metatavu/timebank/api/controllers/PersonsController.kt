@@ -2,7 +2,6 @@ package fi.metatavu.timebank.api.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.persistence.model.DailyEntry
-import fi.metatavu.timebank.api.persistence.model.Person
 import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
@@ -55,7 +54,7 @@ class PersonsController {
      *
      * @return List of persons
      */
-    suspend fun filterActivePersons(persons: List<Person>): List<Person> {
-        return persons.filter{ person -> person.active!! && person.defaultRole != null}
+    suspend fun filterActivePersons(persons: List<fi.metatavu.timebank.model.Person>): List<fi.metatavu.timebank.model.Person> {
+        return persons.filter{ person -> person.active && person.defaultRole != 0}
     }
 }

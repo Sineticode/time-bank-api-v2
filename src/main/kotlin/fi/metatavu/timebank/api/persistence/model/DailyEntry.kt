@@ -5,43 +5,43 @@ import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
-import javax.validation.constraints.NotEmpty
+import javax.persistence.PrePersist
+import javax.persistence.Table
 
 /**
  * DailyEntry JPA entity
  */
 @Entity
+@Table(name = "DailyEntry")
 class DailyEntry {
 
     @Id
-    @Column
-    var entryId: UUID = UUID.randomUUID()
+    @Column(name = "entryId")
+    lateinit var entryId: String
 
-    @NotEmpty
-    @Column(nullable = false)
-    var person: Int = 0
+    @Column(name = "person")
+    var person: Int? = null
+    
+    @Column(name = "internalTime")
+    var internalTime: Int? = null
+    
+    @Column(name = "projectTime")
+    var projectTime: Int? = null
 
-    @NotEmpty
-    @Column(nullable = false)
-    var internalTime: Int = 0
+    @Column(name = "logged")
+    var logged: Int? = null
 
-    @NotEmpty
-    @Column(nullable = false)
-    var projectTime: Int = 0
+    @Column(name = "expected")
+    var expected: Int? = null
 
-    @NotEmpty
-    @Column(nullable = false)
-    var logged: Int = 0
+    @Column(name = "total")
+    var total: Int? = null
 
-    @NotEmpty
-    @Column(nullable = false)
-    var expected: Int = 0
-
-    @NotEmpty
-    @Column(nullable = false)
-    var total: Int = 0
-
-    @NotEmpty
-    @Column(nullable = false)
+    @Column(name = "date")
     var date: OffsetDateTime = OffsetDateTime.now()
+
+    @PrePersist
+    fun onCreate() {
+        entryId = UUID.randomUUID().toString()
+    }
 }
