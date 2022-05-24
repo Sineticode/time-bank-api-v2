@@ -1,5 +1,6 @@
 package fi.metatavu.timebank.api.persistence.model
 
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -9,15 +10,15 @@ import javax.persistence.PrePersist
 import javax.persistence.Table
 
 /**
- * DailyEntry JPA entity
+ * TimeEntry JPA entity
  */
 @Entity
-@Table(name = "DailyEntry")
-class DailyEntry {
+@Table(name = "TimeEntry")
+class TimeEntry {
 
     @Id
     @Column(name = "entryId")
-    lateinit var entryId: String
+    lateinit var entryId: UUID
 
     @Column(name = "person")
     var person: Int? = null
@@ -28,20 +29,17 @@ class DailyEntry {
     @Column(name = "projectTime")
     var projectTime: Int? = null
 
-    @Column(name = "logged")
-    var logged: Int? = null
-
-    @Column(name = "expected")
-    var expected: Int? = null
-
-    @Column(name = "total")
-    var total: Int? = null
-
     @Column(name = "date")
-    var date: OffsetDateTime = OffsetDateTime.now()
+    var date: LocalDate? = null
+
+    @Column(name = "createdAt")
+    var createdAt: OffsetDateTime? = null
+
+    @Column(name = "updatedAt")
+    var updatedAt: OffsetDateTime? = null
 
     @PrePersist
     fun onCreate() {
-        entryId = UUID.randomUUID().toString()
+        entryId = UUID.randomUUID()
     }
 }

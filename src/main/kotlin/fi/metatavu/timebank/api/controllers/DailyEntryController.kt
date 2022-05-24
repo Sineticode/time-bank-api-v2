@@ -1,7 +1,7 @@
 package fi.metatavu.timebank.api.controllers
 
-import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
-import fi.metatavu.timebank.api.persistence.model.DailyEntry
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -12,9 +12,9 @@ import javax.inject.Inject
 class DailyEntryController {
 
     @Inject
-    lateinit var dailyEntryRepository: DailyEntryRepository
+    lateinit var timeEntryRepository: TimeEntryRepository
 
-    suspend fun list(): List<DailyEntry>? {
-        return dailyEntryRepository.getAllEntries()
+    suspend fun list(): List<TimeEntry>? {
+        return timeEntryRepository.getAllEntries()
     }
 }

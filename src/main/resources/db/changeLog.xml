@@ -7,18 +7,18 @@
                    http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
-    <changeSet id="init_db" author="Ville Juutila">
-        <createTable tableName="DailyEntry">
-            <column name="entryId" type="VARCHAR(36)">
+    <changeSet id="timeEntries" author="Ville Juutila">
+        <createTable tableName="TimeEntry">
+            <column name="entryId" type="binary(16)">
                 <constraints primaryKey="true" />
             </column>
-            <column name="forecastId" type="INT" />
-            <column name="person" type="INT" />
-            <column name="internalTime" type="INT" />
-            <column name="projectTime" type="INT" />
-            <column name="date" type="DATE" />
-            <column name="createdAt" type="DATETIME" />
-            <column name="updatedAt" type="DATETIME" />
+            <column name="forecastId" type="integer" />
+            <column name="person" type="integer" />
+            <column name="internalTime" type="integer" />
+            <column name="projectTime" type="integer" />
+            <column name="date" type="date" />
+            <column name="createdAt" type="datetime" />
+            <column name="updatedAt" type="datetime" />
         </createTable>
     </changeSet>
 </databaseChangeLog>

@@ -21,13 +21,11 @@ class PersonsApi: PersonsApi, AbstractApi() {
     lateinit var personsTranslator: PersonsTranslator
 
     override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
-        return createOk(personsController.getPersonTotal(personId))
+        //TODO("Daily entries totals not yet implemented")
+        return createOk()
     }
 
     override suspend fun listPersons(active: Boolean?): Response {
-        val persons = personsController.getPersonsFromForecast()
-        val translatedPersons = personsTranslator.translate(persons)
-        if (active == true) return createOk(personsController.filterActivePersons(translatedPersons))
-        return createOk(translatedPersons)
+        return createOk(personsTranslator.translate(personsController.listPersons(active)))
     }
 }

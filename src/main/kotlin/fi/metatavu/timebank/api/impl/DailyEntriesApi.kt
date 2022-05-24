@@ -17,7 +17,7 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
     lateinit var dailyEntryController: DailyEntryController
 
     override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
-        val dailyEntries = dailyEntryController.list()
-        return createOk(dailyEntries)
+        //TODO("Daily entries Totals not yet implemented")
+        return createOk()
     }
 }

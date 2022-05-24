@@ -29,5 +29,5 @@ data class ForecastPerson(
     val updated_at: String?,
     val department_id: Any?,
     val permissions: List<String>,
-    val is_system_user: Boolean?
+    val is_system_user: Boolean
 )

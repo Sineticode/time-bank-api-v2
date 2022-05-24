@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response
 @RequestScoped
 class SynchronizeApi:  SynchronizeApi, AbstractApi() {
 
-
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
         return createOk()
     }

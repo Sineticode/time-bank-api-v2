@@ -1,6 +1,6 @@
 package fi.metatavu.timebank.api.persistence.repositories
 
-import fi.metatavu.timebank.api.persistence.model.DailyEntry
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import java.util.UUID
@@ -10,24 +10,24 @@ import javax.enterprise.context.ApplicationScoped
  * Manages DailyEntry JPA entity
  */
 @ApplicationScoped
-class DailyEntryRepository: PanacheRepositoryBase<DailyEntry, UUID> {
+class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
      * Lists all dailyEntries
      *
      * @return List of DailyEntries
      */
-    suspend fun getAllEntries(): List<DailyEntry>? {
+    suspend fun getAllEntries(): List<TimeEntry>? {
         return listAll().awaitSuspending()
     }
 
     /**
-     * Lists all dailyEntries for given Person
+     * Lists all TimeEntries for given Person
      *
      * @param personId personId
-     * @return List of DailyEntries
+     * @return List of TimeEntries
      */
-    suspend fun getEntriesById(personId: Int): List<DailyEntry> {
-        return find("person", personId).list<DailyEntry>().awaitSuspending()
+    suspend fun getEntriesByPersonId(personId: Int): List<TimeEntry> {
+        return find("person", personId).list<TimeEntry>().awaitSuspending()
     }
 }

@@ -11,19 +11,19 @@ class PersonsTranslator: AbstractTranslator<ForecastPerson, fi.metatavu.timebank
 
     override fun translate(entity: ForecastPerson): fi.metatavu.timebank.model.Person {
         return fi.metatavu.timebank.model.Person(
-            entity.id,
-            entity.first_name,
-            entity.last_name?: "",
-            entity.monday,
-            entity.tuesday,
-            entity.wednesday,
-            entity.thursday,
-            entity.friday,
-            entity.saturday,
-            entity.sunday,
-            entity.active,
-        entity.start_date?: "",
-        entity.default_role?: 0
+            id = entity.id,
+            firstName = entity.first_name,
+            lastName = entity.last_name ?: "",
+            monday = entity.monday,
+            tuesday = entity.tuesday,
+            wednesday = entity.wednesday,
+            thursday = entity.thursday,
+            friday = entity.friday,
+            saturday = entity.saturday,
+            sunday = entity.sunday,
+            active = entity.active,
+            startDate = entity.start_date ?: "",
+            defaultRole = entity.default_role ?: 0
         )
     }
 

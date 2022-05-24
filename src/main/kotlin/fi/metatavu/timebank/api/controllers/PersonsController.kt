@@ -1,8 +1,8 @@
 package fi.metatavu.timebank.api.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import fi.metatavu.timebank.api.persistence.model.DailyEntry
-import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import org.slf4j.Logger
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class PersonsController {
 
     @Inject
-    lateinit var dailyEntryRepository: DailyEntryRepository
+    lateinit var timeEntryRepository: TimeEntryRepository
 
     @Inject
     lateinit var forecastService: ForecastService
@@ -30,8 +30,8 @@ class PersonsController {
      * @param personId personId
      * @return List of dailyEntries
      */
-    suspend fun getPersonTotal(personId: Int): List<DailyEntry> {
-        return dailyEntryRepository.getEntriesById(personId)
+    suspend fun getPersonTotal(personId: Int): List<TimeEntry> {
+        return timeEntryRepository.getEntriesByPersonId(personId)
     }
 
     /**
@@ -39,7 +39,7 @@ class PersonsController {
      *
      * @return Array of forecastPersons
      */
-    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
+    private fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
             val resultString = forecastService.getPersons()
             jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
@@ -50,11 +50,23 @@ class PersonsController {
     }
 
     /**
-     * Filters inactive persons and system users
+     * Filters inactive Forecast persons and system users
      *
-     * @return List of persons
+     * @return List of Forecast persons
      */
-    suspend fun filterActivePersons(persons: List<fi.metatavu.timebank.model.Person>): List<fi.metatavu.timebank.model.Person> {
-        return persons.filter{ person -> person.active && person.defaultRole != 0}
+    private fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+        return persons.filter{ person -> person.active && !person.is_system_user }
+    }
+
+    /**
+     * Lists Forecast persons based on optional query parameters
+     *
+     * @param active
+     * @return List of Forecast persons
+     */
+    suspend fun listPersons(active: Boolean?): List<ForecastPerson> {
+        var persons = getPersonsFromForecast()
+        if (active == true) persons = filterActivePersons(persons)
+        return persons
     }
 }
