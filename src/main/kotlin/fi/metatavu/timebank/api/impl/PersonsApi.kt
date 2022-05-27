@@ -21,8 +21,7 @@ class PersonsApi: PersonsApi, AbstractApi() {
     lateinit var personsTranslator: PersonsTranslator
 
     override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
-        //TODO("Daily entries totals not yet implemented")
-        return createOk()
+        return Response.ok(personsController.getPersonTotal(personId, timespan ?: Timespan.ALL_TIME)).build()
     }
 
     override suspend fun listPersons(active: Boolean?): Response {

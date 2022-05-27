@@ -5,7 +5,13 @@ import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.utils.GenericFunctions
+import fi.metatavu.timebank.api.utils.TimespanGroup
+import fi.metatavu.timebank.model.PersonTotalTime
+import fi.metatavu.timebank.model.Timespan
 import org.slf4j.Logger
+import java.time.DayOfWeek
+import java.time.temporal.WeekFields
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -23,16 +29,6 @@ class PersonsController {
 
     @Inject
     lateinit var logger: Logger
-
-    /**
-     * Lists persons total time
-     *
-     * @param personId personId
-     * @return List of dailyEntries
-     */
-    suspend fun getPersonTotal(personId: Int): List<TimeEntry> {
-        return timeEntryRepository.getEntriesByPersonId(personId)
-    }
 
     /**
      * List persons data from Forecast API
@@ -68,5 +64,133 @@ class PersonsController {
         var persons = getPersonsFromForecast()
         if (active == true) persons = filterActivePersons(persons)
         return persons
+    }
+
+    /**
+     * Lists persons total time
+     *
+     * @param personId personId
+     * @param timespan span of time to be summed (from query param)
+     * @return List of TimeEntries
+     */
+    suspend fun getPersonTotal(personId: Int, timespan: Timespan): MutableList<PersonTotalTime> {
+        return calculatePersonTotalTime(personId, timespan)
+    }
+
+//    @Jari That I'm using 3 switches essentially in a row for the functions below smells suspicious to me, I tried to find a way around it but didn't. Would be great to speak about how to improve this with you.
+    /**
+     * Calculates the persons total time from timeEntries
+     *
+     * @param personId personId
+     * @param timespan span of time to be summed (from query param)
+     * @return list of Persons total times
+     */
+    private suspend fun calculatePersonTotalTime(personId: Int, timespan: Timespan): MutableList<PersonTotalTime> {
+        val personEntries: List<TimeEntry> = timeEntryRepository.getEntriesByPersonId(personId)
+        var totalTime = mutableListOf<PersonTotalTime>()
+        val genericFunctions = GenericFunctions()
+        val timespanGroup = TimespanGroup()
+
+        when (timespan) {
+            Timespan.ALL_TIME -> {
+                timespanGroup.allTime = personEntries
+                val allTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
+                totalTime = makePersonTotalTimeEntry(allTotals, timespan)
+            }
+            Timespan.YEAR -> {
+                timespanGroup.year = personEntries.groupingBy { it.date?.year }
+                val yearTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
+                totalTime = makePersonTotalTimeEntry(yearTotals, timespan)
+            }
+            Timespan.MONTH -> {
+                timespanGroup.weekMonth = personEntries.groupingBy { Pair(it.date?.year, it.date?.monthValue) }
+                val monthTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
+                totalTime = makePersonTotalTimeEntry(monthTotals, timespan)
+            }
+            Timespan.WEEK -> {
+                val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
+                timespanGroup.weekMonth = personEntries.groupingBy { Pair(it.date?.year, it.date?.get(weekOfYear)) }
+                val weekTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
+                totalTime = makePersonTotalTimeEntry(weekTotals, timespan)
+            }
+        }
+        return totalTime
+    }
+
+    /**
+     * Converts values from the TimespanGroup into PersonTotalTime type
+     *
+     * @param totals timespanGroup class to organise the various grouping types
+     * @param timespan span of time to be summed (from query param)
+     * @return list of persons total times
+     */
+    private fun makePersonTotalTimeEntry(totals: TimespanGroup, timespan: Timespan): MutableList<PersonTotalTime> {
+        var totalList = mutableListOf<PersonTotalTime>()
+            when (timespan) {
+                Timespan.ALL_TIME -> {
+                    val allTime = totals.allTime?.get(0)
+                    totalList.add(
+                        PersonTotalTime(
+                            balance = 435 - (allTime?.internalTime ?: 0) + (allTime?.projectTime ?: 0),
+                            logged = (allTime?.internalTime ?: 0) + (allTime?.projectTime ?: 0),
+                            expected = 435,
+                            internalTime = allTime?.internalTime ?: 0,
+                            projectTime = allTime?.projectTime ?: 0,
+                            personId = allTime?.person!!,
+                            year = null,
+                            monthNumber = null,
+                            weekNumber = null
+                        ))
+                }
+                Timespan.YEAR -> {
+                    totals.yearMap?.forEach { i ->
+                        totalList.add(
+                            PersonTotalTime(
+                                balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                expected = 435,
+                                internalTime = i.value.internalTime ?: 0,
+                                projectTime = i.value.projectTime ?: 0,
+                                personId = i.value.person!!,
+                                year = i.value.date?.year,
+                                monthNumber = null,
+                                weekNumber = null
+                            ))
+                    }
+                }
+                Timespan.MONTH -> {
+                    totals.weekMonthMap?.forEach { i ->
+                        totalList.add(
+                            PersonTotalTime(
+                                balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                expected = 435,
+                                internalTime = i.value.internalTime ?: 0,
+                                projectTime = i.value.projectTime ?: 0,
+                                personId = i.value.person!!,
+                                year = i.value.date?.year,
+                                monthNumber = i.value.date?.monthValue,
+                                weekNumber = null
+                            ))
+                    }
+                }
+                Timespan.WEEK -> {
+                    totals.weekMonthMap?.forEach { i ->
+                        totalList.add(
+                            PersonTotalTime(
+                                balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
+                                expected = 435,
+                                internalTime = i.value.internalTime ?: 0,
+                                projectTime = i.value.projectTime ?: 0,
+                                personId = i.value.person!!,
+                                year = i.value.date?.year,
+                                monthNumber = i.value.date?.monthValue,
+                                weekNumber = i.value.date?.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear())
+                            ))
+                    }
+                }
+            }
+        return totalList
     }
 }
