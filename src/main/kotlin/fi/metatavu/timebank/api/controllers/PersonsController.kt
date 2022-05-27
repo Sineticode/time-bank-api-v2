@@ -6,16 +6,10 @@ import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import org.slf4j.Logger
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
-import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
-import fi.metatavu.timebank.api.forecast.ForecastService
-import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.utils.GenericFunctions
 import fi.metatavu.timebank.api.utils.TimespanGroup
-import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.model.Timespan
-import org.slf4j.Logger
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
 import javax.enterprise.context.ApplicationScoped
@@ -41,7 +35,7 @@ class PersonsController {
      *
      * @return Array of forecastPersons
      */
-    private fun getPersonsFromForecast(): List<ForecastPerson> {
+    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
             val resultString = forecastService.getPersons()
             jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
@@ -56,7 +50,7 @@ class PersonsController {
      *
      * @return List of Forecast persons
      */
-    private fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+    fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
         return persons.filter{ person -> person.active && !person.is_system_user }
     }
 
@@ -92,85 +86,39 @@ class PersonsController {
      * @return list of Persons total times
      */
     private suspend fun calculatePersonTotalTime(personId: Int, timespan: Timespan): MutableList<PersonTotalTime> {
-        val personEntries: List<TimeEntry> = timeEntryRepository.getEntriesByPersonId(personId)
+        val personEntries: List<TimeEntry> = timeEntryRepository.getAllEntries(personId)
         var totalTime = mutableListOf<PersonTotalTime>()
         val genericFunctions = GenericFunctions()
         val timespanGroup = TimespanGroup()
+
+        val dayCount = personEntries.groupingBy { it.date }.eachCount().size
 
         when (timespan) {
             Timespan.ALL_TIME -> {
                 timespanGroup.allTime = personEntries
                 val allTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
-                totalTime = makePersonTotalTimeEntry(allTotals, timespan)
+                totalTime = makePersonTotalTimeEntry(allTotals, timespan, dayCount)
             }
             Timespan.YEAR -> {
                 timespanGroup.year = personEntries.groupingBy { it.date?.year }
                 val yearTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
-                totalTime = makePersonTotalTimeEntry(yearTotals, timespan)
+                totalTime = makePersonTotalTimeEntry(yearTotals, timespan, dayCount)
             }
             Timespan.MONTH -> {
                 timespanGroup.weekMonth = personEntries.groupingBy { Pair(it.date?.year, it.date?.monthValue) }
                 val monthTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
-                totalTime = makePersonTotalTimeEntry(monthTotals, timespan)
+                totalTime = makePersonTotalTimeEntry(monthTotals, timespan, dayCount)
             }
             Timespan.WEEK -> {
                 val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
                 timespanGroup.weekMonth = personEntries.groupingBy { Pair(it.date?.year, it.date?.get(weekOfYear)) }
                 val weekTotals = genericFunctions.sumGroup(timespanGroup, timespan, false, personId)
-                totalTime = makePersonTotalTimeEntry(weekTotals, timespan)
+                totalTime = makePersonTotalTimeEntry(weekTotals, timespan, dayCount)
             }
         }
         return totalTime
     }
 
-    /**
-     * Filters inactive Forecast persons and system users
-     *
-     * @return List of Forecast persons
-     */
-    suspend fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
-        return persons.filter{ i -> i.active && !i.is_system_user }
-    }
-
-    /**
-     * Lists Forecast persons based on optional query parameters
-     *
-     * @param active
-     * @return List of Forecast persons
-     */
-    suspend fun listPersons(active: Boolean?): List<ForecastPerson> {
-        var persons = getPersonsFromForecast()
-        if (active == true) persons = filterActivePersons(persons)
-        return persons
-    }
-    /**
-     * Calculates persons combined total time
-     *
-     * @param personId personId
-     * @return PersonTotalTime
-     */
-    private suspend fun calculatePersonTotalTime(personId: Int): PersonTotalTime {
-        val personEntries = timeEntryRepository.getEntriesById(personId)
-        var logged = 0
-        var expected = 0
-        var internalTime = 0
-        var projectTime = 0
-        personEntries.map{ entry ->
-            logged += entry.internalTime?: 0
-            logged += entry.projectTime?: 0
-            internalTime += entry.internalTime?: 0
-            projectTime += entry.projectTime?: 0
-            expected += 435
-        }
-        val balance = expected - logged
-        return PersonTotalTime(
-            balance,
-            logged,
-            expected,
-            internalTime,
-            projectTime,
-            personId
-        )
     /**
      * Converts values from the TimespanGroup into PersonTotalTime type
      *
@@ -178,7 +126,7 @@ class PersonsController {
      * @param timespan span of time to be summed (from query param)
      * @return list of persons total times
      */
-    private fun makePersonTotalTimeEntry(totals: TimespanGroup, timespan: Timespan): MutableList<PersonTotalTime> {
+    private fun makePersonTotalTimeEntry(totals: TimespanGroup, timespan: Timespan, dayCount: Int): MutableList<PersonTotalTime> {
         var totalList = mutableListOf<PersonTotalTime>()
             when (timespan) {
                 Timespan.ALL_TIME -> {
@@ -187,7 +135,7 @@ class PersonsController {
                         PersonTotalTime(
                             balance = 435 - (allTime?.internalTime ?: 0) + (allTime?.projectTime ?: 0),
                             logged = (allTime?.internalTime ?: 0) + (allTime?.projectTime ?: 0),
-                            expected = 435,
+                            expected = 435 * dayCount,
                             internalTime = allTime?.internalTime ?: 0,
                             projectTime = allTime?.projectTime ?: 0,
                             personId = allTime?.person!!,
@@ -202,7 +150,7 @@ class PersonsController {
                             PersonTotalTime(
                                 balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
                                 logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
-                                expected = 435,
+                                expected = 435 * dayCount,
                                 internalTime = i.value.internalTime ?: 0,
                                 projectTime = i.value.projectTime ?: 0,
                                 personId = i.value.person!!,
@@ -218,7 +166,7 @@ class PersonsController {
                             PersonTotalTime(
                                 balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
                                 logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
-                                expected = 435,
+                                expected = 435 * dayCount,
                                 internalTime = i.value.internalTime ?: 0,
                                 projectTime = i.value.projectTime ?: 0,
                                 personId = i.value.person!!,
@@ -234,7 +182,7 @@ class PersonsController {
                             PersonTotalTime(
                                 balance = 435 - (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
                                 logged = (i.value.internalTime ?: 0) + (i.value.projectTime ?: 0),
-                                expected = 435,
+                                expected = 435 * dayCount,
                                 internalTime = i.value.internalTime ?: 0,
                                 projectTime = i.value.projectTime ?: 0,
                                 personId = i.value.person!!,

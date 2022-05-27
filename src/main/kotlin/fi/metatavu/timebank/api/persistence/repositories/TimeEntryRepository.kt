@@ -52,16 +52,6 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     }
 
     /**
-     * Lists all TimeEntries for given Person
-     *
-     * @param personId personId
-     * @return List of TImeEntries
-     */
-    suspend fun getEntriesById(personId: Int): MutableList<TimeEntry> {
-        return find("person", personId).list<TimeEntry>().awaitSuspending()
-    }
-
-    /**
      * Persists new TimeEntry
      *
      * @return 1 for persisted 0 for not persisted

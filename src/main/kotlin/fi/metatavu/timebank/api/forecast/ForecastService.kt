@@ -29,7 +29,7 @@ class ForecastService {
      * @param path path for the request
      * @return Response from the request
      */
-    private fun doRequest(path: String): String? {
+    private suspend fun doRequest(path: String): String? {
         return try {
             val client = OkHttpClient()
             val request = Request.Builder().url("${forecastBaseUrl}${path}")
@@ -48,7 +48,7 @@ class ForecastService {
      *
      * @return Response with persons' data
      */
-    fun getPersons(): String? {
+    suspend fun getPersons(): String? {
         return doRequest("/v2/persons")
     }
 
@@ -58,9 +58,19 @@ class ForecastService {
      * @OptionalParam date after in YYYY-MM-DD LocalDate
      * @return Response with time registrations data
      */
-    fun getTimeEntries(after: LocalDate?): String? {
+    suspend fun getTimeEntries(after: LocalDate?): String? {
         var path = "/v3/time_registrations"
         if (after != null) path += "?date_after=${after.toString().replace("-", "")}"
+        return doRequest(path)
+    }
+
+    /**
+     * Gets holiday times from Forecast
+     *
+     * @return Response with holiday times data
+     */
+    suspend fun getHolidays(): String? {
+        var path = "/v1/holiday_calendar_entries"
         return doRequest(path)
     }
 }

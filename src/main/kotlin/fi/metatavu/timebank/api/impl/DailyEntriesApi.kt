@@ -18,7 +18,6 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
     lateinit var dailyEntryController: DailyEntryController
 
     override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
-//        return createOk(dailyEntryController.list(personId, before, after))
-        return createOk(dailyEntryController.getDailyTotal(personId, Timespan.ALL_TIME))
+        return createOk(dailyEntryController.getDailyTotal(personId, Timespan.ALL_TIME, before, after))
     }
 }

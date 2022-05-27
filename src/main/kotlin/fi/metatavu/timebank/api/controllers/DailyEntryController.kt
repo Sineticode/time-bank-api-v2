@@ -3,8 +3,6 @@ package fi.metatavu.timebank.api.controllers
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import java.time.LocalDate
-import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
-import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.utils.GenericFunctions
 import fi.metatavu.timebank.api.utils.TimespanGroup
 import fi.metatavu.timebank.model.DailyEntry
@@ -32,8 +30,8 @@ class DailyEntryController {
      * @param timespan span of time to be summed (from query param)
      * @return List of DailyEntries
      */
-    suspend fun getDailyTotal(personId: Int?, timespan: Timespan): MutableList<DailyEntry> {
-        return calculateDailyEntry(personId, timespan)
+    suspend fun getDailyTotal(personId: Int?, timespan: Timespan, before: LocalDate?, after: LocalDate?): MutableList<DailyEntry> {
+        return calculateDailyEntry(personId, timespan, before, after)
     }
 
     /**
@@ -43,19 +41,19 @@ class DailyEntryController {
      * @param timespan span of time to be summed (from query param)
      * @return list of DailyEntries
      */
-    private suspend fun calculateDailyEntry(personId: Int?, timespan: Timespan): MutableList<DailyEntry> {
+    private suspend fun calculateDailyEntry(personId: Int?, timespan: Timespan, before: LocalDate?, after: LocalDate?): MutableList<DailyEntry> {
         val personEntries: List<TimeEntry>?
         var dailyEntry: MutableList<DailyEntry>
         var timespanGroup = TimespanGroup()
         val genericFunctions = GenericFunctions()
 
         if (personId != null) {
-            personEntries = timeEntryRepository.getEntriesByPersonId(personId)
+            personEntries = timeEntryRepository.getAllEntries(personId, before, after)
             timespanGroup.day = personEntries.groupingBy { it.date }
             val dailyTotals = genericFunctions.sumGroup(timespanGroup, timespan, true, personId)
             dailyEntry = makeDailyEntry(dailyTotals, personId)
         } else {
-            personEntries = timeEntryRepository.getAllEntries()
+            personEntries = timeEntryRepository.getAllEntries(personId, before, after)
             timespanGroup.allPersonDay = personEntries?.groupingBy { Pair(it.person, it.date) }
             val allPersonDailyTotals = genericFunctions.sumGroup(timespanGroup, timespan, true, personId)
             dailyEntry = makeDailyEntry(allPersonDailyTotals, personId)
