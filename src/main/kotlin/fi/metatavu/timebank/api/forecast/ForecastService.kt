@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
+import java.time.LocalDate
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
 
@@ -40,7 +41,6 @@ class ForecastService {
             logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
-
     }
 
     /**
@@ -52,4 +52,15 @@ class ForecastService {
         return doRequest("/v2/persons")
     }
 
+    /**
+     * Gets time registrations from Forecast
+     *
+     * @OptionalParam date after in YYYY-MM-DD LocalDate
+     * @return Response with time registrations data
+     */
+    fun getTimeEntries(after: LocalDate?): String? {
+        var path = "/v3/time_registrations"
+        if (after != null) path += "?date_after=${after.toString().replace("-", "")}"
+        return doRequest(path)
+    }
 }

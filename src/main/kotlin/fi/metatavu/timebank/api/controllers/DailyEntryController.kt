@@ -2,6 +2,9 @@ package fi.metatavu.timebank.api.controllers
 
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import java.time.LocalDate
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.utils.GenericFunctions
 import fi.metatavu.timebank.api.utils.TimespanGroup
 import fi.metatavu.timebank.model.DailyEntry
@@ -18,8 +21,8 @@ class DailyEntryController {
     @Inject
     lateinit var timeEntryRepository: TimeEntryRepository
 
-    suspend fun list(): List<TimeEntry>? {
-        return timeEntryRepository.getAllEntries()
+    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry>? {
+        return timeEntryRepository.getAllEntries(personId, before, after)
     }
 
     /**

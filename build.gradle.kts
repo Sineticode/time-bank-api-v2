@@ -34,6 +34,7 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
     implementation("com.squareup.okhttp3:okhttp:4.5.0")
     implementation("io.quarkus:quarkus-liquibase")
+    implementation("io.quarkus:quarkus-scheduler")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")

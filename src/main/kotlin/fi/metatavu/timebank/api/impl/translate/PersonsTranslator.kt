@@ -1,16 +1,17 @@
 package fi.metatavu.timebank.api.impl.translate
 
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.model.Person
 import javax.enterprise.context.ApplicationScoped
 
 /**
  * Translates ForecastPerson object to Person object
  */
 @ApplicationScoped
-class PersonsTranslator: AbstractTranslator<ForecastPerson, fi.metatavu.timebank.model.Person>() {
+class PersonsTranslator: AbstractTranslator<ForecastPerson, Person>() {
 
-    override fun translate(entity: ForecastPerson): fi.metatavu.timebank.model.Person {
-        return fi.metatavu.timebank.model.Person(
+    override fun translate(entity: ForecastPerson): Person {
+        return Person(
             id = entity.id,
             firstName = entity.first_name,
             lastName = entity.last_name ?: "",
@@ -27,7 +28,7 @@ class PersonsTranslator: AbstractTranslator<ForecastPerson, fi.metatavu.timebank
         )
     }
 
-    override fun translate(entities: List<ForecastPerson>): List<fi.metatavu.timebank.model.Person> {
+    override fun translate(entities: List<ForecastPerson>): List<Person> {
         return entities.map(this::translate)
     }
 }

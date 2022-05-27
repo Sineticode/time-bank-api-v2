@@ -19,14 +19,14 @@ class TimeEntry {
     lateinit var entryId: UUID
 
     @Column
-    var forcastId: Int? = null
+    var forecastId: Int? = null
 
     @Column
     var person: Int? = null
-    
+
     @Column
     var internalTime: Int? = null
-    
+
     @Column
     var projectTime: Int? = null
 
