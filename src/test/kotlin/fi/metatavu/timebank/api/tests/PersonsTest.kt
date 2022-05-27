@@ -15,42 +15,42 @@ import javax.ws.rs.core.Response
 @QuarkusTestResource(PersonsMock::class)
 class PersonTest {
 
-//    /**
-//     * Tests listing persons
-//     */
-//    @Test
-//    fun listPersons() {
-//        given()
-//            .contentType("application/json")
-//            .`when`().get("/v1/persons")
-//            .then()
-//            .statusCode(Response.Status.OK.statusCode)
-//    }
-//
-//    /**
-//     * Tests listing active persons
-//     */
-//    @Test
-//    fun listActivePersons() {
-//        given()
-//            .contentType("application/json")
-//            .`when`().get("/v1/persons?active=true")
-//            .then()
-//            .statusCode(Response.Status.OK.statusCode)
-//    }
-//
-//    /**
-//     * Tests listing total time entries of given person
-//     */
-//    @Test
-//    fun listPersonTotalTimeEntries() {
-//        given()
-//            .contentType("application/json")
-//            .`when`().get("/v1/persons/${TestData.personId}/total")
-//            .then()
-//            .statusCode(Response.Status.OK.statusCode)
-//            .body("personId", equalTo(TestData.personId))
-//    }
+    /**
+     * Tests listing persons
+     */
+    @Test
+    fun listPersons() {
+        given()
+            .contentType("application/json")
+            .`when`().get("/v1/persons")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+    }
+
+    /**
+     * Tests listing active persons
+     */
+    @Test
+    fun listActivePersons() {
+        given()
+            .contentType("application/json")
+            .`when`().get("/v1/persons?active=true")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+    }
+
+    /**
+     * Tests listing total time entries of given person
+     */
+    @Test
+    fun listPersonTotalTimeEntries() {
+        given()
+            .contentType("application/json")
+            .`when`().get("/v1/persons/${TestData.personId}/total")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+            .body("personId", equalTo(TestData.personId))
+    }
 
     @Test
     fun personTestWithWiremock() {
