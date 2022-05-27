@@ -37,6 +37,7 @@ dependencies {
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("com.github.tomakehurst:wiremock-jre8:2.33.2")
 }
 
 group = "fi.metatavu.timebank"
