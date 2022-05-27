@@ -1,63 +1,92 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.google.gson.Gson
-import fi.metatavu.timebank.api.impl.translate.ForecastPerson
-import fi.metatavu.timebank.api.persistence.model.DailyEntry
-import fi.metatavu.timebank.api.persistence.model.Person
-import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
-import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
-import fi.metatavu.timebank.api.services.ForecastService
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.model.PersonTotalTime
+import fi.metatavu.timebank.api.forecast.ForecastService
+import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import org.slf4j.Logger
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
-
+/**
+ * Controller for Person objects
+ */
 @ApplicationScoped
 class PersonsController {
 
     @Inject
-    lateinit var dailyEntryRepository: DailyEntryRepository
-
-    @Inject
-    lateinit var personsTranslator: PersonsTranslator
+    lateinit var timeEntryRepository: TimeEntryRepository
 
     @Inject
     lateinit var forecastService: ForecastService
 
-    val gson: Gson = Gson()
+    @Inject
+    lateinit var logger: Logger
 
+    /**
+     * Lists persons total time
+     *
+     * @param personId personId
+     * @return List of dailyEntries
+     */
     suspend fun getPersonTotal(personId: Int): PersonTotalTime? {
         return calculatePersonTotalTime(personId)
     }
 
-    suspend fun getPersonsFromForecast(active: Boolean?): List<Person> {
-        var result: List<Person>
-        try {
+    /**
+     * List persons data from Forecast API
+     *
+     * @return List of forecastPersons
+     */
+    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
+        return try {
             val resultString = forecastService.getPersons()
-            val forecastPersonsArray: Array<ForecastPerson> = gson.fromJson(resultString, Array<ForecastPerson>::class.java)
-            result = personsTranslator.translatePersons(forecastPersonsArray)
-            if (active == true) result = filterActivePersons(result)
+            jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
         } catch (e: Error) {
-            println("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
-        return result
-    }
-    private fun filterActivePersons(persons: List<Person>): List<Person> {
-        return persons.filter{ i -> i.active!! && i.defaultRole != null }
     }
 
+    /**
+     * Filters inactive Forecast persons and system users
+     *
+     * @return List of Forecast persons
+     */
+    suspend fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+        return persons.filter{ i -> i.active && !i.is_system_user }
+    }
+
+    /**
+     * Lists Forecast persons based on optional query parameters
+     *
+     * @param active
+     * @return List of Forecast persons
+     */
+    suspend fun listPersons(active: Boolean?): List<ForecastPerson> {
+        var persons = getPersonsFromForecast()
+        if (active == true) persons = filterActivePersons(persons)
+        return persons
+    }
+    /**
+     * Calculates persons combined total time
+     *
+     * @param personId personId
+     * @return PersonTotalTime
+     */
     private suspend fun calculatePersonTotalTime(personId: Int): PersonTotalTime {
-        val personEntries: List<DailyEntry> = dailyEntryRepository.getEntriesById(personId)
+        val personEntries = timeEntryRepository.getEntriesById(personId)
         var logged = 0
         var expected = 0
         var internalTime = 0
         var projectTime = 0
-        personEntries.map{ i ->
-            logged += i.logged
-            expected += i.expected
-            internalTime += i.internalTime
-            projectTime += i.projectTime
+        personEntries.map{ entry ->
+            logged += entry.internalTime?: 0
+            logged += entry.projectTime?: 0
+            internalTime += entry.internalTime?: 0
+            projectTime += entry.projectTime?: 0
+            expected += 435
         }
         val balance = expected - logged
         return PersonTotalTime(

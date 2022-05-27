@@ -1,22 +1,21 @@
 package fi.metatavu.timebank.api.controllers
 
-import fi.metatavu.timebank.api.persistence.repositories.DailyEntryRepository
-import fi.metatavu.timebank.api.persistence.model.DailyEntry
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import java.time.LocalDate
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
+/**
+ * Controller for DailyEntry objects
+ */
 @ApplicationScoped
 class DailyEntryController {
 
     @Inject
-    lateinit var dailyEntryRepository: DailyEntryRepository
+    lateinit var timeEntryRepository: TimeEntryRepository
 
-    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): MutableList<DailyEntry> {
-        return dailyEntryRepository.getAllEntries(personId, before, after)
-    }
-
-    suspend fun list(personId: Int): MutableList<DailyEntry> {
-        return dailyEntryRepository.getEntriesById(personId)
+    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry>? {
+        return timeEntryRepository.getAllEntries(personId, before, after)
     }
 }

@@ -1,14 +1,19 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.google.gson.Gson
-import fi.metatavu.timebank.api.impl.translate.DailyEntryTranslator
-import fi.metatavu.timebank.api.impl.translate.ForecastTimeEntry
-import fi.metatavu.timebank.api.persistence.model.Person
-import fi.metatavu.timebank.api.services.ForecastService
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.forecast.ForecastService
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import fi.metatavu.timebank.api.impl.translate.TimeEntryTranslator
+import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
+import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
+import org.slf4j.Logger
 import java.time.LocalDate
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
+/**
+ * Controller for synchronization Forecast time registrations with Time-bank
+ */
 @ApplicationScoped
 class SynchronizeController {
 
@@ -16,23 +21,46 @@ class SynchronizeController {
     lateinit var personsController: PersonsController
 
     @Inject
-    lateinit var dailyEntryController: DailyEntryController
+    lateinit var timeEntryRepository: TimeEntryRepository
 
     @Inject
     lateinit var forecastService: ForecastService
 
     @Inject
-    lateinit var dailyEntryTranslator: DailyEntryTranslator
+    lateinit var timeEntryTranslator: TimeEntryTranslator
 
-    val gson: Gson = Gson()
+    @Inject
+    lateinit var personsTranslator: PersonsTranslator
 
+    @Inject
+    lateinit var logger: Logger
 
+    /**
+     * Synchronizes time entries from Forecast to Time-bank
+     *
+     * @param after YYYY-MM-DD LocalDate
+     * @return Length of entries synchronized
+     */
     suspend fun synchronize(after: LocalDate?): Int {
-        val persons: List<Person> = personsController.getPersonsFromForecast(active = true)
+        if (after == null) return -1
+        if (after < LocalDate.now().minusDays(1)) return -1
+        val forecastPersons = personsController.getPersonsFromForecast()
+        val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
         val resultString = forecastService.getTimeEntries(after)
-        val forecastTimeEntryArray: Array<ForecastTimeEntry> = gson.fromJson(resultString, Array<ForecastTimeEntry>::class.java)
-        val translatedEntries = dailyEntryTranslator.translateTimeEntry(forecastTimeEntryArray)
-        return dailyEntryController.dailyEntryRepository.synchronizeEntries(translatedEntries, persons)
+        val forecastTimeEntries = jacksonObjectMapper().readValue(resultString, Array<ForecastTimeEntry>::class.java).toList()
+        val translatedEntries = timeEntryTranslator.translate(forecastTimeEntries)
+        var synchronized = 0
+        translatedEntries.forEachIndexed { idx, timeEntry ->
+            val personName =
+                persons.find { person -> person.id == timeEntry.person}?.lastName + ", " + persons.find { person -> person.id == timeEntry.person}?.firstName
+            logger.info("Synchronizing TimeEntry ${idx + 1}/${translatedEntries.size} of $personName...")
+            if (timeEntryRepository.persistEntry(timeEntry) == 1) {
+                logger.info("Synchronized TimeEntry #${synchronized + 1}!")
+                synchronized++
+            }
+            else logger.warn("Time Entry ${idx + 1}/${translatedEntries.size} already synchronized!")
+        }
+        return synchronized
     }
 
 }

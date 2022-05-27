@@ -20,8 +20,6 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
     implementation("io.quarkus:quarkus-kotlin")
-/*    implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
-    implementation("io.quarkus:quarkus-jdbc-mysql")*/
     implementation("io.quarkus:quarkus-resteasy-reactive")
     implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
@@ -31,10 +29,12 @@ dependencies {
     implementation("io.quarkus:quarkus-hibernate-orm")
     implementation("io.quarkus:quarkus-hibernate-validator")
     implementation("io.smallrye.reactive:mutiny-kotlin")
+    implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("com.squareup.okhttp3:okhttp:4.5.0")
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("io.quarkus:quarkus-liquibase")
+    implementation("io.quarkus:quarkus-scheduler")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
