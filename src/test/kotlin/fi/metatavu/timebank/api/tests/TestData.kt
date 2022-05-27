@@ -1,5 +1,7 @@
 package fi.metatavu.timebank.api.tests
 
+import fi.metatavu.timebank.model.Person
+
 /**
  * Class for test data that is used by wiremock and tests
  */
@@ -38,5 +40,23 @@ class TestData {
             """
 
         const val personId: Int = 123
+
+        fun getPersonA(): Person {
+            return Person(
+                id = 12345,
+                firstName = "Tester",
+                lastName = "Test",
+                monday = 435,
+                tuesday = 435,
+                wednesday = 435,
+                thursday = 435,
+                friday = 435,
+                saturday = 0,
+                sunday = 0,
+                active = true,
+                startDate = "2022-05-11",
+                defaultRole = null
+            )
+        }
     }
 }
