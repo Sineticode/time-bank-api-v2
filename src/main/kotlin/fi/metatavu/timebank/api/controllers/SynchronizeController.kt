@@ -42,8 +42,8 @@ class SynchronizeController {
      * @return Length of entries synchronized
      */
     suspend fun synchronize(after: LocalDate?): Int {
-//        if (after == null) return -1
-//        if (after < LocalDate.now().minusDays(1)) return -1
+        if (after == null) return -1
+        if (after < LocalDate.now().minusDays(1)) return -1
         val forecastPersons = personsController.getPersonsFromForecast()
         val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
         val resultString = forecastService.getTimeEntries(after)

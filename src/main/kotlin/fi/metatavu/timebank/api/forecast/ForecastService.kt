@@ -29,7 +29,7 @@ class ForecastService {
      * @param path path for the request
      * @return Response from the request
      */
-    private suspend fun doRequest(path: String): String? {
+    private fun doRequest(path: String): String? {
         return try {
             val client = OkHttpClient()
             val request = Request.Builder().url("${forecastBaseUrl}${path}")
@@ -70,7 +70,6 @@ class ForecastService {
      * @return Response with holiday times data
      */
     suspend fun getHolidays(): String? {
-        var path = "/v1/holiday_calendar_entries"
-        return doRequest(path)
+        return doRequest("/v1/holiday_calendar_entries")
     }
 }

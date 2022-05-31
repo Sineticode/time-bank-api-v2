@@ -1,7 +1,6 @@
 package fi.metatavu.timebank.api.persistence.repositories
 
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
-
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.smallrye.mutiny.coroutines.awaitSuspending

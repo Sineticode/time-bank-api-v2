@@ -23,13 +23,17 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     lateinit var logger: Logger
 
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
-        val synchronizedEntries = synchronizeController.synchronize(after)
+        var synchronizedEntries = 0
+//        Comment two lines below to synchronize without Keycloak usage
+        if (after == null && !isAdmin()) return createUnauthorized("Forbidden to synchronize all time!")
+        else if (isAdmin() || (after != null && after > LocalDate.now().minusDays(1)))synchronizedEntries = synchronizeController.synchronize(after)
         if (synchronizedEntries == 0) return createBadRequest("Nothing to synchronize!")
-        if (synchronizedEntries == -1) return createUnauthorized("Forbidden to synchronize all time!")
+//         Un-comment line below to synchronize without Keycloak usage
+//         synchronizedEntries = synchronizeController.synchronize(after)
         return createOk("Synchronized $synchronizedEntries entries from Forecast!")
     }
 
-    @Scheduled(cron = "0 36 13 * * ?")
+    @Scheduled(cron = "0 15 3 * * ?")
     fun scheduledSynchronization(){
         runBlocking {
             val afterDate = LocalDate.now().minusDays(1)
