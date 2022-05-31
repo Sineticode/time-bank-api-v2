@@ -23,7 +23,7 @@ class DailyEntriesTest {
             .contentType("application/json")
             .`when`().get("/v1/dailyEntries")
             .then()
-            .statusCode(200)
+            .statusCode(Response.Status.OK.statusCode)
     }
 
     /**

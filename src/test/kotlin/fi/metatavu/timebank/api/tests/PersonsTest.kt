@@ -1,6 +1,6 @@
 package fi.metatavu.timebank.api.tests
 
-import fi.metatavu.timebank.api.resources.PersonsMock
+import fi.metatavu.timebank.api.resources.TestMockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
@@ -12,8 +12,8 @@ import javax.ws.rs.core.Response
  * Tests for Person API
  */
 @QuarkusTest
-@QuarkusTestResource(PersonsMock::class)
-class PersonTest {
+@QuarkusTestResource(TestMockResource::class)
+class PersonsTest {
 
     /**
      * Tests listing persons
@@ -22,9 +22,13 @@ class PersonTest {
     fun listPersons() {
         given()
             .contentType("application/json")
-            .`when`().get("/v1/persons")
+            .`when`().get("http://localhost:8082/v1/persons")
             .then()
             .statusCode(Response.Status.OK.statusCode)
+            .body("id", equalTo(TestData.getPersonA().id))
+            .body("firstName", equalTo(TestData.getPersonA().firstName))
+            .body("lastName", equalTo(TestData.getPersonA().lastName))
+            .body("active", equalTo(TestData.getPersonA().active))
     }
 
     /**
@@ -34,9 +38,10 @@ class PersonTest {
     fun listActivePersons() {
         given()
             .contentType("application/json")
-            .`when`().get("/v1/persons?active=true")
+            .`when`().get("http://localhost:8082/v1/persons?active=true")
             .then()
             .statusCode(Response.Status.OK.statusCode)
+            .body("active", equalTo(TestData.getPersonA().active))
     }
 
     /**
@@ -46,23 +51,9 @@ class PersonTest {
     fun listPersonTotalTimeEntries() {
         given()
             .contentType("application/json")
-            .`when`().get("/v1/persons/${TestData.personId}/total")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total")
             .then()
             .statusCode(Response.Status.OK.statusCode)
-            .body("personId", equalTo(TestData.personId))
-    }
-
-    @Test
-    fun personTestWithWiremock() {
-        given()
-            .contentType("application/json")
-            .`when`().get("/v1/persons")
-            .then()
-            .statusCode(Response.Status.OK.statusCode)
-            .body("personId", equalTo(1234))
-            .body("firstName", equalTo("Test"))
-            .body("lastName", equalTo("Tester"))
-            .body("email", equalTo("test.tester@metatavu.fi"))
-            .body("active", equalTo("true"))
+            .body("id", equalTo(TestData.getPersonA().id))
     }
 }
