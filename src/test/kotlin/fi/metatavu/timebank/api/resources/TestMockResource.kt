@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.jsonResponse
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import fi.metatavu.timebank.api.tests.TestData
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
 
@@ -20,7 +21,7 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         WireMock.configureFor("localhost", 8082)
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/system/ping"))
+            WireMock.get(urlEqualTo("/v1/system/ping"))
                 .willReturn(
                     WireMock.aResponse()
                     .withBody("Pong")))
@@ -36,17 +37,17 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun personStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/persons"))
+            WireMock.get(urlEqualTo("/v1/persons"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/persons?active=true"))
+            WireMock.get(urlEqualTo("/v1/persons?active=true"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
+            WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
     }
@@ -56,12 +57,12 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun dailyEntriesStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/dailyEntries"))
+            WireMock.get(urlEqualTo("/v1/dailyEntries"))
                 .willReturn(jsonResponse("[]", 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}"))
+            WireMock.get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}"))
                 .willReturn(jsonResponse("[]", 200))
         )
     }
