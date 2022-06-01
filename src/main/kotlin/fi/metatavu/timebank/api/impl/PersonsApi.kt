@@ -22,7 +22,7 @@ class PersonsApi: PersonsApi, AbstractApi() {
 
     override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
         val entries = personsController.makePersonTotal(personId, timespan ?: Timespan.ALL_TIME)
-        if (entries.isEmpty()) createNotFound("No daily entries found for given person!")
+            ?: return createNotFound("Cannot calculate totals for given person")
         return createOk(entries)
     }
 

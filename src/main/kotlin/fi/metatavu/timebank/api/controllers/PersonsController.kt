@@ -93,8 +93,9 @@ class PersonsController {
      * @param timespan Timespan
      * @return List of PersonTotalTimes
      */
-    suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime> {
+    suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime>? {
         val dailyEntries = dailyEntryController.makeDailyEntries(personId)
+        if (dailyEntries.isEmpty()) return null
         val personTotalTimeList = mutableListOf<PersonTotalTime>()
         when (timespan) {
             Timespan.ALL_TIME -> {
