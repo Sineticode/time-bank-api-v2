@@ -63,7 +63,7 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
 
         wireMockServer.stubFor(
             WireMock.get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}"))
-                .willReturn(jsonResponse("[]", 200))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getDailyEntryA()), 200))
         )
     }
 

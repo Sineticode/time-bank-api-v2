@@ -1,8 +1,7 @@
 package fi.metatavu.timebank.api.tests
 
-import fi.metatavu.timebank.model.DailyEntry
+import fi.metatavu.timebank.api.resources.DailyEntryTestModel
 import fi.metatavu.timebank.model.Person
-import java.time.LocalDate
 
 /**
  * Class for test data that is used by wiremock and tests
@@ -28,15 +27,15 @@ class TestData {
             )
         }
 
-        fun getDailyEntryA(): DailyEntry {
-            return DailyEntry(
+        fun getDailyEntryA(): DailyEntryTestModel {
+            return DailyEntryTestModel(
                 person = 395952,
                 internalTime = 56,
                 projectTime = 144,
                 logged = 200,
                 expected = 200,
                 balance = 200,
-                date = LocalDate.now()
+                date = "2022-05-31"
             )
         }
     }
