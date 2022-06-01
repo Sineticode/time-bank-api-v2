@@ -3,6 +3,7 @@ package fi.metatavu.timebank.api.tests
 import fi.metatavu.timebank.api.resources.TestMockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.keycloak.client.KeycloakTestClient
 import io.restassured.RestAssured.given
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
@@ -19,12 +20,25 @@ class DailyEntriesTest {
      * Tests listing all daily entries
      */
     @Test
-    fun testDailyEntriesEndPoint() {
+    fun testDailyEntriesEndPointWithoutToken() {
         given()
             .contentType("application/json")
-            .`when`().get("/v1/dailyEntries")
+            .`when`().get("http://localhost:8082/v1/dailyEntries")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+
+    @Test
+    fun testDailyEntriesEndpointWithToken() {
+        given().auth().oauth2(getAccesToken("alice"))
+            .`when`().get("http://localhost:8082/v1/dailyEntries")
             .then()
             .statusCode(Response.Status.OK.statusCode)
+    }
+
+    protected fun getAccesToken(userName: String): String {
+        val keycloakClient = KeycloakTestClient()
+        return keycloakClient.getAccessToken(userName)
     }
 
     /**
