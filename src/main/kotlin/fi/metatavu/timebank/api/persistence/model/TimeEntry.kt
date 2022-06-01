@@ -37,9 +37,4 @@ class TimeEntry {
 
     @Column(name = "updatedAt")
     var updatedAt: OffsetDateTime? = null
-
-    @PrePersist
-    fun onCreate() {
-        entryId = UUID.randomUUID()
-    }
 }

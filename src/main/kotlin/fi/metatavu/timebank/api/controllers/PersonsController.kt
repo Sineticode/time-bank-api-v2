@@ -65,8 +65,12 @@ class PersonsController {
      * @return List of Forecast persons
      */
     suspend fun listPersons(active: Boolean?): List<ForecastPerson> {
-        var persons = getPersonsFromForecast()
-        if (active == true) persons = filterActivePersons(persons)
-        return persons
+        val persons = getPersonsFromForecast()
+
+        return if (active == true) {
+            filterActivePersons(persons)
+        } else {
+            persons
+        }
     }
 }
