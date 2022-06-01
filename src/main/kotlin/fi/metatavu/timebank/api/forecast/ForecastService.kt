@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
+import java.time.LocalDate
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
 
@@ -35,12 +36,12 @@ class ForecastService {
                 .addHeader("X-FORECAST-API-KEY", forecastApiKey)
                 .build()
             val response = client.newCall(request).execute()
+            if (response.code() != 200) return null
             response.body()?.string()
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
-
     }
 
     /**
@@ -48,8 +49,28 @@ class ForecastService {
      *
      * @return Response with persons' data
      */
-    fun getPersons(): String? {
+    suspend fun getPersons(): String? {
         return doRequest("/v2/persons")
     }
 
+    /**
+     * Gets time registrations from Forecast
+     *
+     * @OptionalParam date after in YYYY-MM-DD LocalDate
+     * @return Response with time registrations data
+     */
+    suspend fun getTimeEntries(after: LocalDate?): String? {
+        var path = "/v3/time_registrations"
+        if (after != null) path += "?date_after=${after.toString().replace("-", "")}"
+        return doRequest(path)
+    }
+
+    /**
+     * Gets holiday times from Forecast
+     *
+     * @return Response with holiday times data
+     */
+    suspend fun getHolidays(): String? {
+        return doRequest("/v1/holiday_calendar_entries")
+    }
 }

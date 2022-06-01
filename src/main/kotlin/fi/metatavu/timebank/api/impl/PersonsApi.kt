@@ -21,11 +21,17 @@ class PersonsApi: PersonsApi, AbstractApi() {
     lateinit var personsTranslator: PersonsTranslator
 
     override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?): Response {
-        //TODO("Daily entries totals not yet implemented")
-        return createOk()
+        if (loggedUserId == null) return createUnauthorized("Invalid token!")
+        val entries = personsController.makePersonTotal(personId, timespan ?: Timespan.ALL_TIME)
+            ?: return createNotFound("Cannot calculate totals for given person")
+        return createOk(entries)
     }
 
     override suspend fun listPersons(active: Boolean?): Response {
-        return createOk(personsTranslator.translate(personsController.listPersons(active)))
+        if (loggedUserId == null) return createUnauthorized("Invalid token!")
+        val persons = personsController.listPersons(active)
+            ?: return createNotFound("No persons found!")
+        val translatedPersons = personsTranslator.translate(persons)
+        return createOk(translatedPersons)
     }
 }

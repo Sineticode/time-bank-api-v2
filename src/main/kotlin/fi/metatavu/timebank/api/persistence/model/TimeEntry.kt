@@ -6,40 +6,35 @@ import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
-import javax.persistence.PrePersist
-import javax.persistence.Table
 
 /**
  * TimeEntry JPA entity
  */
 @Entity
-@Table(name = "TimeEntry")
 class TimeEntry {
 
     @Id
-    @Column(name = "entryId")
+    @Column
     lateinit var entryId: UUID
 
-    @Column(name = "person")
+    @Column
+    var forecastId: Int? = null
+
+    @Column
     var person: Int? = null
-    
-    @Column(name = "internalTime")
+
+    @Column
     var internalTime: Int? = null
-    
-    @Column(name = "projectTime")
+
+    @Column
     var projectTime: Int? = null
 
-    @Column(name = "date")
+    @Column
     var date: LocalDate? = null
 
-    @Column(name = "createdAt")
+    @Column
     var createdAt: OffsetDateTime? = null
 
-    @Column(name = "updatedAt")
+    @Column
     var updatedAt: OffsetDateTime? = null
-
-    @PrePersist
-    fun onCreate() {
-        entryId = UUID.randomUUID()
-    }
 }
