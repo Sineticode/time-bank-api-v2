@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="timeEntries" author="Ville Juutila">
+        <createTable tableName="TimeEntry">
+            <column name="entryId" type="binary(16)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="forecastId" type="integer" />
+            <column name="person" type="integer" />
+            <column name="internalTime" type="integer" />
+            <column name="projectTime" type="integer" />
+            <column name="date" type="date" />
+            <column name="createdAt" type="datetime" />
+            <column name="updatedAt" type="datetime" />
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

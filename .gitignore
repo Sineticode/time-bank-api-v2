@@ -34,3 +34,6 @@ nb-configuration.xml
 
 # Local environment
 .env
+
+# Dev DB load script
+src/main/resources/import.sql

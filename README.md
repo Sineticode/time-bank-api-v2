@@ -1,5 +1,11 @@
 # time-bank-api-v2 Project
 
+Start a Docker MYSQL image with
+```
+docker run --name quarkus-mysql-dev -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:latest
+
+```
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
