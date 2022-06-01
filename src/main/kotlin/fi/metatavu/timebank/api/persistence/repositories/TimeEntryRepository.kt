@@ -55,17 +55,15 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
      *
      * @return 1 for persisted 0 for not persisted
      */
-    suspend fun persistEntry(entry: TimeEntry): Int {
-        if (find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending().isEmpty()) {
+    suspend fun persistEntry(entry: TimeEntry): Boolean {
+        return if (find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending().isEmpty()) {
             Panache.withTransaction { persist(entry) }.awaitSuspending()
-            return 1
-        }
-        else if (entry.updatedAt!! > entry.createdAt!! && entry.updatedAt!! >= OffsetDateTime.now().minusDays(1)) {
+            true
+        } else if (entry.updatedAt!! > entry.createdAt!! && entry.updatedAt!! >= OffsetDateTime.now().minusDays(1)) {
             deleteEntry(entry.forecastId ?: 1)
             Panache.withTransaction { persist(entry) }.awaitSuspending()
-            return 1
-        }
-        return 0
+            true
+        } else false
     }
 
     /**

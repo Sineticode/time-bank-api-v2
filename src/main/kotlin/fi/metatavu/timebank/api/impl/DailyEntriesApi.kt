@@ -17,8 +17,9 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
     lateinit var dailyEntryController: DailyEntryController
 
     override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
+        if (loggedUserId == null) return createUnauthorized("Invalid token!")
         val entries = dailyEntryController.list(personId, before, after)
-        if (entries.isEmpty()) return createNotFound("No daily entries found!")
+            ?: return createNotFound("No daily entries found!")
         return createOk(entries)
     }
 }

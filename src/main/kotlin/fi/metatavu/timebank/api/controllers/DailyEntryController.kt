@@ -27,7 +27,7 @@ class DailyEntryController {
      * @param timespan span of time to be summed (from query param)
      * @return List of DailyEntries
      */
-    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): List<DailyEntry> {
+    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): List<DailyEntry>? {
         return makeDailyEntries(personId, before, after)
     }
 
@@ -39,10 +39,11 @@ class DailyEntryController {
      * @param after LocalDate
      * @return List of DailyEntries
      */
-    suspend fun makeDailyEntries(personId: Int? = null, before: LocalDate? = null, after: LocalDate? = null): List<DailyEntry> {
-        val persons = personsController.getPersonsFromForecast()
-        val holidays = personsController.getHolidaysFromForecast()
+    suspend fun makeDailyEntries(personId: Int? = null, before: LocalDate? = null, after: LocalDate? = null): List<DailyEntry>? {
+        val persons = personsController.getPersonsFromForecast() ?: return null
+        val holidays = personsController.getHolidaysFromForecast() ?: return null
         val entries = timeEntryRepository.getAllEntries(personId, before, after)
+        if (entries.isEmpty()) return null
         val dailyEntries = mutableListOf<DailyEntry>()
         if (personId != null) {
             val person = persons.find{ person -> person.id == personId }

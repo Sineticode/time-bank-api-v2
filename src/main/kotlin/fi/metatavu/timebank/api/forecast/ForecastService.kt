@@ -36,6 +36,7 @@ class ForecastService {
                 .addHeader("X-FORECAST-API-KEY", forecastApiKey)
                 .build()
             val response = client.newCall(request).execute()
+            if (response.code() != 200) return null
             response.body()?.string()
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")

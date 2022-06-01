@@ -23,13 +23,12 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     lateinit var logger: Logger
 
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
-        var synchronizedEntries = 0
-//        Comment two lines below to synchronize without Keycloak usage
+        if (loggedUserId == null) return createUnauthorized("Invalid token!")
+        var synchronizedEntries: Int? = null
         if (after == null && !isAdmin()) return createUnauthorized("Forbidden to synchronize all time!")
-        else if (isAdmin() || (after != null && after > LocalDate.now().minusDays(1)))synchronizedEntries = synchronizeController.synchronize(after)
-        if (synchronizedEntries == 0) return createBadRequest("Nothing to synchronize!")
-//         Un-comment line below to synchronize without Keycloak usage
-//         synchronizedEntries = synchronizeController.synchronize(after)
+        else if (isAdmin() || (after != null && after >= LocalDate.now().minusDays(1))) synchronizedEntries = synchronizeController.synchronize(after)
+        if (synchronizedEntries == null) return createBadRequest("Something went wrong with attempt to synchronize!")
+        if (synchronizedEntries == 0) return createNotFound("Nothing to synchronize!")
         return createOk("Synchronized $synchronizedEntries entries from Forecast!")
     }
 

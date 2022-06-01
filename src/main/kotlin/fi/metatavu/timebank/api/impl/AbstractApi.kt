@@ -1,10 +1,11 @@
 package fi.metatavu.timebank.api.impl
 
 import io.quarkus.security.identity.SecurityIdentity
+import org.eclipse.microprofile.jwt.JsonWebToken
+import java.util.*
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
 import javax.ws.rs.core.Response
-
 
 /**
  * Abstract base class for all API services
@@ -15,7 +16,23 @@ import javax.ws.rs.core.Response
 abstract class AbstractApi {
 
     @Inject
+    lateinit var jsonWebToken: JsonWebToken
+
+    @Inject
     lateinit var identity: SecurityIdentity
+
+    /**
+     * Returns logged user id
+     *
+     * @return logged user id
+     */
+    protected val loggedUserId: UUID?
+        get() {
+            if (jsonWebToken.subject != null) {
+                return UUID.fromString(jsonWebToken.subject)
+            }
+            return null
+        }
 
     /**
      * Checks if user is manager

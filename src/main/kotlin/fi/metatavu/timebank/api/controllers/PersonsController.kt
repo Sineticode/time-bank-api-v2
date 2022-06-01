@@ -34,9 +34,9 @@ class PersonsController {
      *
      * @return List of ForecastPersons
      */
-    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
+    suspend fun getPersonsFromForecast(): List<ForecastPerson>? {
         return try {
-            val resultString = forecastService.getPersons()
+            val resultString = forecastService.getPersons() ?: return null
             jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
@@ -49,9 +49,9 @@ class PersonsController {
      *
      * @return List of LocalDate
      */
-    suspend fun getHolidaysFromForecast(): List<LocalDate> {
+    suspend fun getHolidaysFromForecast(): List<LocalDate>? {
         return try {
-            val resultString = forecastService.getHolidays()
+            val resultString = forecastService.getHolidays() ?: return null
             val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
             val holidays = mutableListOf<LocalDate>()
             forecastHolidays.map{ holiday ->
@@ -80,10 +80,14 @@ class PersonsController {
      * @param active
      * @return List of Forecast persons
      */
-    suspend fun listPersons(active: Boolean?): List<ForecastPerson> {
+    suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
         var persons = getPersonsFromForecast()
-        if (active == true) persons = filterActivePersons(persons)
-        return persons
+            ?: return null
+        return if (active == true) {
+            filterActivePersons(persons)
+        } else {
+            persons
+        }
     }
 
     /**
@@ -94,8 +98,7 @@ class PersonsController {
      * @return List of PersonTotalTimes
      */
     suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime>? {
-        val dailyEntries = dailyEntryController.makeDailyEntries(personId)
-        if (dailyEntries.isEmpty()) return null
+        val dailyEntries = dailyEntryController.makeDailyEntries(personId) ?: return null
         val personTotalTimeList = mutableListOf<PersonTotalTime>()
         when (timespan) {
             Timespan.ALL_TIME -> {

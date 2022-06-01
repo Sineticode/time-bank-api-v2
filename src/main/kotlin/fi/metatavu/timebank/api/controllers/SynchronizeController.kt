@@ -41,12 +41,10 @@ class SynchronizeController {
      * @param after YYYY-MM-DD LocalDate
      * @return Length of entries synchronized
      */
-    suspend fun synchronize(after: LocalDate?): Int {
-        if (after == null) return -1
-        if (after < LocalDate.now().minusDays(1)) return -1
-        val forecastPersons = personsController.getPersonsFromForecast()
+    suspend fun synchronize(after: LocalDate?): Int? {
+        val forecastPersons = personsController.getPersonsFromForecast() ?: return null
         val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
-        val resultString = forecastService.getTimeEntries(after)
+        val resultString = forecastService.getTimeEntries(after) ?: return null
         val forecastTimeEntries = jacksonObjectMapper().readValue(resultString, Array<ForecastTimeEntry>::class.java).toList()
         val translatedEntries = timeEntryTranslator.translate(forecastTimeEntries)
         var synchronized = 0
@@ -54,9 +52,9 @@ class SynchronizeController {
             val personName =
                 persons.find { person -> person.id == timeEntry.person}?.lastName + ", " + persons.find { person -> person.id == timeEntry.person}?.firstName
             logger.info("Synchronizing TimeEntry ${idx + 1}/${translatedEntries.size} of $personName...")
-            if (timeEntryRepository.persistEntry(timeEntry) == 1) {
-                logger.info("Synchronized TimeEntry #${synchronized + 1}!")
+            if (timeEntryRepository.persistEntry(timeEntry)) {
                 synchronized++
+                logger.info("Synchronized TimeEntry #${synchronized}!")
             }
             else logger.warn("Time Entry ${idx + 1}/${translatedEntries.size} already synchronized!")
         }
