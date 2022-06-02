@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response
 @QuarkusTest
 @QuarkusTestResource(TestMockResource::class)
 
-class SyncTest {
+class SynchronizeTest {
 
     val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
 
