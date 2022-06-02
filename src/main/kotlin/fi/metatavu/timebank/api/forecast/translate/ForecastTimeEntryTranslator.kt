@@ -13,6 +13,12 @@ import javax.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class ForecastTimeEntryTranslator {
 
+    /**
+     * Translates ForecastTimeEntry into TimeEntry
+     *
+     * @param entity ForecastTimeEntry
+     * @return TimeEntry
+     */
     fun translate(entity: ForecastTimeEntry): TimeEntry {
         val translatedTimeEntry = TimeEntry()
         translatedTimeEntry.entryId = UUID.randomUUID()
@@ -26,6 +32,12 @@ class ForecastTimeEntryTranslator {
         return translatedTimeEntry
     }
 
+    /**
+     * Translates list of ForecastTimeEntries
+     *
+     * @param entities list of ForecastTimeEntries to translate
+     * @return List of TimeEntries
+     */
     fun translate(entities: List<ForecastTimeEntry>): List<TimeEntry> {
         return entities.map(this::translate)
     }

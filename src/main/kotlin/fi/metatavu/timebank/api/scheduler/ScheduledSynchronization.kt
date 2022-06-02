@@ -5,8 +5,13 @@ import io.quarkus.scheduler.Scheduled
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import java.time.LocalDate
+import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
+/**
+ * Class for scheduled synchronization
+ */
+@ApplicationScoped
 class ScheduledSynchronization {
 
     @Inject
@@ -15,6 +20,9 @@ class ScheduledSynchronization {
     @Inject
     lateinit var logger: Logger
 
+    /**
+     * Runs synchronization function on cron schedule
+     */
     @Scheduled(cron = "0 15 3 * * ?")
     fun scheduledSynchronization(){
         runBlocking {
