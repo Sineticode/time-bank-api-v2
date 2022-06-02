@@ -18,6 +18,7 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
     private val bearerPattern: StringValuePattern = containing("Bearer")
 
     override fun start(): Map<String, String> {
+        objectMapper.findAndRegisterModules()
         wireMockServer = WireMockServer(8082)
         wireMockServer.start()
         configureFor("localhost", 8082)

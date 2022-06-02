@@ -42,6 +42,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("com.github.tomakehurst:wiremock-jre8:2.33.2")
     testImplementation("io.quarkus:quarkus-test-keycloak-server")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }
 
 group = "fi.metatavu.timebank"
