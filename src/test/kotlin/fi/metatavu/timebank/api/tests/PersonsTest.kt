@@ -22,6 +22,14 @@ class PersonsTest {
      * Tests listing persons
      */
     @Test
+    fun listPersonsWithoutToken() {
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+    @Test
     fun listPersons() {
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
@@ -38,6 +46,14 @@ class PersonsTest {
      * Tests listing active persons
      */
     @Test
+    fun listActivePersonsWithoutToken() {
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons?active=true")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+    @Test
     fun listActivePersons() {
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
@@ -51,6 +67,14 @@ class PersonsTest {
      * Tests listing total time entries of given person
      */
     @Test
+    fun listPersonTotalTimeEntriesWithoutToken() {
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+    @Test
     fun listPersonTotalTimeEntries() {
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
@@ -63,6 +87,15 @@ class PersonsTest {
     /**
      * Tests listing total time entries of given person with timespan of week
      */
+    @Test
+    fun listPersonTotalTimeEntriesForWeekWithoutToken(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+
     @Test
     fun listPersonTotalTimeEntriesForWeek(){
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
@@ -80,6 +113,14 @@ class PersonsTest {
      * Tests listing total time entries of given person with timespan of month
      */
     @Test
+    fun listPersonTotalTimeEntriesForMonthWithoutToken(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
+    @Test
     fun listPersonTotalTimeEntriesForMonth(){
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
@@ -95,6 +136,14 @@ class PersonsTest {
     /**
      * Tests listing total time entries of given person with timespan of year
      */
+    @Test
+    fun listPersonTotalTimeEntriesForYearWithoutToken(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR")
+            .then()
+            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+    }
     @Test
     fun listPersonTotalTimeEntriesForYear(){
         given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))

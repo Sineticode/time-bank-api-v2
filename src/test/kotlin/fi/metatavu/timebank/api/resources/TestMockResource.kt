@@ -38,8 +38,18 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun personStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons"))
+                .willReturn(jsonResponse("[]", 401))
+        )
+
+        wireMockServer.stubFor(
             get(urlEqualTo("/v1/persons")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
+        )
+
+        wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons?active=true"))
+                .willReturn(jsonResponse("[]", 401))
         )
 
         wireMockServer.stubFor(
@@ -48,8 +58,18 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         )
 
         wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
+                .willReturn(jsonResponse("[]", 401))
+        )
+
+        wireMockServer.stubFor(
             get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
+        )
+
+        wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK"))
+                .willReturn(jsonResponse("[]", 401))
         )
 
         wireMockServer.stubFor(
@@ -58,8 +78,18 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         )
 
         wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH"))
+                .willReturn(jsonResponse("[]", 401))
+        )
+
+        wireMockServer.stubFor(
            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanMonth()), 200))
+        )
+
+        wireMockServer.stubFor(
+            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR"))
+                .willReturn(jsonResponse("[]", 401))
         )
 
         wireMockServer.stubFor(
