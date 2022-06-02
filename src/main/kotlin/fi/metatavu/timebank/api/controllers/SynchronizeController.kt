@@ -3,8 +3,10 @@ package fi.metatavu.timebank.api.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
+import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import org.slf4j.Logger
 import java.time.LocalDate
@@ -43,16 +45,29 @@ class SynchronizeController {
      */
     suspend fun synchronize(after: LocalDate?): Int? {
         return try {
-            val forecastPersons = personsController.getPersonsFromForecast()
-            val resultString = forecastService.getTimeEntries(after)
-
-            if (forecastPersons.isNullOrEmpty() || resultString.isNullOrEmpty()) {
-                return null
-            }
+            val forecastPersons = personsController.getPersonsFromForecast() ?: return null
 
             val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
-            val forecastTimeEntries = jacksonObjectMapper().readValue(resultString, Array<ForecastTimeEntry>::class.java).toList()
-            val translatedEntries = forecastTimeEntryTranslator.translate(forecastTimeEntries)
+
+            var retrievedAllEntries = false
+            val translatedEntries = mutableListOf<TimeEntry>()
+            var pageNumber = 1
+
+            while (!retrievedAllEntries){
+                val resultString = forecastService.getTimeEntries(after, pageNumber)
+                val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
+                val amountOfPages =
+                    if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
+                    else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
+                logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
+                if (forecastTimeEntryResponse.pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
+                    pageNumber++
+                } else {
+                    retrievedAllEntries = true
+                }
+                val entries = forecastTimeEntryTranslator.translate(forecastTimeEntryResponse.pageContents!!)
+                entries.forEach{ entry -> translatedEntries.add(entry)}
+            }
 
             var synchronized = 0
 
