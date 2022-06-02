@@ -29,6 +29,7 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
 
         personStubs(wireMockServer)
         dailyEntriesStubs(wireMockServer)
+        synchronizeStubs(wireMockServer)
 
         return mapOf(Pair("forecast.base.url", wireMockServer.baseUrl()))
     }
@@ -115,6 +116,21 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         wireMockServer.stubFor(
             get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getDailyEntryA()), 200))
+        )
+    }
+
+    /**
+     * Stubs for synchronization functionality
+     */
+    private fun synchronizeStubs (wireMockServer: WireMockServer) {
+        wireMockServer.stubFor(
+            post(urlEqualTo("/v1/synchronize"))
+                .willReturn(jsonResponse("[]", 401))
+        )
+
+        wireMockServer.stubFor(
+            post(urlEqualTo("/v1/synchronize")).withHeader(authHeader, bearerPattern)
+                .willReturn(jsonResponse("[]", 200))
         )
     }
 
