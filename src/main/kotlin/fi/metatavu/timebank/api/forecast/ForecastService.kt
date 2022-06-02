@@ -36,7 +36,6 @@ class ForecastService {
                 .addHeader("X-FORECAST-API-KEY", forecastApiKey)
                 .build()
             val response = client.newCall(request).execute()
-            if (response.code() != 200) return null
             response.body()?.string()
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
@@ -49,7 +48,7 @@ class ForecastService {
      *
      * @return Response with persons' data
      */
-    suspend fun getPersons(): String? {
+    fun getPersons(): String? {
         return doRequest("/v2/persons")
     }
 
@@ -59,9 +58,9 @@ class ForecastService {
      * @OptionalParam date after in YYYY-MM-DD LocalDate
      * @return Response with time registrations data
      */
-    suspend fun getTimeEntries(after: LocalDate?): String? {
+    fun getTimeEntries(after: LocalDate?): String? {
         var path = "/v3/time_registrations"
-        if (after != null) path += "?date_after=${after.toString().replace("-", "")}"
+        if (after != null) path += "?updated_after=${after.toString().replace("-", "")}T000000"
         return doRequest(path)
     }
 
@@ -70,7 +69,7 @@ class ForecastService {
      *
      * @return Response with holiday times data
      */
-    suspend fun getHolidays(): String? {
+    fun getHolidays(): String? {
         return doRequest("/v1/holiday_calendar_entries")
     }
 }

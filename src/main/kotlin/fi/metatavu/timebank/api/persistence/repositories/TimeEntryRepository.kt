@@ -3,6 +3,7 @@ package fi.metatavu.timebank.api.persistence.repositories
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
+import io.quarkus.panache.common.Parameters
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -17,53 +18,56 @@ import javax.enterprise.context.ApplicationScoped
 class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
-     * Lists all dailyEntries
+     * Lists all timeEntries
      *
-     * @return List of DailyEntries
+     * @param personId persons id in Forecast
+     * @param before LocalDate to retrieve entries before given date
+     * @param after LocalDate to retrieve entries after given date
+     * @return List of timeEntries
      */
-    suspend fun getAllEntries(personId: Int? = null, before: LocalDate? = null, after: LocalDate? = null): List<TimeEntry> {
-        var queryString: String? = null
-        val beforeOdt: OffsetDateTime? = before?.atStartOfDay(ZoneId.of("Europe/Helsinki"))?.toOffsetDateTime()
-        val afterOdt: OffsetDateTime? = after?.atStartOfDay(ZoneId.of("Europe/Helsinki"))?.toOffsetDateTime()
-        if (personId != null && before == null && after == null) {
-            queryString = "person = $personId order by date DESC"
+    suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry> {
+        val stringBuilder = StringBuilder()
+        val parameters = Parameters()
+
+        if (personId != null) {
+            stringBuilder.append("person = :personId")
+            parameters.and("personId", personId)
         }
-        else if (personId == null &&  before != null && after == null) {
-            queryString = "date < '$beforeOdt' order by date DESC"
+
+        if (before != null) {
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date < :before" else "date < :before")
+            parameters.and("before", before)
         }
-        else if (personId == null && before == null && after != null) {
-            queryString = "date > '$afterOdt' order by date DESC"
+
+        if (after != null) {
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date > :after" else "date > :after")
+            parameters.and("after", after)
         }
-        else if (personId == null && before != null) {
-            queryString = "date < '$beforeOdt' and date > '$afterOdt' order by date DESC"
-        }
-        else if (personId != null && before != null && after == null) {
-            queryString = "person = $personId and date < '$beforeOdt' order by date DESC"
-        }
-        else if (personId != null && before == null) {
-            queryString = "person = $personId and date > '$afterOdt' order by date DESC"
-        }
-        else if (personId != null) {
-            queryString = "person = $personId and date < '$beforeOdt' and date > '$afterOdt' order by date DESC"
-        }
-        if (queryString != null) return find(queryString).list<TimeEntry>().awaitSuspending()
-        return list("order by date DESC").awaitSuspending()
+
+        stringBuilder.append(" order by date DESC")
+
+        return find(stringBuilder.toString(), parameters).list<TimeEntry>().awaitSuspending()
     }
 
     /**
      * Persists new TimeEntry
      *
-     * @return 1 for persisted 0 for not persisted
+     * @return true for persisted false for not persisted
      */
     suspend fun persistEntry(entry: TimeEntry): Boolean {
-        return if (find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending().isEmpty()) {
+
+        if (find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending().isEmpty()) {
             Panache.withTransaction { persist(entry) }.awaitSuspending()
-            true
-        } else if (entry.updatedAt!! > entry.createdAt!! && entry.updatedAt!! >= OffsetDateTime.now().minusDays(1)) {
+            return true
+        }
+
+        if (entry.updatedAt!! > entry.createdAt!! && entry.updatedAt!! >= OffsetDateTime.now().minusDays(1)) {
             deleteEntry(entry.forecastId ?: 1)
             Panache.withTransaction { persist(entry) }.awaitSuspending()
-            true
-        } else false
+            return true
+        }
+
+        return false
     }
 
     /**

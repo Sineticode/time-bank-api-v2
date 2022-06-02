@@ -53,11 +53,9 @@ class PersonsController {
         return try {
             val resultString = forecastService.getHolidays() ?: return null
             val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
-            val holidays = mutableListOf<LocalDate>()
             forecastHolidays.map{ holiday ->
-                holidays.add(LocalDate.of(holiday.year, holiday.month, holiday.day))
+                LocalDate.of(holiday.year, holiday.month, holiday.day)
             }
-            holidays
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -81,8 +79,8 @@ class PersonsController {
      * @return List of Forecast persons
      */
     suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
-        var persons = getPersonsFromForecast()
-            ?: return null
+        val persons = getPersonsFromForecast() ?: return null
+
         return if (active == true) {
             filterActivePersons(persons)
         } else {
@@ -98,30 +96,29 @@ class PersonsController {
      * @return List of PersonTotalTimes
      */
     suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime>? {
-        val dailyEntries = dailyEntryController.makeDailyEntries(personId) ?: return null
-        val personTotalTimeList = mutableListOf<PersonTotalTime>()
-        when (timespan) {
+        val dailyEntries = dailyEntryController.makeDailyEntries(personId, null, null) ?: return null
+
+        return when (timespan) {
             Timespan.ALL_TIME -> {
-                personTotalTimeList.add(calculatePersonTotalTime(personId, dailyEntries, timespan))
+                listOf(calculatePersonTotalTime(personId, dailyEntries, timespan))
             }
             Timespan.YEAR -> {
-                dailyEntries.groupBy{ it.date.year }.values.toList().forEach{ year ->
-                    personTotalTimeList.add(calculatePersonTotalTime(personId, year, timespan))
+                dailyEntries.groupBy{ it.date.year }.values.map{ year ->
+                    calculatePersonTotalTime(personId, year, timespan)
                 }
             }
             Timespan.MONTH -> {
-                dailyEntries.groupBy{ Pair(it.date.year, it.date.monthValue) }.values.toList().forEach{ month ->
-                    personTotalTimeList.add(calculatePersonTotalTime(personId, month, timespan))
+                dailyEntries.groupBy{ Pair(it.date.year, it.date.monthValue) }.values.map{ month ->
+                    calculatePersonTotalTime(personId, month, timespan)
                 }
             }
             Timespan.WEEK -> {
                 val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
-                dailyEntries.groupBy{ Pair(it.date.year, it.date.get(weekOfYear)) }.values.toList().forEach{ week ->
-                    personTotalTimeList.add(calculatePersonTotalTime(personId,week, timespan))
+                dailyEntries.groupBy{ Pair(it.date.year, it.date.get(weekOfYear)) }.values.map{ week ->
+                    calculatePersonTotalTime(personId, week, timespan)
                 }
             }
         }
-        return personTotalTimeList
     }
 
     /**
