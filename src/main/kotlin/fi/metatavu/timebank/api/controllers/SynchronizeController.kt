@@ -3,7 +3,7 @@ package fi.metatavu.timebank.api.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
-import fi.metatavu.timebank.api.impl.translate.TimeEntryTranslator
+import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import org.slf4j.Logger
@@ -27,7 +27,7 @@ class SynchronizeController {
     lateinit var forecastService: ForecastService
 
     @Inject
-    lateinit var timeEntryTranslator: TimeEntryTranslator
+    lateinit var forecastTimeEntryTranslator: ForecastTimeEntryTranslator
 
     @Inject
     lateinit var personsTranslator: PersonsTranslator
@@ -42,23 +42,38 @@ class SynchronizeController {
      * @return Length of entries synchronized
      */
     suspend fun synchronize(after: LocalDate?): Int? {
-        val forecastPersons = personsController.getPersonsFromForecast() ?: return null
-        val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
-        val resultString = forecastService.getTimeEntries(after) ?: return null
-        val forecastTimeEntries = jacksonObjectMapper().readValue(resultString, Array<ForecastTimeEntry>::class.java).toList()
-        val translatedEntries = timeEntryTranslator.translate(forecastTimeEntries)
-        var synchronized = 0
-        translatedEntries.forEachIndexed { idx, timeEntry ->
-            val personName =
-                persons.find { person -> person.id == timeEntry.person}?.lastName + ", " + persons.find { person -> person.id == timeEntry.person}?.firstName
-            logger.info("Synchronizing TimeEntry ${idx + 1}/${translatedEntries.size} of $personName...")
-            if (timeEntryRepository.persistEntry(timeEntry)) {
-                synchronized++
-                logger.info("Synchronized TimeEntry #${synchronized}!")
+        return try {
+            val forecastPersons = personsController.getPersonsFromForecast()
+            val resultString = forecastService.getTimeEntries(after)
+
+            if (forecastPersons.isNullOrEmpty() || resultString.isNullOrEmpty()) {
+                return null
             }
-            else logger.warn("Time Entry ${idx + 1}/${translatedEntries.size} already synchronized!")
+
+            val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
+            val forecastTimeEntries = jacksonObjectMapper().readValue(resultString, Array<ForecastTimeEntry>::class.java).toList()
+            val translatedEntries = forecastTimeEntryTranslator.translate(forecastTimeEntries)
+
+            var synchronized = 0
+
+            translatedEntries.forEachIndexed { idx, timeEntry ->
+                val person = persons.find { person -> person.id == timeEntry.person }
+                val personName = "${person?.lastName}, ${person?.firstName}"
+                logger.info("Synchronizing TimeEntry ${idx + 1}/${translatedEntries.size} of $personName...")
+
+                if (timeEntryRepository.persistEntry(timeEntry)) {
+                    synchronized++
+                    logger.info("Synchronized TimeEntry #${synchronized}!")
+                } else {
+                    logger.warn("Time Entry ${idx + 1}/${translatedEntries.size} already synchronized!")
+                }
+            }
+
+            synchronized
+        } catch (e: Error) {
+            logger.error(e.localizedMessage)
+            null
         }
-        return synchronized
     }
 
 }

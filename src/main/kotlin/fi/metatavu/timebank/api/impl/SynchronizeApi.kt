@@ -23,23 +23,26 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     lateinit var logger: Logger
 
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
-        if (loggedUserId == null) return createUnauthorized("Invalid token!")
-        var synchronizedEntries: Int? = null
-        if (after == null && !isAdmin()) return createUnauthorized("Forbidden to synchronize all time!")
-        else if (isAdmin() || (after != null && after >= LocalDate.now().minusDays(1))) synchronizedEntries = synchronizeController.synchronize(after)
-        if (synchronizedEntries == null) return createBadRequest("Something went wrong with attempt to synchronize!")
-        if (synchronizedEntries == 0) return createNotFound("Nothing to synchronize!")
-        return createOk("Synchronized $synchronizedEntries entries from Forecast!")
-    }
+        loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
-    @Scheduled(cron = "0 15 3 * * ?")
-    fun scheduledSynchronization(){
-        runBlocking {
-            val afterDate = LocalDate.now().minusDays(1)
-            logger.info("[${LocalDate.now()}] Scheduled synchronization starting with...")
-            val synchronizedEntries = synchronizeController.synchronize(afterDate)
-            logger.info("Synchronized $synchronizedEntries entries from Forecast!")
+        if (after == null && !isAdmin()) {
+            return createUnauthorized(message = "Forbidden to synchronize all time!")
         }
-    }
 
+        var synchronizedEntries: Int? = null
+
+        if (isAdmin() || (after != null && after >= LocalDate.now().minusDays(1))) {
+            synchronizedEntries = synchronizeController.synchronize(after)
+        }
+
+        if (synchronizedEntries == null) {
+            return createBadRequest(message = "Something went wrong with attempt to synchronize!")
+        }
+
+        if (synchronizedEntries == 0){
+            return createNotFound(message = "Nothing to synchronize!")
+        }
+
+        return createOk(entity = "Synchronized $synchronizedEntries entries from Forecast!")
+    }
 }

@@ -1,4 +1,4 @@
-package fi.metatavu.timebank.api.impl.translate
+package fi.metatavu.timebank.api.forecast.translate
 
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
@@ -8,12 +8,12 @@ import java.util.*
 import javax.enterprise.context.ApplicationScoped
 
 /**
- * Translates ForecastTimeEntry object to DailyEntry object
+ * Translates ForecastTimeEntry object to persistable TimeEntry object
  */
 @ApplicationScoped
-class TimeEntryTranslator: AbstractTranslator<ForecastTimeEntry, TimeEntry>() {
+class ForecastTimeEntryTranslator {
 
-    override fun translate(entity: ForecastTimeEntry): TimeEntry {
+    fun translate(entity: ForecastTimeEntry): TimeEntry {
         val translatedTimeEntry = TimeEntry()
         translatedTimeEntry.entryId = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
@@ -26,9 +26,7 @@ class TimeEntryTranslator: AbstractTranslator<ForecastTimeEntry, TimeEntry>() {
         return translatedTimeEntry
     }
 
-    override fun translate(entities: List<ForecastTimeEntry>): List<TimeEntry> {
+    fun translate(entities: List<ForecastTimeEntry>): List<TimeEntry> {
         return entities.map(this::translate)
     }
-
 }
-
