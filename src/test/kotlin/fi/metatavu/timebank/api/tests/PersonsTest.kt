@@ -65,7 +65,7 @@ class PersonsTest {
      */
     @Test
     fun listPersonTotalTimeEntriesForWeek(){
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK")
             .then()
@@ -81,7 +81,7 @@ class PersonsTest {
      */
     @Test
     fun listPersonTotalTimeEntriesForMonth(){
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")
             .then()
@@ -97,7 +97,7 @@ class PersonsTest {
      */
     @Test
     fun listPersonTotalTimeEntriesForYear(){
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR")
             .then()
