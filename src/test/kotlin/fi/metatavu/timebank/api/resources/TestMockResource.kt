@@ -50,6 +50,21 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
             WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
+
+        wireMockServer.stubFor(
+            WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanWeek()), 200))
+        )
+
+        wireMockServer.stubFor(
+            WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanMonth()), 200))
+        )
+
+        wireMockServer.stubFor(
+            WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanYear()), 200))
+        )
     }
 
     /**

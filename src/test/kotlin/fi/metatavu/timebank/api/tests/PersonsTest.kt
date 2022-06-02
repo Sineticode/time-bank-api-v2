@@ -56,4 +56,52 @@ class PersonsTest {
             .statusCode(Response.Status.OK.statusCode)
             .body("id", equalTo(TestData.getPersonA().id))
     }
+
+    /**
+     * Tests listing total time entries of given person with timespan of week
+     */
+    @Test
+    fun listPersonTotalTimeEntriesForWeek(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+            .body("personId", equalTo(TestData.getTotalTimespanWeek().personId))
+            .body("year", equalTo(TestData.getTotalTimespanWeek().year))
+            .body("monthNumber", equalTo(TestData.getTotalTimespanWeek().monthNumber))
+            .body("weekNumber", equalTo(TestData.getTotalTimespanWeek().weekNumber))
+    }
+
+    /**
+     * Tests listing total time entries of given person with timespan of month
+     */
+    @Test
+    fun listPersonTotalTimeEntriesForMonth(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+            .body("personId", equalTo(TestData.getTotalTimespanMonth().personId))
+            .body("year", equalTo(TestData.getTotalTimespanMonth().year))
+            .body("monthNumber", equalTo(TestData.getTotalTimespanMonth().monthNumber))
+            .body("weekNumber", equalTo(TestData.getTotalTimespanMonth().weekNumber))
+    }
+
+    /**
+     * Tests listing total time entries of given person with timespan of year
+     */
+    @Test
+    fun listPersonTotalTimeEntriesForYear(){
+        given()
+            .contentType("application/json")
+            .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR")
+            .then()
+            .statusCode(Response.Status.OK.statusCode)
+            .body("personId", equalTo(TestData.getTotalTimespanYear().personId))
+            .body("year", equalTo(TestData.getTotalTimespanYear().year))
+            .body("monthNumber", equalTo(TestData.getTotalTimespanYear().monthNumber))
+            .body("weekNumber", equalTo(TestData.getTotalTimespanYear().weekNumber))
+    }
 }

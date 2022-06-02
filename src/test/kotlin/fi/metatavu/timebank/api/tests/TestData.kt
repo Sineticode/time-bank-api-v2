@@ -2,6 +2,7 @@ package fi.metatavu.timebank.api.tests
 
 import fi.metatavu.timebank.api.resources.DailyEntryTestModel
 import fi.metatavu.timebank.model.Person
+import fi.metatavu.timebank.model.PersonTotalTime
 
 /**
  * Class for test data that is used by wiremock and tests
@@ -36,6 +37,45 @@ class TestData {
                 expected = 200,
                 balance = 200,
                 date = "2022-05-31"
+            )
+        }
+        fun getTotalTimespanWeek(): PersonTotalTime {
+            return PersonTotalTime(
+                balance = 150,
+                logged = 250,
+                internalTime = 100,
+                projectTime = 150,
+                expected =  500,
+                personId = 395952,
+                year = 2022,
+                monthNumber = 5,
+                weekNumber = 22
+            )
+        }
+        fun getTotalTimespanMonth(): PersonTotalTime {
+            return PersonTotalTime(
+                balance = 150,
+                logged = 250,
+                internalTime = 100,
+                projectTime = 150,
+                expected =  500,
+                personId = 395952,
+                year = 2022,
+                monthNumber = 5,
+                weekNumber = null
+            )
+        }
+        fun getTotalTimespanYear(): PersonTotalTime {
+            return PersonTotalTime(
+                balance = 150,
+                logged = 250,
+                internalTime = 100,
+                projectTime = 150,
+                expected =  500,
+                personId = 395952,
+                year = 2022,
+                monthNumber = null,
+                weekNumber = null
             )
         }
     }
