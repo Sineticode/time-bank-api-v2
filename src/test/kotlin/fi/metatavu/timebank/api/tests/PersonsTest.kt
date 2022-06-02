@@ -1,5 +1,6 @@
 package fi.metatavu.timebank.api.tests
 
+import fi.metatavu.timebank.api.resources.AccessTokenProvider
 import fi.metatavu.timebank.api.resources.TestMockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
@@ -15,12 +16,14 @@ import javax.ws.rs.core.Response
 @QuarkusTestResource(TestMockResource::class)
 class PersonsTest {
 
+    val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
+
     /**
      * Tests listing persons
      */
     @Test
     fun listPersons() {
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons")
             .then()
@@ -36,7 +39,7 @@ class PersonsTest {
      */
     @Test
     fun listActivePersons() {
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons?active=true")
             .then()
@@ -49,7 +52,7 @@ class PersonsTest {
      */
     @Test
     fun listPersonTotalTimeEntries() {
-        given()
+        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
             .contentType("application/json")
             .`when`().get("http://localhost:8082/v1/persons/${TestData.getPersonA().id}/total")
             .then()

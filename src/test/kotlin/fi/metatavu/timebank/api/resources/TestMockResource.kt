@@ -2,9 +2,8 @@ package fi.metatavu.timebank.api.resources
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.jsonResponse
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import fi.metatavu.timebank.api.tests.TestData
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
 
@@ -15,15 +14,17 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
     private lateinit var wireMockServer: WireMockServer
     private val objectMapper = ObjectMapper()
 
+    private val authHeader = "Authorization"
+    private val bearerPattern: StringValuePattern = containing("Bearer")
+
     override fun start(): Map<String, String> {
         wireMockServer = WireMockServer(8082)
         wireMockServer.start()
-        WireMock.configureFor("localhost", 8082)
+        configureFor("localhost", 8082)
 
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/system/ping"))
-                .willReturn(
-                    WireMock.aResponse()
+            get(urlEqualTo("/v1/system/ping")).withHeader(authHeader, bearerPattern)
+                .willReturn(aResponse()
                     .withBody("Pong")))
 
         personStubs(wireMockServer)
@@ -37,17 +38,17 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun personStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/persons"))
+            get(urlEqualTo("/v1/persons")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/persons?active=true"))
+           get(urlEqualTo("/v1/persons?active=true")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
+            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
         )
     }
@@ -57,12 +58,17 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun dailyEntriesStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/dailyEntries"))
+            get(urlEqualTo("/v1/dailyEntries"))
+                .willReturn(jsonResponse("[]", 401))
+        )
+
+        wireMockServer.stubFor(
+            get(urlEqualTo("/v1/dailyEntries")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse("[]", 200))
         )
 
         wireMockServer.stubFor(
-            WireMock.get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}"))
+            get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}")).withHeader(authHeader, bearerPattern)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getDailyEntryA()), 200))
         )
     }
