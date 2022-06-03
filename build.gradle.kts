@@ -32,17 +32,21 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
-    implementation("com.squareup.okhttp3:okhttp:4.5.0")
+    implementation("com.squareup.okhttp3:okhttp")
     implementation("io.quarkus:quarkus-liquibase")
     implementation("io.quarkus:quarkus-scheduler")
     implementation("io.quarkus:quarkus-keycloak-authorization")
     implementation("io.quarkus:quarkus-oidc")
+    implementation("io.quarkus:quarkus-jdbc-mysql")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("com.github.tomakehurst:wiremock-jre8:2.33.2")
     testImplementation("io.quarkus:quarkus-test-keycloak-server")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    testImplementation("org.testcontainers:testcontainers:1.17.2")
+    testImplementation("org.testcontainers:mysql:1.17.2")
+    testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
 }
 
 group = "fi.metatavu.timebank"
@@ -55,6 +59,9 @@ java {
 
 sourceSets["main"].java {
     srcDir("build/generated/api-spec/src/main/kotlin")
+}
+sourceSets["test"].java {
+    srcDir("build/generated/api-client/src/main/kotlin")
 }
 
 allOpen {
@@ -73,9 +80,9 @@ val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
     setProperty("generatorName", "kotlin-server")
     setProperty("inputSpec",  "$rootDir/time-bank-api-spec/swagger.yaml")
     setProperty("outputDir", "$buildDir/generated/api-spec")
-    setProperty("apiPackage", "fi.metatavu.timebank.spec")
-    setProperty("invokerPackage", "fi.metatavu.timebank.invoker")
-    setProperty("modelPackage", "fi.metatavu.timebank.model")
+    setProperty("apiPackage", "${project.group}.spec")
+    setProperty("invokerPackage", "${project.group}.invoker")
+    setProperty("modelPackage", "${project.group}.model")
 
     this.configOptions.put("library", "jaxrs-spec")
     this.configOptions.put("dateLibrary", "java8")
@@ -85,5 +92,15 @@ val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
     this.configOptions.put("returnResponse", "true")
     this.configOptions.put("useSwaggerAnnotations", "false")
     this.configOptions.put("additionalModelTypeAnnotations", "@io.quarkus.runtime.annotations.RegisterForReflection")
+}
 
+val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
+    setProperty("generatorName", "kotlin")
+    setProperty("library", "jvm-okhttp3")
+    setProperty("inputSpec",  "$rootDir/time-bank-api-spec/swagger.yaml")
+    setProperty("outputDir", "$buildDir/generated/api-client")
+    setProperty("packageName", "${project.group}.test.client")
+    this.configOptions.put("dateLibrary", "string")
+    this.configOptions.put("collectionType", "array")
+    this.configOptions.put("serializationLibrary", "jackson")
 }

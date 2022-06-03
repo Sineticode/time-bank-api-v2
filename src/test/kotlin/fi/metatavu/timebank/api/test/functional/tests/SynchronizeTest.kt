@@ -1,7 +1,7 @@
-package fi.metatavu.timebank.api.tests
+package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.resources.AccessTokenProvider
-import fi.metatavu.timebank.api.resources.TestMockResource
+import fi.metatavu.timebank.api.test.functional.resources.AccessTokenProvider
+import fi.metatavu.timebank.api.test.functional.resources.TestMockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given

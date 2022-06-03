@@ -1,4 +1,4 @@
-package fi.metatavu.timebank.api.tests
+package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Person

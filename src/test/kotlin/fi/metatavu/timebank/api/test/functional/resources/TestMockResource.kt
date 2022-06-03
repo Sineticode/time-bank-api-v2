@@ -1,10 +1,10 @@
-package fi.metatavu.timebank.api.resources
+package fi.metatavu.timebank.api.test.functional.resources
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
-import fi.metatavu.timebank.api.tests.TestData
+import fi.metatavu.timebank.api.test.functional.tests.TestData
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
 
 /**

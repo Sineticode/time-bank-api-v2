@@ -1,4 +1,4 @@
-package fi.metatavu.timebank.api.resources
+package fi.metatavu.timebank.api.test.functional.resources
 
 import io.quarkus.test.keycloak.client.KeycloakTestClient
 
