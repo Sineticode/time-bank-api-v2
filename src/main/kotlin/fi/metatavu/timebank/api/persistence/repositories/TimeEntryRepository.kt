@@ -52,6 +52,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     /**
      * Persists new TimeEntry
      *
+     * @param entry TimeEntry
      * @return true for persisted false for not persisted
      */
     suspend fun persistEntry(entry: TimeEntry): Boolean {
@@ -72,6 +73,8 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
      * Deletes persisted TimeEntry
+     *
+     * @param forecastId id of time registration in Forecast
      */
     suspend fun deleteEntry(forecastId: Int) {
         Panache.withTransaction { delete("forecastId", forecastId) }.awaitSuspending()

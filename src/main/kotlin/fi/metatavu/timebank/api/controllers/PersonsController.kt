@@ -137,6 +137,7 @@ class PersonsController {
         var year: Int? = null
         var month: Int? = null
         var week: Int? = null
+
         days.forEach{ day ->
             internalTime += day.internalTime
             projectTime += day.projectTime
@@ -145,6 +146,7 @@ class PersonsController {
             month = if (timespan == Timespan.MONTH || timespan == Timespan.WEEK) day.date.monthValue else null
             week = if (timespan == Timespan.WEEK) day.date.get(weekOfYear) else null
         }
+
         return PersonTotalTime(
             balance = internalTime + projectTime - expected,
             logged = internalTime + projectTime,

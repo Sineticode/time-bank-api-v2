@@ -58,9 +58,10 @@ class ForecastService {
      * @OptionalParam date after in YYYY-MM-DD LocalDate
      * @return Response with time registrations data
      */
-    fun getTimeEntries(after: LocalDate?): String? {
-        var path = "/v3/time_registrations"
-        if (after != null) path += "?updated_after=${after.toString().replace("-", "")}T000000"
+    fun getTimeEntries(after: LocalDate?, pageNumber: Int): String? {
+        var path = "/v4/time_registrations"
+        if (after != null) path += "/updated_after/${after.toString().replace("-", "")}T000000"
+        path = "$path?pageSize=1000&pageNumber=$pageNumber"
         return doRequest(path)
     }
 

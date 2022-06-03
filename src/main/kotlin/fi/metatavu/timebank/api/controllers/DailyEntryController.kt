@@ -124,6 +124,7 @@ class DailyEntryController {
             DayOfWeek.FRIDAY -> person.friday
             DayOfWeek.SATURDAY -> person.saturday
             DayOfWeek.SUNDAY -> person.sunday
+            else -> throw Error("An unexpected date!")
         }
     }
 }
