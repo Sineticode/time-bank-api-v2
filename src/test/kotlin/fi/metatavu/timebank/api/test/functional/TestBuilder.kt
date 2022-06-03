@@ -11,7 +11,7 @@ import org.eclipse.microprofile.config.ConfigProvider
 
 class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
 
-    var manager = createTestBuilderAuthentication("alice", "alice")
+    var manager = createTestBuilderAuthentication("manager", "test")
 
     override fun createTestBuilderAuthentication(
         abstractTestBuilder: AbstractTestBuilder<ApiClient, AccessTokenProvider>,

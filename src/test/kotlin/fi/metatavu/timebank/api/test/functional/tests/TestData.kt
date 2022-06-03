@@ -4,6 +4,7 @@ import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.PersonTotalTime
 import java.time.LocalDate
+import kotlin.random.Random
 
 /**
  * Class for test data that is used by wiremock and tests
@@ -11,6 +12,9 @@ import java.time.LocalDate
 class TestData {
     companion object{
 
+        fun getPersons(): List<Person> {
+            return listOf(getPersonA())
+        }
         fun getPersonA(): Person {
             return Person(
                 id = 395952,

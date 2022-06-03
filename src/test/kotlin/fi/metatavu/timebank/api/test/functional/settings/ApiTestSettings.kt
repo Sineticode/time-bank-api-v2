@@ -14,6 +14,6 @@ class ApiTestSettings {
          * Return API service base path
          */
         val apiBasePath: String
-        get() = "http://localhost:8081"
+        get() = "http://localhost:8082"
     }
 }

@@ -18,37 +18,37 @@ class DailyEntriesTest {
 
     val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
 
-    /**
-     * Tests listing all daily entries
-     */
-    @Test
-    fun testDailyEntriesEndPointWithoutToken() {
-        given()
-            .contentType("application/json")
-            .`when`().get("http://localhost:8082/v1/dailyEntries")
-            .then()
-            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
-    }
-
-    @Test
-    fun testDailyEntriesEndpointWithToken() {
-        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
-            .`when`().get("http://localhost:8082/v1/dailyEntries")
-            .then()
-            .statusCode(Response.Status.OK.statusCode)
-    }
-
-    /**
-     * Tests listing all daily entries for specific person
-     */
-    @Test
-    fun testDailyEntriesEndPointForPerson() {
-        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
-            .contentType("application/json")
-            .`when`().get("http://localhost:8082/v1/dailyEntries?personId=${TestData.getPersonA().id}")
-            .then()
-            .statusCode(Response.Status.OK.statusCode)
-            .body("person", equalTo(TestData.getPersonA().id))
-    }
+//    /**
+//     * Tests listing all daily entries
+//     */
+//    @Test
+//    fun testDailyEntriesEndPointWithoutToken() {
+//        given()
+//            .contentType("application/json")
+//            .`when`().get("http://localhost:8082/v1/dailyEntries")
+//            .then()
+//            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+//    }
+//
+//    @Test
+//    fun testDailyEntriesEndpointWithToken() {
+//        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
+//            .`when`().get("http://localhost:8082/v1/dailyEntries")
+//            .then()
+//            .statusCode(Response.Status.OK.statusCode)
+//    }
+//
+//    /**
+//     * Tests listing all daily entries for specific person
+//     */
+//    @Test
+//    fun testDailyEntriesEndPointForPerson() {
+//        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
+//            .contentType("application/json")
+//            .`when`().get("http://localhost:8082/v1/dailyEntries?personId=${TestData.getPersonA().id}")
+//            .then()
+//            .statusCode(Response.Status.OK.statusCode)
+//            .body("person", equalTo(TestData.getPersonA().id))
+//    }
 
   }

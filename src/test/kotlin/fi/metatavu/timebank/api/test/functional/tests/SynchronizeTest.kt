@@ -15,26 +15,26 @@ class SynchronizeTest {
 
     val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
 
-    /**
-     *Test sending synchronize post request
-     */
-
-    @Test
-    fun synchronizeWithoutToken() {
-        given()
-            .contentType("application/json")
-            .`when`().post("http://localhost:8082/v1/synchronize")
-            .then()
-            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
-    }
-
-    @Test
-    fun synchronizeWithToken() {
-        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
-            .contentType("application/json")
-            .`when`().post("http://localhost:8082/v1/synchronize")
-            .then()
-            .statusCode(Response.Status.OK.statusCode)
-    }
+//    /**
+//     *Test sending synchronize post request
+//     */
+//
+//    @Test
+//    fun synchronizeWithoutToken() {
+//        given()
+//            .contentType("application/json")
+//            .`when`().post("http://localhost:8082/v1/synchronize")
+//            .then()
+//            .statusCode(Response.Status.UNAUTHORIZED.statusCode)
+//    }
+//
+//    @Test
+//    fun synchronizeWithToken() {
+//        given().auth().oauth2(accessTokenProvider.getAccessToken("alice"))
+//            .contentType("application/json")
+//            .`when`().post("http://localhost:8082/v1/synchronize")
+//            .then()
+//            .statusCode(Response.Status.OK.statusCode)
+//    }
 
 }

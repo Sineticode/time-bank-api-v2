@@ -12,15 +12,15 @@ import org.junit.jupiter.api.Test
 @QuarkusTest
 class SystemTest {
 
-    val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
-
-    @Test
-    fun testPingEndpoint() {
-        given()
-            .contentType("application/json").auth().oauth2(accessTokenProvider.getAccessToken("alice"))
-            .`when`().get("http://localhost:8082/v1/system/ping")
-            .then()
-            .statusCode(200)
-            .body(`is`("Pong"))
-    }
+//    val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
+//
+//    @Test
+//    fun testPingEndpoint() {
+//        given()
+//            .contentType("application/json").auth().oauth2(accessTokenProvider.getAccessToken("alice"))
+//            .`when`().get("http://localhost:8082/v1/system/ping")
+//            .then()
+//            .statusCode(200)
+//            .body(`is`("Pong"))
+//    }
 }

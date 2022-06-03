@@ -29,8 +29,8 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
                     .withBody("Pong")))
 
         personStubs(wireMockServer)
-        dailyEntriesStubs(wireMockServer)
-        synchronizeStubs(wireMockServer)
+//        dailyEntriesStubs(wireMockServer)
+//        synchronizeStubs(wireMockServer)
 
         return mapOf(Pair("forecast.base.url", wireMockServer.baseUrl()))
     }
@@ -40,100 +40,104 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
      */
     private fun personStubs (wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons"))
-                .willReturn(jsonResponse("[]", 401))
+            get(urlEqualTo("/v2/persons"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersons()), 200))
         )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons?active=true"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-           get(urlEqualTo("/v1/persons?active=true")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanWeek()), 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-           get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanMonth()), 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanYear()), 200))
-        )
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons?active=true"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//           get(urlEqualTo("/v1/persons?active=true")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersonA()), 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=WEEK")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanWeek()), 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//           get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=MONTH")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanMonth()), 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/persons/${TestData.getPersonA().id}/total?timespan=YEAR")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getTotalTimespanYear()), 200))
+//        )
     }
-
-    /**
-     * Stubs for the daily entry functionality
-     */
-    private fun dailyEntriesStubs (wireMockServer: WireMockServer) {
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/dailyEntries"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/dailyEntries")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse("[]", 200))
-        )
-
-        wireMockServer.stubFor(
-            get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getDailyEntryA()), 200))
-        )
-    }
-
-    /**
-     * Stubs for synchronization functionality
-     */
-    private fun synchronizeStubs (wireMockServer: WireMockServer) {
-        wireMockServer.stubFor(
-            post(urlEqualTo("/v1/synchronize"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            post(urlEqualTo("/v1/synchronize")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse("[]", 200))
-        )
-    }
+//
+//    /**
+//     * Stubs for the daily entry functionality
+//     */
+//    private fun dailyEntriesStubs (wireMockServer: WireMockServer) {
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/dailyEntries"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/dailyEntries")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse("[]", 200))
+//        )
+//
+//        wireMockServer.stubFor(
+//            get(urlEqualTo("/v1/dailyEntries?personId=${TestData.getPersonA().id}")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getDailyEntryA()), 200))
+//        )
+//    }
+//
+//    /**
+//     * Stubs for synchronization functionality
+//     */
+//    private fun synchronizeStubs (wireMockServer: WireMockServer) {
+//        wireMockServer.stubFor(
+//            post(urlEqualTo("/v1/synchronize"))
+//                .willReturn(jsonResponse("[]", 401))
+//        )
+//
+//        wireMockServer.stubFor(
+//            post(urlEqualTo("/v1/synchronize")).withHeader(authHeader, bearerPattern)
+//                .willReturn(jsonResponse("[]", 200))
+//        )
+//    }
 
     override fun stop() {
         wireMockServer.stop()
