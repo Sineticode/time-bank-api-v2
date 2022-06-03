@@ -2,7 +2,6 @@ package fi.metatavu.timebank.api.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
-import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
@@ -55,18 +54,25 @@ class SynchronizeController {
 
             while (!retrievedAllEntries){
                 val resultString = forecastService.getTimeEntries(after, pageNumber)
+
+                if (resultString.isNullOrEmpty()) {
+                    break
+                }
+
                 val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
                 val amountOfPages =
                     if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
                     else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
                 logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
+
                 if (forecastTimeEntryResponse.pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
                     pageNumber++
                 } else {
                     retrievedAllEntries = true
                 }
+
                 val entries = forecastTimeEntryTranslator.translate(forecastTimeEntryResponse.pageContents!!)
-                entries.forEach{ entry -> translatedEntries.add(entry)}
+                entries.forEach{ entry -> translatedEntries.add(entry) }
             }
 
             var synchronized = 0
