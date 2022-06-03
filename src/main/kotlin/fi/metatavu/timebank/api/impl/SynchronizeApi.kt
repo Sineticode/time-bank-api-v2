@@ -2,7 +2,6 @@ package fi.metatavu.timebank.api.impl
 
 import fi.metatavu.timebank.api.controllers.SynchronizeController
 import fi.metatavu.timebank.spec.SynchronizeApi
-import org.slf4j.Logger
 import java.time.LocalDate
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
@@ -17,16 +16,13 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     @Inject
     lateinit var synchronizeController: SynchronizeController
 
-    @Inject
-    lateinit var logger: Logger
-
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
-        val synchronizedEntries: Int? = synchronizeController.synchronize(after)
+        val synchronizedEntries = synchronizeController.synchronize(after)
             ?: return createBadRequest(message = "Something went wrong with attempt to synchronize!")
 
-        if (synchronizedEntries == 0){
+        if (synchronizedEntries == 0) {
             return createNotFound(message = "Nothing to synchronize!")
         }
 

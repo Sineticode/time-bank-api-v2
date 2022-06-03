@@ -48,45 +48,20 @@ class SynchronizeController {
 
             val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
 
-            var retrievedAllEntries = false
-            val translatedEntries = mutableListOf<TimeEntry>()
-            var pageNumber = 1
-
-            while (!retrievedAllEntries){
-                val resultString = forecastService.getTimeEntries(after, pageNumber)
-
-                if (resultString.isNullOrEmpty()) {
-                    break
-                }
-
-                val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
-                val amountOfPages =
-                    if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
-                    else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
-                logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
-
-                if (forecastTimeEntryResponse.pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
-                    pageNumber++
-                } else {
-                    retrievedAllEntries = true
-                }
-
-                val entries = forecastTimeEntryTranslator.translate(forecastTimeEntryResponse.pageContents!!)
-                entries.forEach{ entry -> translatedEntries.add(entry) }
-            }
+            val entries = paginationHandler(after)
 
             var synchronized = 0
 
-            translatedEntries.forEachIndexed { idx, timeEntry ->
+            entries.forEachIndexed { idx, timeEntry ->
                 val person = persons.find { person -> person.id == timeEntry.person }
                 val personName = "${person?.lastName}, ${person?.firstName}"
-                logger.info("Synchronizing TimeEntry ${idx + 1}/${translatedEntries.size} of $personName...")
+                logger.info("Synchronizing TimeEntry ${idx + 1}/${entries.size} of $personName...")
 
                 if (timeEntryRepository.persistEntry(timeEntry)) {
                     synchronized++
                     logger.info("Synchronized TimeEntry #${synchronized}!")
                 } else {
-                    logger.warn("Time Entry ${idx + 1}/${translatedEntries.size} already synchronized!")
+                    logger.warn("Time Entry ${idx + 1}/${entries.size} already synchronized!")
                 }
             }
 
@@ -97,4 +72,40 @@ class SynchronizeController {
         }
     }
 
+    /**
+     * Loops through paginated API responses of varying sizes from Forecast API
+     * and translates the received ForecastTimeEntries to TimeEntries.
+     *
+     * @param after YYYY-MM-DD LocalDate'
+     * @return List of TimeEntries
+     */
+    private suspend fun paginationHandler(after: LocalDate?): List<TimeEntry> {
+        var retrievedAllEntries = false
+        val translatedEntries = mutableListOf<TimeEntry>()
+        var pageNumber = 1
+
+        while (!retrievedAllEntries) {
+            val resultString = forecastService.getTimeEntries(after, pageNumber)
+
+            if (resultString.isNullOrEmpty()) {
+                break
+            }
+
+            val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
+            val amountOfPages =
+                if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
+                else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
+            logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
+
+            if (forecastTimeEntryResponse.pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
+                pageNumber++
+            } else {
+                retrievedAllEntries = true
+            }
+
+            translatedEntries.addAll(forecastTimeEntryTranslator.translate(forecastTimeEntryResponse.pageContents!!))
+        }
+
+        return translatedEntries
+    }
 }
