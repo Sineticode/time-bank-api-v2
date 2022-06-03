@@ -100,22 +100,39 @@ class PersonsController {
 
         return when (timespan) {
             Timespan.ALL_TIME -> {
-                listOf(calculatePersonTotalTime(personId, dailyEntries, timespan))
+                listOf(calculatePersonTotalTime(
+                        personId = personId,
+                        days = dailyEntries,
+                        timespan = timespan
+                    )
+                )
             }
             Timespan.YEAR -> {
-                dailyEntries.groupBy{ it.date.year }.values.map{ year ->
-                    calculatePersonTotalTime(personId, year, timespan)
+                dailyEntries.groupBy{ it.date.year }.values.map{ days ->
+                    calculatePersonTotalTime(
+                        personId = personId,
+                        days = days,
+                        timespan = timespan
+                    )
                 }
             }
             Timespan.MONTH -> {
-                dailyEntries.groupBy{ Pair(it.date.year, it.date.monthValue) }.values.map{ month ->
-                    calculatePersonTotalTime(personId, month, timespan)
+                dailyEntries.groupBy{ Pair(it.date.year, it.date.monthValue) }.values.map{ days ->
+                    calculatePersonTotalTime(
+                        personId = personId,
+                        days = days,
+                        timespan = timespan
+                    )
                 }
             }
             Timespan.WEEK -> {
                 val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
-                dailyEntries.groupBy{ Pair(it.date.year, it.date.get(weekOfYear)) }.values.map{ week ->
-                    calculatePersonTotalTime(personId, week, timespan)
+                dailyEntries.groupBy{ Pair(it.date.year, it.date.get(weekOfYear)) }.values.map{ days ->
+                    calculatePersonTotalTime(
+                        personId = personId,
+                        days = days,
+                        timespan = timespan
+                    )
                 }
             }
         }

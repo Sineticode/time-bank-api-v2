@@ -55,14 +55,18 @@ class ForecastService {
     /**
      * Gets time registrations from Forecast
      *
-     * @OptionalParam date after in YYYY-MM-DD LocalDate
+     * @param date after in YYYY-MM-DD LocalDate
+     * @param pageNumber page of paginated response to request
      * @return Response with time registrations data
      */
     fun getTimeEntries(after: LocalDate?, pageNumber: Int): String? {
-        var path = "/v4/time_registrations"
-        if (after != null) path += "/updated_after/${after.toString().replace("-", "")}T000000"
-        path = "$path?pageSize=1000&pageNumber=$pageNumber"
-        return doRequest(path)
+        val pathSections = mutableListOf<String>()
+        pathSections.add("/v4/time_registrations")
+        if (after != null) {
+            pathSections.add("/updated_after/${after.toString().replace("-", "")}T000000")
+        }
+        pathSections.add("?pageSize=1000&pageNumber=$pageNumber")
+        return doRequest(pathSections.joinToString(""))
     }
 
     /**
