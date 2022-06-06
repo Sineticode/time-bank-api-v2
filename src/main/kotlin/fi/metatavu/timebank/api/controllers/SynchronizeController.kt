@@ -48,7 +48,7 @@ class SynchronizeController {
 
             val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
 
-            val entries = paginationHandler(after)
+            val entries = retrieveAllEntries(after)
 
             var synchronized = 0
 
@@ -79,7 +79,7 @@ class SynchronizeController {
      * @param after YYYY-MM-DD LocalDate'
      * @return List of TimeEntries
      */
-    private suspend fun paginationHandler(after: LocalDate?): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?): List<TimeEntry> {
         var retrievedAllEntries = false
         val translatedEntries = mutableListOf<TimeEntry>()
         var pageNumber = 1

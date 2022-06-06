@@ -96,7 +96,11 @@ class PersonsController {
      * @return List of PersonTotalTimes
      */
     suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime>? {
-        val dailyEntries = dailyEntryController.makeDailyEntries(personId, null, null) ?: return null
+        val dailyEntries = dailyEntryController.makeDailyEntries(
+            personId = personId,
+            before = null,
+            after = null
+        ) ?: return null
 
         return when (timespan) {
             Timespan.ALL_TIME -> {
