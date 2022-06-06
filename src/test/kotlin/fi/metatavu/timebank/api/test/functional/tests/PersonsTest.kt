@@ -8,6 +8,7 @@ import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.junit.TestProfile
 import io.restassured.RestAssured.given
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -17,27 +18,16 @@ import javax.ws.rs.core.Response
  * Tests for Person API
  */
 @QuarkusTest
-@QuarkusTestResource(TestMockResource::class)
+//@QuarkusTestResource(TestMockResource::class)
 @TestProfile(LocalTestProfile::class)
 class PersonsTest {
 
-    val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
-
     @Test
-    fun listPersonsExp() {
+    fun listPersons() {
         TestBuilder().use {
             val persons = it.manager.persons.getPersons()
 
             assertEquals(1, persons.size)
-        }
-    }
-    @Test
-    fun listPersonsExpTwo() {
-        TestBuilder().use {
-            val persons = it.manager.persons.getPersons()
-
-
-            assert(persons[0].firstName == "Tester")
         }
     }
 

@@ -1,5 +1,7 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
+import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
+import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.PersonTotalTime
@@ -12,14 +14,15 @@ import kotlin.random.Random
 class TestData {
     companion object{
 
-        fun getPersons(): List<Person> {
-            return listOf(getPersonA())
+        fun getPersons(): Array<ForecastPerson> {
+            return arrayOf(getPersonA())
         }
-        fun getPersonA(): Person {
-            return Person(
-                id = 395952,
-                firstName = "Tester",
-                lastName = "Test",
+        fun getPersonA(): ForecastPerson {
+            return ForecastPerson(
+                id = 1,
+                first_name = "Tester",
+                last_name = "Test",
+                email = null,
                 monday = 435,
                 tuesday = 435,
                 wednesday = 435,
@@ -28,14 +31,26 @@ class TestData {
                 saturday = 0,
                 sunday = 0,
                 active = true,
-                startDate = "2022-05-11",
-                defaultRole = null
+                default_role = null,
+                cost = 0.0,
+                language = "ENGLISH_UK",
+                created_by = null,
+                updated_by = null,
+                client_id = null,
+                holiday_calendar_id = 123456,
+                start_date = "2022-05-11",
+                end_date = null,
+                created_at = null,
+                updated_at = null,
+                department_id = null,
+                permissions = listOf("TEst"),
+                is_system_user = false
             )
         }
 
         fun getDailyEntryA(): DailyEntry {
             return DailyEntry(
-                person = 395952,
+                person = 1,
                 internalTime = 56,
                 projectTime = 144,
                 logged = 200,
@@ -82,6 +97,22 @@ class TestData {
                 monthNumber = null,
                 weekNumber = null
             )
+        }
+
+        fun getHolidays(): List<ForecastHoliday> {
+            return listOf(
+                ForecastHoliday(
+                id = 1,
+                holiday_calendar_id = 2,
+                year = 2022,
+                month = 6,
+                day = 5,
+                name = "Helluntai",
+                created_by = 0,
+                updated_by = 0,
+                created_at = "2022-05-01",
+                updated_at = "2022-05-01"
+            ))
         }
     }
 }
