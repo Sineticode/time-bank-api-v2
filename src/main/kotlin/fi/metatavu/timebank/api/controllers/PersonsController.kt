@@ -81,10 +81,10 @@ class PersonsController {
     suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
         val persons = getPersonsFromForecast() ?: return null
 
-        return if (active == true) {
-            filterActivePersons(persons)
-        } else {
+        return if (active == false) {
             persons
+        } else {
+            filterActivePersons(persons)
         }
     }
 

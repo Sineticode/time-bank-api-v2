@@ -28,4 +28,10 @@ class PersonsTestBuilderResource(
         )
     }
 
+    fun getActivePersons(): Array<Person> {
+        return api.listPersons(
+            active = true
+        )
+    }
+
 }

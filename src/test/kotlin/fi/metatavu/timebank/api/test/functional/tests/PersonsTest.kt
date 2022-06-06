@@ -26,7 +26,16 @@ class PersonsTest {
         TestBuilder().use {
             val persons = it.manager.persons.getPersons()
 
-            assertEquals(1, persons.size)
+            assertEquals(3, persons.size)
+        }
+    }
+
+    @Test
+    fun listActivePersons() {
+        TestBuilder().use {
+            val activePersons = it.manager.persons.getActivePersons()
+            assertEquals(1, activePersons.size)
+            assertEquals(TestData.getPersonA().first_name, activePersons[0].firstName)
         }
     }
 

@@ -13,8 +13,9 @@ class TestData {
     companion object{
 
         fun getPersons(): Array<ForecastPerson> {
-            return arrayOf(getPersonA())
+            return arrayOf(getPersonA(), getPersonB(), getPersonC())
         }
+
         fun getPersonA(): ForecastPerson {
             return ForecastPerson(
                 id = 1,
@@ -41,7 +42,69 @@ class TestData {
                 created_at = null,
                 updated_at = null,
                 department_id = null,
-                permissions = listOf("TEst"),
+                permissions = listOf("Test"),
+                is_system_user = false
+            )
+        }
+
+        fun getPersonB(): ForecastPerson {
+            return ForecastPerson(
+                id = 1,
+                first_name = "Tester2",
+                last_name = "Test2",
+                email = null,
+                monday = 435,
+                tuesday = 435,
+                wednesday = 435,
+                thursday = 435,
+                friday = 435,
+                saturday = 0,
+                sunday = 0,
+                active = false,
+                default_role = null,
+                cost = 0.0,
+                language = "ENGLISH_UK",
+                created_by = null,
+                updated_by = null,
+                client_id = null,
+                holiday_calendar_id = 123456,
+                start_date = "2022-05-05",
+                end_date = null,
+                created_at = null,
+                updated_at = null,
+                department_id = null,
+                permissions = listOf("Test"),
+                is_system_user = false
+            )
+        }
+
+        fun getPersonC(): ForecastPerson {
+            return ForecastPerson(
+                id = 1,
+                first_name = "Tester3",
+                last_name = "Test3",
+                email = null,
+                monday = 435,
+                tuesday = 435,
+                wednesday = 435,
+                thursday = 435,
+                friday = 435,
+                saturday = 0,
+                sunday = 0,
+                active = false,
+                default_role = null,
+                cost = 0.0,
+                language = "ENGLISH_UK",
+                created_by = null,
+                updated_by = null,
+                client_id = null,
+                holiday_calendar_id = 123456,
+                start_date = "2022-05-11",
+                end_date = null,
+                created_at = null,
+                updated_at = null,
+                department_id = null,
+                permissions = listOf("Test"),
                 is_system_user = false
             )
         }
