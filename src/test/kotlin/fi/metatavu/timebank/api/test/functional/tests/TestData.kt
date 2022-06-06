@@ -3,10 +3,8 @@ package fi.metatavu.timebank.api.test.functional.tests
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.model.DailyEntry
-import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.PersonTotalTime
 import java.time.LocalDate
-import kotlin.random.Random
 
 /**
  * Class for test data that is used by wiremock and tests

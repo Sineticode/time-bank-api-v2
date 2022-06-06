@@ -6,6 +6,11 @@ import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import org.junit.Assert
 
+/**
+ * Abstract base class for API test resource builders
+ *
+ * @author Jari Nykänen
+ */
 abstract class ApiTestBuilderResource<T, A>(
     testBuilder: TestBuilder,
     private val apiClient: ApiClient

@@ -5,6 +5,11 @@ import org.testcontainers.containers.MySQLContainer
 
 internal class SpecifiedMySQLContainer(image: String): MySQLContainer<SpecifiedMySQLContainer>(image)
 
+/**
+ * Quarkus test resource for providing MySQL database
+ *
+ * @author Jari Nykänen
+ */
 class TestMySQLResource: QuarkusTestResourceLifecycleManager {
 
     private val db: MySQLContainer<*> = SpecifiedMySQLContainer("mysql:5.6")
@@ -14,6 +19,7 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager {
         .withCommand(
             "--lower_case_table_names=1"
         )
+        //.withInitScript("src/test/resources/MySqlScript.sql")
 
     override fun start(): Map<String, String> {
         db.start()

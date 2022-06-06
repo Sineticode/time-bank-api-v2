@@ -8,6 +8,14 @@ import fi.metatavu.timebank.api.test.functional.impl.PersonsTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 
+/**
+ * Test builder authentication
+ *
+ * @author Jari Nykänen
+ *
+ * @param testBuilder test builder instance
+ * @param accessTokenProvider access token provider
+ */
 class TestBuilderAuthentication(
     private val testBuilder: TestBuilder,
     accessTokenProvider: AccessTokenProvider
@@ -18,6 +26,12 @@ class TestBuilderAuthentication(
     var dailyEntries: DailyEntriesTestBuilderResource = DailyEntriesTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
     var persons: PersonsTestBuilderResource = PersonsTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
 
+    /**
+     * Creates an API client
+     *
+     * @param authProvider access token
+     * @return API client
+     */
     override fun createClient(authProvider: AccessTokenProvider): ApiClient {
         val result = ApiClient(ApiTestSettings.apiBasePath)
         ApiClient.accessToken = authProvider.accessToken

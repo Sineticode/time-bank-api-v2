@@ -1,16 +1,21 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.resources.AccessTokenProvider
+import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestMockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
-import io.restassured.RestAssured.given
-import org.junit.jupiter.api.Test
-import javax.ws.rs.core.Response
+import io.quarkus.test.junit.TestProfile
 
+/**
+ * Test for Synchronization API
+ */
 @QuarkusTest
-@QuarkusTestResource(TestMockResource::class)
-
+@QuarkusTestResource.List(
+    QuarkusTestResource(TestMockResource::class),
+    //QuarkusTestResource(TestMySQLResource::class)
+)
+@TestProfile(LocalTestProfile::class)
 class SynchronizeTest {
 
     val accessTokenProvider: AccessTokenProvider = AccessTokenProvider()
