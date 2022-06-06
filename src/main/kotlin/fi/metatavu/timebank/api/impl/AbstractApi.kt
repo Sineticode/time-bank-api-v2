@@ -31,7 +31,6 @@ abstract class AbstractApi {
             if (jsonWebToken.subject != null) {
                 return UUID.fromString(jsonWebToken.subject)
             }
-
             return null
         }
 
@@ -40,9 +39,9 @@ abstract class AbstractApi {
      *
      * @return if user is manager
      */
-//    protected fun isManager(): Boolean {
-//        return identity.hasRole(UserRole.MANAGER.name)
-//    }
+    protected fun isAdmin(): Boolean {
+        return identity.hasRole("admin")
+    }
 
     /**
      * Constructs ok response with total count header
