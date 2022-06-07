@@ -26,7 +26,6 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
      * @return List of timeEntries
      */
     suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry> {
-        println("TEST IS HERE")
         val stringBuilder = StringBuilder()
         val parameters = Parameters()
 

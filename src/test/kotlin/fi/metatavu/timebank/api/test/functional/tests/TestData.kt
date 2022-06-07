@@ -128,9 +128,7 @@ class TestData {
                 projectTime = 150,
                 expected =  500,
                 personId = 395952,
-                year = 2022,
-                monthNumber = 5,
-                weekNumber = 22
+                timePeriod = "this week of the year..."
             )
         }
         fun getTotalTimespanMonth(): PersonTotalTime {
@@ -141,9 +139,8 @@ class TestData {
                 projectTime = 150,
                 expected =  500,
                 personId = 395952,
-                year = 2022,
-                monthNumber = 5,
-                weekNumber = null
+                timePeriod = "this week of the year..."
+
             )
         }
         fun getTotalTimespanYear(): PersonTotalTime {
@@ -154,9 +151,7 @@ class TestData {
                 projectTime = 150,
                 expected =  500,
                 personId = 395952,
-                year = 2022,
-                monthNumber = null,
-                weekNumber = null
+                timePeriod = "this week of the year..."
             )
         }
 

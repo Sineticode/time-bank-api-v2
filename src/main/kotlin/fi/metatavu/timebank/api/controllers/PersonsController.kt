@@ -8,6 +8,7 @@ import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Timespan
+import io.quarkus.panache.common.Parameters
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.WeekFields
@@ -158,15 +159,21 @@ class PersonsController {
         var year: Int? = null
         var month: Int? = null
         var week: Int? = null
+        var startDate: LocalDate? = null
+        var endDate: LocalDate? = null
 
-        days.forEach{ day ->
+        days.forEachIndexed{ idx, day ->
             internalTime += day.internalTime
             projectTime += day.projectTime
             expected += day.expected
             year = if (timespan != Timespan.ALL_TIME) day.date.year else null
             month = if (timespan == Timespan.MONTH || timespan == Timespan.WEEK) day.date.monthValue else null
             week = if (timespan == Timespan.WEEK) day.date.get(weekOfYear) else null
+            if (idx == 0) endDate = day.date
+            if (idx == days.lastIndex) startDate = day.date
         }
+
+        val timePeriod = timespanDateStringBuilder(timespan, year, month, week, startDate, endDate)
 
         return PersonTotalTime(
             balance = internalTime + projectTime - expected,
@@ -175,9 +182,27 @@ class PersonsController {
             internalTime = internalTime,
             projectTime = projectTime,
             personId = personId,
-            year = year,
-            monthNumber = month,
-            weekNumber = week
+            timePeriod = timePeriod
         )
+    }
+}
+
+/**
+ * build string for the timespan date
+ *
+ * @param timespan of totals to display
+ * @param Year of current time period
+ * @param Month of current time period
+ * @param Week of current time period
+ * @param startDate date
+ * @param endDate date
+ * @return
+ */
+fun timespanDateStringBuilder(timespan: Timespan, year: Int?, month: Int?, week: Int?, startDate: LocalDate?, endDate: LocalDate?): String {
+    return when (timespan) {
+        Timespan.ALL_TIME -> "$startDate,$endDate"
+        Timespan.YEAR -> "$year"
+        Timespan.MONTH -> "$year,$month"
+        Timespan.WEEK -> "$year,$month,$week"
     }
 }
