@@ -4,6 +4,7 @@ import fi.metatavu.jaxrs.test.functional.builder.AbstractAccessTokenTestBuilder
 import fi.metatavu.jaxrs.test.functional.builder.AbstractTestBuilder
 import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenProvider
 import fi.metatavu.jaxrs.test.functional.builder.auth.AuthorizedTestBuilderAuthentication
+import fi.metatavu.jaxrs.test.functional.builder.auth.InvalidAccessTokenProvider
 import fi.metatavu.jaxrs.test.functional.builder.auth.KeycloakAccessTokenProvider
 import fi.metatavu.timebank.api.test.functional.auth.TestBuilderAuthentication
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
@@ -12,6 +13,8 @@ import org.eclipse.microprofile.config.ConfigProvider
 class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
 
     var manager = createTestBuilderAuthentication("manager", "test")
+
+    val notvalid: TestBuilderAuthentication = TestBuilderAuthentication(this, InvalidAccessTokenProvider())
 
     override fun createTestBuilderAuthentication(
         abstractTestBuilder: AbstractTestBuilder<ApiClient, AccessTokenProvider>,

@@ -3,7 +3,6 @@ package fi.metatavu.timebank.api.test.functional.tests
 import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestMockResource
-import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.junit.TestProfile
@@ -27,6 +26,8 @@ class PersonsTest {
             val persons = it.manager.persons.getPersons()
 
             assertEquals(3, persons.size)
+
+            it.notvalid.persons.assertListFail(401)
         }
     }
 
@@ -36,6 +37,8 @@ class PersonsTest {
             val activePersons = it.manager.persons.getActivePersons()
             assertEquals(1, activePersons.size)
             assertEquals(TestData.getPersonA().first_name, activePersons[0].firstName)
+
+            it.notvalid.persons.assertListFail(401)
         }
     }
 
