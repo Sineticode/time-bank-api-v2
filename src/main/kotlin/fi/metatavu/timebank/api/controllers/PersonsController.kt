@@ -8,7 +8,6 @@ import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Timespan
-import io.quarkus.panache.common.Parameters
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.WeekFields

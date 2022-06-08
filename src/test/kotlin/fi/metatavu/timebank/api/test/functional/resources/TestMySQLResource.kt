@@ -12,14 +12,13 @@ internal class SpecifiedMySQLContainer(image: String): MySQLContainer<SpecifiedM
  */
 class TestMySQLResource: QuarkusTestResourceLifecycleManager {
 
-    private val db: MySQLContainer<*> = SpecifiedMySQLContainer("mysql:5.6")
+    private val db: MySQLContainer<*> = SpecifiedMySQLContainer("mysql:latest")
         .withDatabaseName(DATABASE)
         .withUsername(USERNAME)
         .withPassword(PASSWORD)
         .withCommand(
             "--lower_case_table_names=1"
         )
-        //.withInitScript("src/test/resources/MySqlScript.sql")
 
     override fun start(): Map<String, String> {
         db.start()
@@ -37,7 +36,7 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager {
 
     companion object {
         const val DATABASE = "timebank-test"
-        const val USERNAME = "timebank"
-        const val PASSWORD = "timebank"
+        const val USERNAME = "root"
+        const val PASSWORD = "root"
     }
 }

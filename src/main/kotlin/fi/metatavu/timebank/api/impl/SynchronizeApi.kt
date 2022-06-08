@@ -1,6 +1,7 @@
 package fi.metatavu.timebank.api.impl
 
 import fi.metatavu.timebank.api.controllers.SynchronizeController
+import fi.metatavu.timebank.model.SyncResponse
 import fi.metatavu.timebank.spec.SynchronizeApi
 import java.time.LocalDate
 import javax.enterprise.context.RequestScoped
@@ -26,6 +27,9 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
             return createNotFound(message = "Nothing to synchronize!")
         }
 
-        return createOk(entity = "Synchronized $synchronizedEntries entries from Forecast!")
+        return createOk(SyncResponse(
+            code = 200,
+            message = synchronizedEntries
+        ))
     }
 }

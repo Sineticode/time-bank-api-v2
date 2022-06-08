@@ -5,6 +5,7 @@ import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenTestBuilderAuth
 import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.impl.DailyEntriesTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.impl.PersonsTestBuilderResource
+import fi.metatavu.timebank.api.test.functional.impl.SynchronizeTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 
@@ -25,6 +26,7 @@ class TestBuilderAuthentication(
 
     var dailyEntries: DailyEntriesTestBuilderResource = DailyEntriesTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
     var persons: PersonsTestBuilderResource = PersonsTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
+    var synchronization: SynchronizeTestBuilderResource = SynchronizeTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
 
     /**
      * Creates an API client

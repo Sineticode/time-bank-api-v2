@@ -5,6 +5,7 @@ import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.SynchronizeApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
+import fi.metatavu.timebank.test.client.models.SyncResponse
 import fi.metatavu.timebank.test.client.models.TimeEntry
 import java.util.*
 
@@ -23,10 +24,10 @@ class SynchronizeTestBuilderResource(
         return SynchronizeApi(ApiTestSettings.apiBasePath)
     }
 
-    fun synchronizeEntries() {
-        api.synchronizeTimeEntries(
+    fun synchronizeEntries(): SyncResponse {
+        return api.synchronizeTimeEntries(
             before = null,
-            after = "2022-05-10"
+            after = null
         )
     }
 

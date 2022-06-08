@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import fi.metatavu.timebank.api.test.functional.tests.TestData
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
+import org.testcontainers.shaded.org.zeroturnaround.exec.StartedProcess
+import javax.ws.rs.core.MediaType.APPLICATION_JSON
+import javax.ws.rs.core.MediaType.TEXT_PLAIN
 
 /**
  * Wiremock with mock data for Time Bank API
@@ -24,16 +28,16 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         configureFor("localhost", 8082)
 
         personStubs(wireMockServer)
-        dailyEntriesStubs(wireMockServer)
-//        synchronizeStubs(wireMockServer)
+        holidayStubs(wireMockServer)
+        timeRegistrationsStubs(wireMockServer)
 
         return mapOf(Pair("forecast.base.url", wireMockServer.baseUrl()))
     }
 
     /**
-     * Stubs for the persons related functionality
+     * Stubs for Forecast persons endpoint used in different functionalities
      */
-    private fun personStubs (wireMockServer: WireMockServer) {
+    private fun personStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlEqualTo("/v2/persons"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersons()), 200))
@@ -41,9 +45,9 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
     }
 
     /**
-     * Stubs for the daily entry functionality
+     * Stubs for Forecast holiday_calendar_entries endpoint used in daily entry functionality
      */
-    private fun dailyEntriesStubs (wireMockServer: WireMockServer) {
+    private fun holidayStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlEqualTo("/v1/holiday_calendar_entries"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getHolidays()), 200))
@@ -51,17 +55,12 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
     }
 
     /**
-     * Stubs for synchronization functionality
+     * Stubs for Forecast time_registrations endpoint used in synchronization functionality
      */
-    private fun synchronizeStubs (wireMockServer: WireMockServer) {
+    private fun timeRegistrationsStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
-            post(urlEqualTo("/v1/synchronize"))
-                .willReturn(jsonResponse("[]", 401))
-        )
-
-        wireMockServer.stubFor(
-            post(urlEqualTo("/v1/synchronize")).withHeader(authHeader, bearerPattern)
-                .willReturn(jsonResponse("[]", 200))
+            get(urlPathEqualTo("/v4/time_registrations"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse()), 200))
         )
     }
 

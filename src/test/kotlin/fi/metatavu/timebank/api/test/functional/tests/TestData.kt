@@ -2,9 +2,8 @@ package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
-import fi.metatavu.timebank.model.DailyEntry
-import fi.metatavu.timebank.model.PersonTotalTime
-import java.time.LocalDate
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 
 /**
  * Class for test data that is used by wiremock and tests
@@ -12,6 +11,16 @@ import java.time.LocalDate
 class TestData {
     companion object{
 
+        fun getForecastTimeEntryResponse(): ForecastTimeEntryResponse {
+            return ForecastTimeEntryResponse(
+                pageContents = getForecastTimeEntries(),
+                pageNumber = 1,
+                pageSize = getForecastTimeEntries().size,
+                totalObjectCount = getForecastTimeEntries().size,
+                status = 200,
+                message = null
+            )
+        }
         fun getPersons(): Array<ForecastPerson> {
             return arrayOf(getPersonA(), getPersonB(), getPersonC())
         }
@@ -49,7 +58,7 @@ class TestData {
 
         fun getPersonB(): ForecastPerson {
             return ForecastPerson(
-                id = 1,
+                id = 2,
                 first_name = "Tester2",
                 last_name = "Test2",
                 email = null,
@@ -80,7 +89,7 @@ class TestData {
 
         fun getPersonC(): ForecastPerson {
             return ForecastPerson(
-                id = 1,
+                id = 3,
                 first_name = "Tester3",
                 last_name = "Test3",
                 email = null,
@@ -109,49 +118,68 @@ class TestData {
             )
         }
 
-        fun getDailyEntryA(): DailyEntry {
-            return DailyEntry(
-                person = 1,
-                internalTime = 56,
-                projectTime = 144,
-                logged = 200,
-                expected = 200,
-                balance = 200,
-                date = LocalDate.now()
-            )
-        }
-        fun getTotalTimespanWeek(): PersonTotalTime {
-            return PersonTotalTime(
-                balance = 150,
-                logged = 250,
-                internalTime = 100,
-                projectTime = 150,
-                expected =  500,
-                personId = 395952,
-                timePeriod = "this week of the year..."
-            )
-        }
-        fun getTotalTimespanMonth(): PersonTotalTime {
-            return PersonTotalTime(
-                balance = 150,
-                logged = 250,
-                internalTime = 100,
-                projectTime = 150,
-                expected =  500,
-                personId = 395952,
-                timePeriod = "this week of the year..."
-
-            )
-        }
-        fun getTotalTimespanYear(): PersonTotalTime {
-            return PersonTotalTime(
-                balance = 150,
-                logged = 250,
-                internalTime = 100,
-                projectTime = 150,
-                expected =  500,
-                personId = 395952,
-                timePeriod = "this week of the year..."
+        fun getForecastTimeEntries(): List<ForecastTimeEntry> {
+            return listOf(
+                ForecastTimeEntry(
+                    id = 1,
+                    person = 1,
+                    project = null,
+                    card = null,
+                    task = null,
+                    non_project_time = 255455,
+                    time_registered = 100,
+                    date = "2022-05-30",
+                    notes = null,
+                    approval_status = null,
+                    created_by = 1,
+                    updated_by = 1,
+                    created_at = "2022-05-30T04:53:33Z",
+                    updated_at = "2022-05-30T04:53:33Z",
+                    phase = null,
+                    task_project = null,
+                    invoice_entry = null,
+                    invoice = null
+                ),
+                ForecastTimeEntry(
+                    id = 2,
+                    person = 1,
+                    project = null,
+                    card = null,
+                    task = null,
+                    non_project_time = null,
+                    time_registered = 100,
+                    date = "2022-05-30",
+                    notes = null,
+                    approval_status = null,
+                    created_by = 1,
+                    updated_by = 1,
+                    created_at = "2022-05-30T04:53:33Z",
+                    updated_at = "2022-05-30T04:53:33Z",
+                    phase = null,
+                    task_project = null,
+                    invoice_entry = null,
+                    invoice = null
+                ),
+                ForecastTimeEntry(
+                    id = 3,
+                    person = 2,
+                    project = null,
+                    card = null,
+                    task = null,
+                    non_project_time = null,
+                    time_registered = 400,
+                    date = "2022-05-30",
+                    notes = null,
+                    approval_status = null,
+                    created_by = 1,
+                    updated_by = 1,
+                    created_at = "2022-05-30T04:53:33Z",
+                    updated_at = "2022-05-30T04:53:33Z",
+                    phase = null,
+                    task_project = null,
+                    invoice_entry = null,
+                    invoice = null
+                )
             )
         }
 
