@@ -79,8 +79,24 @@ class PersonsTest {
                 personId = TestData.getPersonA().id,
                 timespan = null
             )
+            val personAEntries = TestData.forecastTimeEntries.filter { entry -> entry.person == TestData.getPersonA().id }
+            var projectTime = 0
+            var internalTime = 0
+            var totalTimeRegistered = 0
+
+            personAEntries.forEach { forecastTimeEntry ->
+                totalTimeRegistered += forecastTimeEntry.time_registered
+                if (forecastTimeEntry.non_project_time == null) {
+                    projectTime += forecastTimeEntry.time_registered
+                } else {
+                    internalTime += forecastTimeEntry.time_registered
+                }
+            }
 
             assertEquals(1, personTotalTimes.size)
+            assertEquals(totalTimeRegistered, personTotalTimes[0].logged)
+            assertEquals(internalTime, personTotalTimes[0].internalTime)
+            assertEquals(projectTime, personTotalTimes[0].projectTime)
         }
     }
 

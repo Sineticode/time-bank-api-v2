@@ -132,7 +132,7 @@ class TestData {
             )
         }
 
-        private val forecastTimeEntries = listOf(
+        val forecastTimeEntries = listOf(
             ForecastTimeEntry(
                 id = 1,
                 person = 1,
