@@ -52,6 +52,12 @@ class DailyEntriesTest {
             )
 
             assertEquals(expectedAmount, dailyEntries.size)
+
+            testBuilder.manager.dailyEntries.assertListFail(404, id = 12345658, before = null, after = null)
+            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = "NOT_VALID_DATE", after = null)
+            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = null, after = "NOT_VALID_DATE")
+            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = "NOT_VALID_DATE", after = "NOT_VALID_DATE")
+
         }
     }
   }
