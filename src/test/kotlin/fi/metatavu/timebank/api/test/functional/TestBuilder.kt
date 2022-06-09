@@ -20,7 +20,8 @@ class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
 
     val notvalid: TestBuilderAuthentication = TestBuilderAuthentication(this, InvalidAccessTokenProvider())
 
-    val userWithNullToken = TestBuilderAuthentication(this, NullAccessTokenProvider())
+    val userWithNullToken: TestBuilderAuthentication = TestBuilderAuthentication(this, NullAccessTokenProvider())
+
     override fun createTestBuilderAuthentication(
         abstractTestBuilder: AbstractTestBuilder<ApiClient, AccessTokenProvider>,
         authProvider: AccessTokenProvider
