@@ -15,19 +15,20 @@ class SynchronizeTestBuilderResource(
     apiClient: ApiClient
 ): ApiTestBuilderResource<TimeEntry, ApiClient?>(testBuilder, apiClient) {
 
-    override fun clean(timeEntry: TimeEntry) {
-
+    override fun clean(t: TimeEntry?) {
+        TODO("Not yet implemented")
     }
+
 
     override fun getApi(): SynchronizeApi {
         ApiClient.accessToken = accessTokenProvider?.accessToken
         return SynchronizeApi(ApiTestSettings.apiBasePath)
     }
 
-    fun synchronizeEntries(): SyncResponse {
+    fun synchronizeEntries(before: String? = null, after: String? = null): SyncResponse {
         return api.synchronizeTimeEntries(
-            before = null,
-            after = null
+            before = before,
+            after = after
         )
     }
 

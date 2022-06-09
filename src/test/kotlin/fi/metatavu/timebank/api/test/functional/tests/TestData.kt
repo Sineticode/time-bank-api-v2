@@ -4,6 +4,7 @@ import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
+import java.time.LocalDate
 
 /**
  * Class for test data that is used by wiremock and tests
@@ -11,12 +12,25 @@ import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 class TestData {
     companion object{
 
-        fun getForecastTimeEntryResponse(): ForecastTimeEntryResponse {
-            return ForecastTimeEntryResponse(
-                pageContents = getForecastTimeEntries(),
+        fun getForecastTimeEntryResponse(after: String? = null): ForecastTimeEntryResponse {
+            return if (after  != null) {
+                val pageContents = forecastTimeEntries.filter { forecastTimeEntry ->
+                    LocalDate.parse(forecastTimeEntry.date) > LocalDate.parse(after)
+                }
+                ForecastTimeEntryResponse(
+                    pageContents = pageContents,
+                    pageNumber = 1,
+                    pageSize = pageContents.size,
+                    totalObjectCount = pageContents.size,
+                    status = 200,
+                    message = null
+                )
+            }
+             else ForecastTimeEntryResponse(
+                pageContents = forecastTimeEntries,
                 pageNumber = 1,
-                pageSize = getForecastTimeEntries().size,
-                totalObjectCount = getForecastTimeEntries().size,
+                pageSize = forecastTimeEntries.size,
+                totalObjectCount = forecastTimeEntries.size,
                 status = 200,
                 message = null
             )
@@ -118,70 +132,88 @@ class TestData {
             )
         }
 
-        fun getForecastTimeEntries(): List<ForecastTimeEntry> {
-            return listOf(
-                ForecastTimeEntry(
-                    id = 1,
-                    person = 1,
-                    project = null,
-                    card = null,
-                    task = null,
-                    non_project_time = 255455,
-                    time_registered = 100,
-                    date = "2022-05-30",
-                    notes = null,
-                    approval_status = null,
-                    created_by = 1,
-                    updated_by = 1,
-                    created_at = "2022-05-30T04:53:33Z",
-                    updated_at = "2022-05-30T04:53:33Z",
-                    phase = null,
-                    task_project = null,
-                    invoice_entry = null,
-                    invoice = null
-                ),
-                ForecastTimeEntry(
-                    id = 2,
-                    person = 1,
-                    project = null,
-                    card = null,
-                    task = null,
-                    non_project_time = null,
-                    time_registered = 100,
-                    date = "2022-05-30",
-                    notes = null,
-                    approval_status = null,
-                    created_by = 1,
-                    updated_by = 1,
-                    created_at = "2022-05-30T04:53:33Z",
-                    updated_at = "2022-05-30T04:53:33Z",
-                    phase = null,
-                    task_project = null,
-                    invoice_entry = null,
-                    invoice = null
-                ),
-                ForecastTimeEntry(
-                    id = 3,
-                    person = 2,
-                    project = null,
-                    card = null,
-                    task = null,
-                    non_project_time = null,
-                    time_registered = 400,
-                    date = "2022-05-30",
-                    notes = null,
-                    approval_status = null,
-                    created_by = 1,
-                    updated_by = 1,
-                    created_at = "2022-05-30T04:53:33Z",
-                    updated_at = "2022-05-30T04:53:33Z",
-                    phase = null,
-                    task_project = null,
-                    invoice_entry = null,
-                    invoice = null
-                )
+        private val forecastTimeEntries = listOf(
+            ForecastTimeEntry(
+                id = 1,
+                person = 1,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = 255455,
+                time_registered = 100,
+                date = "2022-05-30",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 2,
+                person = 1,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 100,
+                date = "2022-05-30",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 3,
+                person = 2,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 400,
+                date = "2022-05-30",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 4,
+                person = 2,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 400,
+                date = "2022-04-30",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
             )
-        }
+        )
 
         fun getHolidays(): List<ForecastHoliday> {
             return listOf(

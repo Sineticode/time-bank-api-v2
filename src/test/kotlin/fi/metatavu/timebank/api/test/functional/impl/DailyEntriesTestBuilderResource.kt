@@ -13,20 +13,21 @@ class DailyEntriesTestBuilderResource(
     apiClient: ApiClient
 ): ApiTestBuilderResource<DailyEntry, ApiClient?>(testBuilder, apiClient) {
 
-    override fun clean(dailyEntry: DailyEntry) {
-
+    override fun clean(t: DailyEntry?) {
+        TODO("Not yet implemented")
     }
+
 
     override fun getApi(): DailyEntriesApi {
         ApiClient.accessToken = accessTokenProvider?.accessToken
         return DailyEntriesApi(ApiTestSettings.apiBasePath)
     }
 
-    fun getDailyEntries(): Array<DailyEntry> {
+    fun getDailyEntries(personId: Int?, before: String?, after: String?): Array<DailyEntry> {
         return api.listDailyEntries(
-            personId = null,
-            before = null,
-            after = null
+            personId = personId,
+            before = before,
+            after = after
         )
     }
 

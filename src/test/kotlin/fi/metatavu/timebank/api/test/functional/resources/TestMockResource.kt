@@ -62,6 +62,10 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
             get(urlPathEqualTo("/v4/time_registrations"))
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse()), 200))
         )
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v4/time_registrations/updated_after/20220501T000000"))
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(after = "2022-05-01")), 200))
+        )
     }
 
     override fun stop() {

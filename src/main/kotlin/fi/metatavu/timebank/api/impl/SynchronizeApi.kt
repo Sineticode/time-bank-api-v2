@@ -24,7 +24,7 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
             ?: return createBadRequest(message = "Something went wrong with attempt to synchronize!")
 
         if (synchronizedEntries == 0) {
-            return createNotFound(message = "Nothing to synchronize!")
+            return createOk(SyncResponse(code= 200, message = 0))
         }
 
         return createOk(SyncResponse(

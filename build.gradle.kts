@@ -38,6 +38,7 @@ dependencies {
     implementation("io.quarkus:quarkus-keycloak-authorization")
     implementation("io.quarkus:quarkus-oidc")
     implementation("io.quarkus:quarkus-jdbc-mysql")
+    implementation("io.quarkus:quarkus-rest-client")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")

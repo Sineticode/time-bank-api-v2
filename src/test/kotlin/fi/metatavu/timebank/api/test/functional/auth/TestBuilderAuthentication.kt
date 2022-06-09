@@ -24,9 +24,9 @@ class TestBuilderAuthentication(
 
     private var accessTokenProvider: AccessTokenProvider? = accessTokenProvider
 
-    var dailyEntries: DailyEntriesTestBuilderResource = DailyEntriesTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
-    var persons: PersonsTestBuilderResource = PersonsTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
-    var synchronization: SynchronizeTestBuilderResource = SynchronizeTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
+    val dailyEntries = DailyEntriesTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
+    val persons = PersonsTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
+    val synchronization = SynchronizeTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
 
     /**
      * Creates an API client

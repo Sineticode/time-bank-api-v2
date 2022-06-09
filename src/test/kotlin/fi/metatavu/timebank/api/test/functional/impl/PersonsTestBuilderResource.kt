@@ -7,6 +7,8 @@ import fi.metatavu.timebank.test.client.apis.PersonsApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.Person
+import fi.metatavu.timebank.test.client.models.PersonTotalTime
+import fi.metatavu.timebank.test.client.models.Timespan
 import org.junit.Assert
 
 class PersonsTestBuilderResource(
@@ -15,8 +17,8 @@ class PersonsTestBuilderResource(
     apiClient: ApiClient
 ): ApiTestBuilderResource<Person, ApiClient?>(testBuilder, apiClient) {
 
-    override fun clean(person: Person) {
-
+    override fun clean(t: Person?) {
+        TODO("Not yet implemented")
     }
 
     override fun getApi(): PersonsApi {
@@ -24,15 +26,16 @@ class PersonsTestBuilderResource(
         return PersonsApi(ApiTestSettings.apiBasePath)
     }
 
-    fun getPersons(): Array<Person> {
+    fun getPersons(active: Boolean? = true): Array<Person> {
         return api.listPersons(
-            active = false
+            active = active
         )
     }
 
-    fun getActivePersons(): Array<Person> {
-        return api.listPersons(
-            active = true
+    fun getPersonTotal(personId: Int, timespan: Timespan? = Timespan.aLLTIME): Array<PersonTotalTime> {
+        return api.listPersonTotalTime(
+            personId = personId,
+            timespan = timespan
         )
     }
 

@@ -2,7 +2,7 @@ package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
-import fi.metatavu.timebank.api.test.functional.resources.TestMockResource
+import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.junit.TestProfile
@@ -14,22 +14,39 @@ import org.junit.jupiter.api.Assertions.*
  */
 @QuarkusTest
 @QuarkusTestResource.List(
-    QuarkusTestResource(TestMockResource::class),
+    QuarkusTestResource(TestMySQLResource::class),
 )
 @TestProfile(LocalTestProfile::class)
+@TestClassOrder(ClassOrderer.OrderAnnotation::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Order(3)
 class PersonsTest {
+
+    /**
+     * Runs synchronization to make sure that test database is populated before all tests.
+     */
+    @BeforeAll
+    fun runSynchronizationBeforeTests() {
+        TestBuilder().use { testBuilder ->
+            testBuilder.manager.synchronization.synchronizeEntries()
+        }
+    }
 
     /**
      * Tests /v1/persons?active=false -endpoint
      */
     @Test
-    fun listPersons() {
-        TestBuilder().use {
-            val persons = it.manager.persons.getPersons()
+    fun listActivePersons() {
 
-            assertEquals(3, persons.size)
+        TestBuilder().use { testBuilder ->
 
-            it.notvalid.persons.assertListFail(401)
+//            testBuilder.manager.synchronization.synchronizeEntries()
+
+            val persons = testBuilder.manager.persons.getPersons()
+
+            assertEquals(1, persons.size)
+
+            testBuilder.notvalid.persons.assertListFail(401)
         }
     }
 
@@ -37,14 +54,33 @@ class PersonsTest {
      * Tests /v1/persons -endpoint
      */
     @Test
-    fun listActivePersons() {
-        TestBuilder().use {
-            val activePersons = it.manager.persons.getActivePersons()
+    fun listAllPersons() {
+        TestBuilder().use { testBuilder ->
 
-            assertEquals(1, activePersons.size)
-            assertEquals(TestData.getPersonA().first_name, activePersons[0].firstName)
+            val persons = testBuilder.manager.persons.getPersons(
+                active = false
+            )
 
-            it.notvalid.persons.assertListFail(401)
+            assertEquals(3, persons.size)
+            assertEquals(TestData.getPersonA().first_name, persons[0].firstName)
+
+            testBuilder.notvalid.persons.assertListFail(401)
+        }
+    }
+
+    /**
+     * Tests /v1/persons/1/total
+     */
+    @Test
+    fun listPersonTotalTimeForPersonA() {
+        TestBuilder().use { testBuilder ->
+
+            val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
+                personId = TestData.getPersonA().id,
+                timespan = null
+            )
+
+            assertEquals(1, personTotalTimes.size)
         }
     }
 }

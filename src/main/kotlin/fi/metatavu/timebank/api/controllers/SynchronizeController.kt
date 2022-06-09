@@ -97,7 +97,7 @@ class SynchronizeController {
                 else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
             logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
 
-            if (pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
+            if (pageNumber * forecastTimeEntryResponse.pageSize < forecastTimeEntryResponse.totalObjectCount) {
                 pageNumber++
             } else {
                 retrievedAllEntries = true
