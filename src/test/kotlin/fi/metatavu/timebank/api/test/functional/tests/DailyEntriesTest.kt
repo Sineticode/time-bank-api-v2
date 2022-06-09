@@ -95,8 +95,11 @@ class DailyEntriesTest {
     @Test
     fun listDailyEntriesWithNullToken(){
         TestBuilder().use { testBuilder ->
-            testBuilder.userWithNullToken.dailyEntries.assertListFailWithNullToken(
-                expectedStatus = 401
+            testBuilder.userWithNullToken.dailyEntries.assertListFail(
+                expectedStatus = 401,
+                id = null,
+                before = null,
+                after = null
             )
         }
     }
