@@ -88,7 +88,7 @@ class PersonsTest {
      * Tests listing total time entries for a non-existing person
      */
     @Test
-    fun listPersonTotalForPersonAFail() {
+    fun listNonExistingPersonTimeEntries() {
         TestBuilder().use {
             testBuilder ->
             testBuilder.manager.persons.assertTotalsFail(
