@@ -83,4 +83,30 @@ class PersonsTest {
             assertEquals(1, personTotalTimes.size)
         }
     }
+
+    /**
+     * Tests listing total time entries for a non-existing person
+     */
+    @Test
+    fun listPersonTotalForPersonAFail() {
+        TestBuilder().use {
+            testBuilder ->
+            testBuilder.manager.persons.assertTotalsFail(
+                expectedStatus = 404,
+                personId = 123
+            )
+        }
+    }
+
+    /**
+     * Test /v1/persons?active=false without access token
+     */
+    @Test
+    fun listPersonsWithNullToken() {
+        TestBuilder().use { testBuilder ->
+            testBuilder.userWithNullToken.persons.assertListFailWithNullToken(
+                expectedStatus = 401
+            )
+        }
+    }
 }

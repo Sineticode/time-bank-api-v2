@@ -50,4 +50,27 @@ class PersonsTestBuilderResource(
         }
     }
 
+    fun assertTotalsFail(expectedStatus: Int, personId: Int) {
+        try {
+            api.listPersonTotalTime(
+                personId = personId,
+                timespan = null
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
+    }
+
+    fun assertListFailWithNullToken(expectedStatus: Int) {
+        try {
+            api.listPersons(
+                active = null
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
+    }
+
 }
