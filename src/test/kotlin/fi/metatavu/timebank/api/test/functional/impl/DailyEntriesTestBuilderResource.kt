@@ -46,4 +46,16 @@ class DailyEntriesTestBuilderResource(
         }
     }
 
+    fun assertListFailWithNullToken(expectedStatus: Int) {
+        try {
+            api.listDailyEntries(
+                personId = null,
+                before = null,
+                after = null
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
+    }
 }

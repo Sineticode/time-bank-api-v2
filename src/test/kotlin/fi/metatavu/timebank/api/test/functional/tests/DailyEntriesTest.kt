@@ -53,11 +53,51 @@ class DailyEntriesTest {
 
             assertEquals(expectedAmount, dailyEntries.size)
 
-            testBuilder.manager.dailyEntries.assertListFail(404, id = 12345658, before = null, after = null)
-            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = "NOT_VALID_DATE", after = null)
-            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = null, after = "NOT_VALID_DATE")
-            testBuilder.manager.dailyEntries.assertListFail(404, id = 1, before = "NOT_VALID_DATE", after = "NOT_VALID_DATE")
-
         }
     }
-  }
+
+    /**
+     * Tests listing dailyEntry for non-existing user and existing user with invalid params
+     */
+    @Test
+    fun listDailyEntriesFails() {
+        TestBuilder().use { testBuilder ->
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 404,
+                id = 12345658,
+                before = null,
+                after = null
+            )
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 404,
+                id = 1,
+                before = "NOT_VALID_DATE",
+                after = null
+            )
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 404,
+                id = 1,
+                before = null,
+                after = "NOT_VALID_DATE"
+            )
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 404,
+                id = 1,
+                before = "NOT_VALID_DATE",
+                after = "NOT_VALID_DATE"
+            )
+        }
+    }
+
+    /**
+     * Tests /v1/dailyEntries -endpoint without access token
+     */
+    @Test
+    fun listDailyEntriesWithNullToken(){
+        TestBuilder().use { testBuilder ->
+            testBuilder.userWithNullToken.dailyEntries.assertListFailWithNullToken(
+                expectedStatus = 401
+            )
+        }
+    }
+}
