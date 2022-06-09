@@ -7,8 +7,11 @@ import fi.metatavu.timebank.test.client.apis.SynchronizeApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.models.SyncResponse
 import fi.metatavu.timebank.test.client.models.TimeEntry
-import java.util.*
 
+
+/**
+ * Test builder resource for Synchronize API
+ */
 class SynchronizeTestBuilderResource(
     testBuilder: TestBuilder,
     private val accessTokenProvider: AccessTokenProvider?,
@@ -25,11 +28,16 @@ class SynchronizeTestBuilderResource(
         return SynchronizeApi(ApiTestSettings.apiBasePath)
     }
 
+    /**
+     * Synchronizes time entries
+     *
+     * @param before before date
+     * @param after after date
+     */
     fun synchronizeEntries(before: String? = null, after: String? = null): SyncResponse {
         return api.synchronizeTimeEntries(
             before = before,
             after = after
         )
     }
-
 }

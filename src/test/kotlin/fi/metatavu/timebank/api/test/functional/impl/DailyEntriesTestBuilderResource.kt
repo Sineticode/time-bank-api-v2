@@ -9,6 +9,9 @@ import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.DailyEntry
 import org.junit.Assert
 
+/**
+ * Test builder resource for Daily Entries API
+ */
 class DailyEntriesTestBuilderResource(
     testBuilder: TestBuilder,
     private val accessTokenProvider: AccessTokenProvider?,
@@ -25,6 +28,14 @@ class DailyEntriesTestBuilderResource(
         return DailyEntriesApi(ApiTestSettings.apiBasePath)
     }
 
+    /**
+     * Gets daily entries of given person
+     *
+     * @param personId person id
+     * @param before before date
+     * @param after after date
+     * @return list of daily entries
+     */
     fun getDailyEntries(personId: Int?, before: String?, after: String?): Array<DailyEntry> {
         return api.listDailyEntries(
             personId = personId,
@@ -33,6 +44,14 @@ class DailyEntriesTestBuilderResource(
         )
     }
 
+    /**
+     * Asserts that listing daily entries fails with given status
+     *
+     * @param expectedStatus expected status
+     * @param id person id
+     * @param before before date
+     * @param after after date
+     */
     fun assertListFail(expectedStatus: Int, id: Int?, before: String?, after: String?) {
         try{
             api.listDailyEntries(
@@ -46,6 +65,11 @@ class DailyEntriesTestBuilderResource(
         }
     }
 
+    /**
+     * Asserts that listing daily entries with a null token fails with given status
+     *
+     * @param expectedStatus expected status
+     */
     fun assertListFailWithNullToken(expectedStatus: Int) {
         try {
             api.listDailyEntries(

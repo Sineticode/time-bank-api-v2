@@ -105,8 +105,7 @@ class PersonsTest {
      */
     @Test
     fun listNonExistingPersonTimeEntries() {
-        TestBuilder().use {
-            testBuilder ->
+        TestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertTotalsFail(
                 expectedStatus = 404,
                 personId = 123
