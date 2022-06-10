@@ -12,8 +12,8 @@ import java.time.LocalDate
 class TestData {
     companion object{
 
-        fun getForecastTimeEntryResponse(after: String? = null): ForecastTimeEntryResponse {
-            return if (after  != null) {
+        fun getForecastTimeEntryResponse(before: String? = null, after: String? = null): ForecastTimeEntryResponse {
+            return if (after != null) {
                 val pageContents = forecastTimeEntries.filter { forecastTimeEntry ->
                     LocalDate.parse(forecastTimeEntry.date) > LocalDate.parse(after)
                 }
@@ -25,8 +25,19 @@ class TestData {
                     status = 200,
                     message = null
                 )
-            }
-             else ForecastTimeEntryResponse(
+            } else if (before != null) {
+                val pageContents = forecastTimeEntries.filter { forecastTimeEntry ->
+                    LocalDate.parse(forecastTimeEntry.date) < LocalDate.parse(before)
+                }
+                ForecastTimeEntryResponse(
+                    pageContents = pageContents,
+                    pageNumber = 1,
+                    pageSize = pageContents.size,
+                    totalObjectCount = pageContents.size,
+                    status = 200,
+                    message = null
+                )
+        } else ForecastTimeEntryResponse(
                 pageContents = forecastTimeEntries,
                 pageNumber = 1,
                 pageSize = forecastTimeEntries.size,
@@ -141,7 +152,7 @@ class TestData {
                 task = null,
                 non_project_time = 255455,
                 time_registered = 100,
-                date = "2022-05-30",
+                date = "2022-06-05",
                 notes = null,
                 approval_status = null,
                 created_by = 1,
@@ -181,7 +192,7 @@ class TestData {
                 task = null,
                 non_project_time = null,
                 time_registered = 400,
-                date = "2022-05-30",
+                date = "2022-05-12",
                 notes = null,
                 approval_status = null,
                 created_by = 1,
@@ -202,6 +213,106 @@ class TestData {
                 non_project_time = null,
                 time_registered = 400,
                 date = "2022-04-30",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 5,
+                person = 3,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 122,
+                date = "2022-04-02",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 6,
+                person = 3,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = 255455,
+                time_registered = 372,
+                date = "2022-03-28",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 7,
+                person = 3,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = 114753,
+                time_registered = 378,
+                date = "2022-03-16",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 8,
+                person = 3,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 122,
+                date = "2022-03-14",
+                notes = null,
+                approval_status = null,
+                created_by = 1,
+                updated_by = 1,
+                created_at = "2022-05-30T04:53:33Z",
+                updated_at = "2022-05-30T04:53:33Z",
+                phase = null,
+                task_project = null,
+                invoice_entry = null,
+                invoice = null
+            ),
+            ForecastTimeEntry(
+                id = 9,
+                person = 3,
+                project = null,
+                card = null,
+                task = null,
+                non_project_time = null,
+                time_registered = 52,
+                date = "2022-01-03",
                 notes = null,
                 approval_status = null,
                 created_by = 1,

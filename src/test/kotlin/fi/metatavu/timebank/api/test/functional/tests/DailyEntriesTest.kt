@@ -22,16 +22,25 @@ import org.junit.jupiter.api.Assertions.*
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Order(2)
-class DailyEntriesTest {
+class DailyEntriesTest: AbstractTest() {
 
     /**
      * Runs synchronization to make sure that test database is populated before all tests.
      */
     @BeforeAll
     fun runSynchronizationBeforeTests() {
+        resetScenarios()
         TestBuilder().use { testBuilder ->
             testBuilder.manager.synchronization.synchronizeEntries()
         }
+    }
+
+    /**
+     * Resets Wiremock scenario states before each test
+     */
+    @BeforeEach
+    fun resetScenariosBeforeEach() {
+        resetScenarios()
     }
 
     /**
@@ -39,11 +48,8 @@ class DailyEntriesTest {
      */
     @Test
     fun testDailyEntries() {
-        TestBuilder().use{ testBuilder ->
-
-            val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.groupBy { forecastTimeEntry ->
-                Pair(forecastTimeEntry.date, forecastTimeEntry.person)
-            }.values.size
+        TestBuilder().use { testBuilder ->
+            val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.groupBy { Pair(it.date, it.person) }.values.size
 
             val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
                 personId = null,
@@ -56,6 +62,62 @@ class DailyEntriesTest {
         }
     }
 
+    /**
+     * Tests /v1/dailyEntries?personId -endpoint
+     */
+    @Test
+    fun testDailyEntriesForPersonA() {
+        TestBuilder().use { testBuilder ->
+            val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.filter { forecastTimeEntry ->
+                forecastTimeEntry.person == TestData.getPersonA().id
+            }.size
+            val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 1,
+                before = null,
+                after = null
+            )
+
+            assertEquals(expectedAmount, dailyEntries.size)
+        }
+    }
+
+    /**
+     * Tests /v1/dailyEntries?before -endpoint
+     */
+    @Test
+    fun testDailyEntriesWithBefore() {
+        TestBuilder().use { testBuilder ->
+            val expectedAmount = TestData.getForecastTimeEntryResponse(
+                before = "2022-05-12"
+            ).pageContents!!.size
+            val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = null,
+                before = "2022-05-12",
+                after = null
+            )
+
+            assertEquals(expectedAmount, dailyEntries.size)
+        }
+    }
+
+    /**
+     * Tests /v1/dailyEntries?after -endpoint
+     */
+    @Test
+    fun testDailyEntriesWithAfter() {
+        TestBuilder().use { testBuilder ->
+            val expectedAmount = TestData.getForecastTimeEntryResponse(
+                after = "2022-05-12"
+            ).pageContents!!.size
+            val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = null,
+                before = null,
+                after = "2022-05-12"
+            )
+
+            assertEquals(expectedAmount, dailyEntries.size)
+        }
+    }
     /**
      * Tests listing dailyEntry for non-existing user and existing user with invalid params
      */

@@ -11,9 +11,6 @@ import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import org.junit.Assert
 
-/**
- * Test builder resource for Persons API
- */
 class PersonsTestBuilderResource(
     testBuilder: TestBuilder,
     private val accessTokenProvider: AccessTokenProvider?,

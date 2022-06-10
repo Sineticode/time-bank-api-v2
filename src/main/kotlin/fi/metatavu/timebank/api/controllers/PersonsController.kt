@@ -34,12 +34,12 @@ class PersonsController {
      *
      * @return List of ForecastPersons
      */
-    suspend fun getPersonsFromForecast(): List<ForecastPerson>? {
+    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
-            val resultString = forecastService.getPersons() ?: return null
+            val resultString = forecastService.getPersons()
             jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
         } catch (e: Error) {
-            logger.error("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when requesting persons from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
     }
@@ -79,7 +79,7 @@ class PersonsController {
      * @return List of Forecast persons
      */
     suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
-        val persons = getPersonsFromForecast() ?: return null
+        val persons = getPersonsFromForecast()
 
         return if (active == false) {
             persons
@@ -105,10 +105,10 @@ class PersonsController {
         return when (timespan) {
             Timespan.ALL_TIME -> {
                 listOf(calculatePersonTotalTime(
-                        personId = personId,
-                        days = dailyEntries,
-                        timespan = timespan
-                    )
+                    personId = personId,
+                    days = dailyEntries,
+                    timespan = timespan
+                )
                 )
             }
             Timespan.YEAR -> {
@@ -184,24 +184,24 @@ class PersonsController {
             timePeriod = timePeriod
         )
     }
-}
 
-/**
- * build string for the timespan date
- *
- * @param timespan of totals to display
- * @param Year of current time period
- * @param Month of current time period
- * @param Week of current time period
- * @param startDate date
- * @param endDate date
- * @return
- */
-fun timespanDateStringBuilder(timespan: Timespan, year: Int?, month: Int?, week: Int?, startDate: LocalDate?, endDate: LocalDate?): String {
-    return when (timespan) {
-        Timespan.ALL_TIME -> "$startDate,$endDate"
-        Timespan.YEAR -> "$year"
-        Timespan.MONTH -> "$year,$month"
-        Timespan.WEEK -> "$year,$month,$week"
+    /**
+     * build string for the timespan date
+     *
+     * @param timespan of totals to display
+     * @param Year of current time period
+     * @param Month of current time period
+     * @param Week of current time period
+     * @param startDate date
+     * @param endDate date
+     * @return
+     */
+    private fun timespanDateStringBuilder(timespan: Timespan, year: Int?, month: Int?, week: Int?, startDate: LocalDate?, endDate: LocalDate?): String {
+        return when (timespan) {
+            Timespan.ALL_TIME -> "$startDate,$endDate"
+            Timespan.YEAR -> "$year"
+            Timespan.MONTH -> "$year,$month"
+            Timespan.WEEK -> "$year,$month,$week"
+        }
     }
 }

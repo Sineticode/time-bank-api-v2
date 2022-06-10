@@ -5,9 +5,10 @@ import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.SynchronizeApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
+import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.SyncResponse
 import fi.metatavu.timebank.test.client.models.TimeEntry
-
+import org.junit.Assert
 
 /**
  * Test builder resource for Synchronize API
@@ -39,5 +40,17 @@ class SynchronizeTestBuilderResource(
             before = before,
             after = after
         )
+    }
+
+    fun assertSynchronizeFail(expectedStatus: Int) {
+        try {
+            api.synchronizeTimeEntries(
+                before = null,
+                after = null
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
     }
 }

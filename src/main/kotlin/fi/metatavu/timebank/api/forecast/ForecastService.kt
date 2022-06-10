@@ -36,7 +36,10 @@ class ForecastService {
                 .addHeader("X-FORECAST-API-KEY", forecastApiKey)
                 .build()
             val response = client.newCall(request).execute()
-            response.body()?.string()
+            when (response.code()) {
+                200 -> response.body()?.string()
+                else -> throw Error("Couldn't reach Forecast API.")
+            }
         } catch (e: Error) {
             logger.error("Error when executing get request: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
