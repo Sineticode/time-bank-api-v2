@@ -10,7 +10,10 @@ jobs:
       with:
         submodules: true
 
-    - name: generate, test and publish coverage
+    - name: Start Docker Daemon
+      run: dockerd
+
+    - name: Generate client and spec and run tests
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
       run: ./gradlew generateApiClient generateApiSpec test
