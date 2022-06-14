@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
       with:
@@ -13,10 +13,4 @@ jobs:
     - name: generate, test and publish coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-        forecast.api.key: asd
-        forecast.base.url: asd
-        quarkus.datasource.username: asd
-        quarkus.datasource.password: asd
-        quarkus.datasource.reactive.url: mysql://localhost:3306/timebank
-        quarkus.datasource.jdbc.url: jdbc:mysql://localhost:3306/timebank
       run: ./gradlew generateApiClient generateApiSpec test
