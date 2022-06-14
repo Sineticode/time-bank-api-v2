@@ -9,6 +9,9 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
+    - name: checkout submodule to feature-2-rebuild
+      run: git submodule checkout feature-2-rebuild
+
     - name: generate, test and publish coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
