@@ -10,8 +10,8 @@ jobs:
       with:
         submodules: true
 
-    - name: Start Docker Daemon
-      run: dockerd
+    - name: Checks if Docker Daemon is running
+      run: systemctl status docker
 
     - name: Generate client and spec and run tests
       env:
