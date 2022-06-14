@@ -10,7 +10,9 @@ jobs:
       with:
         submodules: true
     - name: checkout submodule to feature-2-rebuild
-      run: git submodule update --remote
+      run: |
+        git submodule sync
+        git submodule update --remote
 
     - name: generate, test and publish coverage
       env:
