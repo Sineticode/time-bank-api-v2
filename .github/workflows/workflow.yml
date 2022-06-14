@@ -12,4 +12,4 @@ jobs:
     - name: generate, test and publish coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-      run: ./gradlew generateApiClient generateApiClient test jacocoTestReport coverallsJacoco
+      run: ./gradlew generateApiClient generateApiClient test
