@@ -5,6 +5,7 @@ import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import java.time.LocalDate
 import fi.metatavu.timebank.model.DailyEntry
+import org.slf4j.Logger
 import java.time.DayOfWeek
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
@@ -20,6 +21,9 @@ class DailyEntryController {
 
     @Inject
     lateinit var personsController: PersonsController
+
+    @Inject
+    lateinit var logger: Logger
 
     /**
      * Lists daily total times from combined timeEntries
@@ -42,32 +46,33 @@ class DailyEntryController {
      * @return List of DailyEntries
      */
     suspend fun makeDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<DailyEntry>? {
-        val persons = personsController.getPersonsFromForecast()
-        val holidays = personsController.getHolidaysFromForecast()
+        return try {
+            val persons = personsController.getPersonsFromForecast()
+            val holidays = personsController.getHolidaysFromForecast()
 
-        if (persons.isNullOrEmpty() || holidays.isNullOrEmpty()) {
-            return null
+            val entries = timeEntryRepository.getAllEntries(
+                personId = personId,
+                before = before,
+                after = after
+            )
+
+            if (entries.isEmpty()) return null
+
+            val dailyEntries = mutableListOf<DailyEntry>()
+
+            persons.forEach { person ->
+                entries
+                    .filter { timeEntry -> timeEntry.person == person.id }
+                    .groupBy { it.date }.values.map { day ->
+                        dailyEntries.add(calculateDailyEntries(day, person, holidays))
+                    }
+            }
+
+            dailyEntries.sortedByDescending { it.date }
+        } catch (e: Error) {
+            logger.error("Error during calculation of daily entries: ${e.localizedMessage}")
+            throw Error(e.localizedMessage)
         }
-
-        val entries = timeEntryRepository.getAllEntries(
-            personId = personId,
-            before = before,
-            after = after
-        )
-
-        if (entries.isEmpty()) return null
-
-        val dailyEntries = mutableListOf<DailyEntry>()
-
-        persons.forEach{ person ->
-            entries
-                .filter{ timeEntry -> timeEntry.person == person.id }
-                .groupBy{ it.date }.values.map{ day ->
-                    dailyEntries.add(calculateDailyEntries(day, person, holidays))
-                }
-        }
-
-        return dailyEntries.sortedByDescending{ it.date }
     }
 
     /**

@@ -46,7 +46,7 @@ class DailyEntriesTest: AbstractTest() {
     /**
      * Tests /v1/dailyEntries -endpoint
      */
-    @Test
+     @Test
     fun testDailyEntries() {
         TestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.groupBy { Pair(it.date, it.person) }.values.size
@@ -65,11 +65,11 @@ class DailyEntriesTest: AbstractTest() {
     /**
      * Tests /v1/dailyEntries?personId -endpoint
      */
-    @Test
+     @Test
     fun testDailyEntriesForPersonA() {
         TestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.filter { forecastTimeEntry ->
-                forecastTimeEntry.person == TestData.getPersonA().id
+                forecastTimeEntry.person == TestData.getPerson(id = 1).id
             }.size
             val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
                 personId = 1,
@@ -84,7 +84,7 @@ class DailyEntriesTest: AbstractTest() {
     /**
      * Tests /v1/dailyEntries?before -endpoint
      */
-    @Test
+     @Test
     fun testDailyEntriesWithBefore() {
         TestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse(
@@ -103,7 +103,7 @@ class DailyEntriesTest: AbstractTest() {
     /**
      * Tests /v1/dailyEntries?after -endpoint
      */
-    @Test
+     @Test
     fun testDailyEntriesWithAfter() {
         TestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse(
@@ -118,10 +118,11 @@ class DailyEntriesTest: AbstractTest() {
             assertEquals(expectedAmount, dailyEntries.size)
         }
     }
+
     /**
      * Tests listing dailyEntry for non-existing user and existing user with invalid params
      */
-    @Test
+     @Test
     fun listDailyEntriesFails() {
         TestBuilder().use { testBuilder ->
             testBuilder.manager.dailyEntries.assertListFail(
@@ -152,9 +153,47 @@ class DailyEntriesTest: AbstractTest() {
     }
 
     /**
+     * Tests /v1/dailyEntries -endpoint when Forecast API persons -endpoint responses with an error
+     */
+     @Test
+    fun testDailyEntriesForecastPersonsError() {
+        setScenario(
+            scenario = PERSONS_SCENARIO,
+            state = ERROR_STATE
+        )
+        TestBuilder().use { testBuilder ->
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 400,
+                id = null,
+                before = null,
+                after = null
+            )
+        }
+    }
+
+    /**
+     * Tests /v1/dailyEntries -endpoint when Forecast API holidays -endpoint responses with an error
+     */
+     @Test
+    fun testDailyEntriesForecastHolidaysError() {
+        setScenario(
+            scenario = HOLIDAYS_SCENARIO,
+            state = ERROR_STATE
+        )
+        TestBuilder().use { testBuilder ->
+            testBuilder.manager.dailyEntries.assertListFail(
+                expectedStatus = 400,
+                id = null,
+                before = null,
+                after = null
+            )
+        }
+    }
+
+    /**
      * Tests /v1/dailyEntries -endpoint without access token
      */
-    @Test
+     @Test
     fun listDailyEntriesWithNullToken(){
         TestBuilder().use { testBuilder ->
             testBuilder.userWithNullToken.dailyEntries.assertListFail(

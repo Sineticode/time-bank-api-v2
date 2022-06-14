@@ -53,7 +53,7 @@ class PersonsTest: AbstractTest() {
     /**
      * Tests /v1/persons?active=false -endpoint
      */
-    @Test
+     @Test
     fun listActivePersons() {
         TestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons()
@@ -66,7 +66,7 @@ class PersonsTest: AbstractTest() {
     /**
      * Tests /v1/persons -endpoint
      */
-    @Test
+     @Test
     fun listAllPersons() {
         TestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons(
@@ -74,7 +74,7 @@ class PersonsTest: AbstractTest() {
             )
 
             assertEquals(3, persons.size)
-            assertEquals(TestData.getPersonA().first_name, persons[0].firstName)
+            assertEquals(TestData.getPerson(id = 1).first_name, persons[0].firstName)
             testBuilder.notvalid.persons.assertListFail(401)
         }
     }
@@ -83,51 +83,41 @@ class PersonsTest: AbstractTest() {
      * Tests /v1/persons/1/total
      *  timespan defaults to ALL_TIME
      */
-    @Test
+     @Test
     fun listPersonTotalTimeForPersonA() {
         TestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPersonA().id,
+                personId = TestData.getPerson(id = 1).id,
                 timespan = null
             )
-            val personAEntries = TestData.forecastTimeEntries.filter { entry -> entry.person == TestData.getPersonA().id }
-            var projectTime = 0
-            var internalTime = 0
-            var totalTimeRegistered = 0
-            val startDate = personAEntries.last().date
-            val endDate = personAEntries.first().date
-
-            personAEntries.forEach { forecastTimeEntry ->
-                totalTimeRegistered += forecastTimeEntry.time_registered
-                if (forecastTimeEntry.non_project_time == null) {
-                    projectTime += forecastTimeEntry.time_registered
-                } else {
-                    internalTime += forecastTimeEntry.time_registered
-                }
-            }
+            val personAEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 1,
+                before = null,
+                after = null
+            ).groupBy { LocalDate.parse(it.date).year }.values
+            val personARefData = personAEntries.map { days ->
+                calculatePersonTotalTimes(
+                    personId = 1,
+                    days = days,
+                    timespan = Timespan.aLLTIME
+                )
+            }.first()
 
             assertEquals(1, personTotalTimes.size)
-            assertEquals(totalTimeRegistered, personTotalTimes[0].logged)
-            assertEquals(internalTime, personTotalTimes[0].internalTime)
-            assertEquals(projectTime, personTotalTimes[0].projectTime)
-            assertEquals(
-                "$startDate,$endDate",
-                personTotalTimes[0].timePeriod
-            )
+            assertTrue(ReflectionEquals(personARefData, null).matches(personTotalTimes.first()))
         }
     }
 
     /**
      * Tests /v1/persons/2/total?timespan=YEAR
      */
-    @Test
+     @Test
     fun listPersonTotalTimeForPersonB() {
         TestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPersonB().id,
+                personId = TestData.getPerson(id = 2).id,
                 timespan = Timespan.yEAR
             )
-            resetScenarios()
             val personBEntries = testBuilder.manager.dailyEntries.getDailyEntries(
                 personId = 2,
                 before = null,
@@ -139,27 +129,26 @@ class PersonsTest: AbstractTest() {
                     days = days,
                     timespan = Timespan.yEAR
                 )
-            }.first()
+            }
 
-            assertEquals(1, personTotalTimes.size)
-            assertEquals(personBRefData.logged, personTotalTimes[0].logged)
-            assertEquals(personBRefData.internalTime, personTotalTimes[0].internalTime)
-            assertEquals(personBRefData.projectTime, personTotalTimes[0].projectTime)
-            assertEquals(personBRefData.timePeriod, personTotalTimes[0].timePeriod)
+            personBRefData.forEachIndexed { index, _ ->
+                personTotalTimes.forEach { actual ->
+                    assertTrue(ReflectionEquals(personBRefData[index], null).matches(personTotalTimes[index]))
+                }
+            }
         }
     }
 
     /**
      * Tests /v1/persons/3/total?timespan=MONTH
      */
-    @Test
+     @Test
     fun listPersonTotalTimeForPersonC() {
         TestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPersonC().id,
+                personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.mONTH
             )
-            resetScenarios()
             val personCEntries = testBuilder.manager.dailyEntries.getDailyEntries(
                 personId = 3,
                 before = null,
@@ -185,15 +174,14 @@ class PersonsTest: AbstractTest() {
     /**
      * Tests /v1/persons/3/total?timespan=WEEK
      */
-    @Test
+     @Test
     fun listPersonTotalTimeForPersonCWeek() {
         val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
         TestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPersonC().id,
+                personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.wEEK
             ).sortedBy { it.timePeriod!!.split(",")[2] }
-            resetScenarios()
             val personCEntries = testBuilder.manager.dailyEntries.getDailyEntries(
                 personId = 3,
                 before = null,
@@ -220,7 +208,7 @@ class PersonsTest: AbstractTest() {
     /**
      * Tests listing total time entries for a non-existing person
      */
-    @Test
+     @Test
     fun listNonExistingPersonTimeEntries() {
         TestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertTotalsFail(
@@ -233,12 +221,26 @@ class PersonsTest: AbstractTest() {
     /**
      * Test /v1/persons?active=false without access token
      */
-    @Test
+     @Test
     fun listPersonsWithNullToken() {
         TestBuilder().use { testBuilder ->
             testBuilder.userWithNullToken.persons.assertListFailWithNullToken(
                 expectedStatus = 401
             )
+        }
+    }
+
+    /**
+     * Tests /v1/persons -endpoint when Forecast API persons -endpoint responses with an error
+     */
+     @Test
+    fun testPersonsWithForecastError() {
+        setScenario(
+            scenario = PERSONS_SCENARIO,
+            state = ERROR_STATE
+        )
+        TestBuilder().use { testBuilder ->
+            testBuilder.manager.persons.assertListFail(400)
         }
     }
 

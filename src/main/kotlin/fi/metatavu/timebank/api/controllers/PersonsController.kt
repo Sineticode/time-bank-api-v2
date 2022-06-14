@@ -49,15 +49,15 @@ class PersonsController {
      *
      * @return List of LocalDate
      */
-    suspend fun getHolidaysFromForecast(): List<LocalDate>? {
+    suspend fun getHolidaysFromForecast(): List<LocalDate> {
         return try {
-            val resultString = forecastService.getHolidays() ?: return null
+            val resultString = forecastService.getHolidays()
             val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
             forecastHolidays.map{ holiday ->
                 LocalDate.of(holiday.year, holiday.month, holiday.day)
             }
         } catch (e: Error) {
-            logger.error("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when requesting holidays from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
     }

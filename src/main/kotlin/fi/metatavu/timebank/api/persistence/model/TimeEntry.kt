@@ -2,7 +2,7 @@ package fi.metatavu.timebank.api.persistence.model
 
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -37,4 +37,20 @@ class TimeEntry {
 
     @Column
     var updatedAt: OffsetDateTime? = null
+
+    /**
+     * Compares object equality ignoring entryId
+     */
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        other as TimeEntry
+        return forecastId == other.forecastId &&
+            person == other.person &&
+            internalTime == other.internalTime &&
+            projectTime == other.projectTime &&
+            date == other.date &&
+            createdAt == other.createdAt &&
+            updatedAt == other.updatedAt
+    }
 }

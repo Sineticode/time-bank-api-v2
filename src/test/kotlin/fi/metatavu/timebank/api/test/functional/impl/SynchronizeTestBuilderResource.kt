@@ -9,6 +9,7 @@ import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.SyncResponse
 import fi.metatavu.timebank.test.client.models.TimeEntry
 import org.junit.Assert
+import java.util.concurrent.TimeUnit
 
 /**
  * Test builder resource for Synchronize API
@@ -26,6 +27,7 @@ class SynchronizeTestBuilderResource(
 
     override fun getApi(): SynchronizeApi {
         ApiClient.accessToken = accessTokenProvider?.accessToken
+        ApiClient.builder.connectTimeout(0, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS).readTimeout(0, TimeUnit.SECONDS).build()
         return SynchronizeApi(ApiTestSettings.apiBasePath)
     }
 
@@ -42,6 +44,9 @@ class SynchronizeTestBuilderResource(
         )
     }
 
+    /**
+     * Asserts that synchronization fails with given client error
+     */
     fun assertSynchronizeFail(expectedStatus: Int) {
         try {
             api.synchronizeTimeEntries(

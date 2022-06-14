@@ -87,10 +87,6 @@ class SynchronizeController {
         while (!retrievedAllEntries) {
             val resultString = forecastService.getTimeEntries(after, pageNumber)
 
-            if (resultString.isNullOrEmpty()) {
-                throw Error("Error while retrieving time registrations from Forecast API.")
-            }
-
             val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
             val amountOfPages =
                 if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1

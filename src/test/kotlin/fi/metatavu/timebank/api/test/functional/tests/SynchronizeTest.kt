@@ -25,6 +25,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 class SynchronizeTest: AbstractTest() {
 
     /**
+     * Resets Wiremock scenario states before each test
+     */
+    @BeforeEach
+    fun resetScenariosBeforeEach() {
+        resetScenarios()
+    }
+
+    /**
      * Tests /v1/synchronize -endpoint
      */
     @Test
@@ -34,23 +42,71 @@ class SynchronizeTest: AbstractTest() {
                 before = null,
                 after = "2022-05-01"
             )
-            resetScenarios()
-
             val synchronized = testBuilder.manager.synchronization.synchronizeEntries()
+            val synchronizedNotFound = testBuilder.manager.synchronization.synchronizeEntries()
+            setScenario(
+                scenario = TIMES_SCENARIO,
+                state = UPDATE_STATE
+            )
+            val synchronizeUpdated = testBuilder.manager.synchronization.synchronizeEntries()
 
-            assertEquals(3, synchronizedAfter.message)
-            assertEquals(6, synchronized.message)
+            var expected = TestData.getForecastTimeEntry().size
+            val expectedAfter = TestData.getForecastTimeEntry().filter { it.date > "2022-05-01" }.size
+            expected -= expectedAfter
+
+            assertEquals(expectedAfter, synchronizedAfter.message)
+            assertEquals(expected, synchronized.message)
+            assertEquals(0, synchronizedNotFound.message)
+            assertEquals(1, synchronizeUpdated.message)
         }
     }
 
     /**
-     *  Tests /v1/synchronize -endpoint when Forecast API responses with an error
+     * Tests /v1/synchronize -endpoint with 2000 random generated ForecastTimeEntries
      */
     @Test
-    fun testSynchronizationForecastError() {
+    fun testSynchronizationLoop() {
+        setScenario(
+            scenario = "timesScenario",
+            state = "generatedStateOne"
+        )
         TestBuilder().use { testBuilder ->
-            testBuilder.manager.synchronization.assertSynchronizeFail(400)
+            val synchronized = testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = null
+            )
 
+            assertEquals(2000, synchronized.message)
+        }
+    }
+
+    /**
+     *  Tests /v1/synchronize -endpoint when Forecast API persons -endpoint responses with an error
+     */
+    @Test
+    fun testSynchronizationForecastPersonsError() {
+        setScenario(
+            scenario = PERSONS_SCENARIO,
+            state = ERROR_STATE
+        )
+        TestBuilder().use { testBuilder ->
+
+            testBuilder.manager.synchronization.assertSynchronizeFail(400)
+        }
+    }
+
+    /**
+     * Tests /v1/synchronize -endpoint when Forecast API time_registrations -endpoint responses with an error
+     */
+    @Test
+    fun testSynchronizationForecastTimeRegError() {
+        setScenario(
+            scenario = TIMES_SCENARIO,
+            state = ERROR_STATE
+        )
+        TestBuilder().use { testBuilder ->
+
+            testBuilder.manager.synchronization.assertSynchronizeFail(400)
         }
     }
 }
