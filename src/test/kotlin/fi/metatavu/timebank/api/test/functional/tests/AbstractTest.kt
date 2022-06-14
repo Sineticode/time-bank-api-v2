@@ -1,7 +1,10 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.test.functional.TestBuilder
+import io.quarkus.test.common.DevServicesContext
 import okhttp3.*
+import org.eclipse.microprofile.config.ConfigProvider
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
 import javax.inject.Inject
@@ -16,6 +19,25 @@ abstract class AbstractTest {
 
     @ConfigProperty(name = "forecast.base.url")
     lateinit var forecastBaseUrl: String
+
+    private var devServicesContext: DevServicesContext? = null
+
+    protected fun createTestBuilder(): TestBuilder {
+        return TestBuilder(getConfig())
+    }
+
+    private fun getConfig(): Map<String, String> {
+        return getDevServiceConfig() ?: getQuarkusConfig()
+    }
+
+    private fun getDevServiceConfig(): Map<String, String>? {
+        return devServicesContext?.devServicesProperties()
+    }
+
+    private fun getQuarkusConfig(): Map<String, String> {
+        val config = ConfigProvider.getConfig()
+        return config.propertyNames.associateWith { config.getConfigValue(it).rawValue }
+    }
 
     /**
      * Resets Wiremock scenario states

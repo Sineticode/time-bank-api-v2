@@ -37,7 +37,7 @@ class SynchronizeTest: AbstractTest() {
      */
     @Test
     fun testSynchronization() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val synchronizedAfter = testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = "2022-05-01"
@@ -70,7 +70,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = "timesScenario",
             state = "generatedStateOne"
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val synchronized = testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = null
@@ -89,7 +89,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = PERSONS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
 
             testBuilder.manager.synchronization.assertSynchronizeFail(400)
         }
@@ -104,7 +104,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = TIMES_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
 
             testBuilder.manager.synchronization.assertSynchronizeFail(400)
         }

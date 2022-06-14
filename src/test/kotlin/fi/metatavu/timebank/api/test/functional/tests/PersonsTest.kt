@@ -37,7 +37,7 @@ class PersonsTest: AbstractTest() {
     @BeforeAll
     fun runSynchronizationBeforeTests() {
         resetScenarios()
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.synchronization.synchronizeEntries()
         }
     }
@@ -55,7 +55,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listActivePersons() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons()
 
             assertEquals(1, persons.size)
@@ -68,7 +68,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listAllPersons() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons(
                 active = false
             )
@@ -85,7 +85,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listPersonTotalTimeForPersonA() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 1).id,
                 timespan = null
@@ -113,7 +113,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listPersonTotalTimeForPersonB() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 2).id,
                 timespan = Timespan.yEAR
@@ -144,7 +144,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listPersonTotalTimeForPersonC() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.mONTH
@@ -177,7 +177,7 @@ class PersonsTest: AbstractTest() {
      @Test
     fun listPersonTotalTimeForPersonCWeek() {
         val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.wEEK
@@ -210,7 +210,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listNonExistingPersonTimeEntries() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertTotalsFail(
                 expectedStatus = 404,
                 personId = 123
@@ -223,7 +223,7 @@ class PersonsTest: AbstractTest() {
      */
      @Test
     fun listPersonsWithNullToken() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.userWithNullToken.persons.assertListFailWithNullToken(
                 expectedStatus = 401
             )
@@ -239,7 +239,7 @@ class PersonsTest: AbstractTest() {
             scenario = PERSONS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertListFail(400)
         }
     }

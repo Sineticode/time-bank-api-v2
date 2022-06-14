@@ -12,7 +12,7 @@ import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import org.eclipse.microprofile.config.ConfigProvider
 
-class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
+class TestBuilder(private val config: Map<String, String>): AbstractAccessTokenTestBuilder<ApiClient>() {
 
     val settings = ApiTestSettings
 

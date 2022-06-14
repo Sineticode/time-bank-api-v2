@@ -30,7 +30,7 @@ class DailyEntriesTest: AbstractTest() {
     @BeforeAll
     fun runSynchronizationBeforeTests() {
         resetScenarios()
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.synchronization.synchronizeEntries()
         }
     }
@@ -48,7 +48,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun testDailyEntries() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.groupBy { Pair(it.date, it.person) }.values.size
 
             val dailyEntries = testBuilder.manager.dailyEntries.getDailyEntries(
@@ -67,7 +67,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun testDailyEntriesForPersonA() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse().pageContents!!.filter { forecastTimeEntry ->
                 forecastTimeEntry.person == TestData.getPerson(id = 1).id
             }.size
@@ -86,7 +86,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun testDailyEntriesWithBefore() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse(
                 before = "2022-05-12"
             ).pageContents!!.size
@@ -105,7 +105,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun testDailyEntriesWithAfter() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val expectedAmount = TestData.getForecastTimeEntryResponse(
                 after = "2022-05-12"
             ).pageContents!!.size
@@ -124,7 +124,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun listDailyEntriesFails() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.dailyEntries.assertListFail(
                 expectedStatus = 404,
                 id = 12345658,
@@ -161,7 +161,7 @@ class DailyEntriesTest: AbstractTest() {
             scenario = PERSONS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.dailyEntries.assertListFail(
                 expectedStatus = 400,
                 id = null,
@@ -180,7 +180,7 @@ class DailyEntriesTest: AbstractTest() {
             scenario = HOLIDAYS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.dailyEntries.assertListFail(
                 expectedStatus = 400,
                 id = null,
@@ -195,7 +195,7 @@ class DailyEntriesTest: AbstractTest() {
      */
      @Test
     fun listDailyEntriesWithNullToken(){
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.userWithNullToken.dailyEntries.assertListFail(
                 expectedStatus = 401,
                 id = null,
