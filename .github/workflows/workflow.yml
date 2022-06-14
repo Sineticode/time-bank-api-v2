@@ -1,0 +1,15 @@
+name: coveralls
+
+on: ["push", "pull_request"]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: generate, test and publish coverage
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+      run: ./gradlew generateApiClient generateApiClient test jacocoTestReport coverallsJacoco
