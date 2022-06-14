@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.allopen") version "1.6.10"
     id("io.quarkus")
     id("org.openapi.generator") version "5.4.0"
+    id("com.github.nbaztec.coveralls-jacoco") version "1.2.14"
 }
 
 repositories {
@@ -49,6 +50,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.17.2")
     testImplementation("org.testcontainers:mysql:1.17.2")
     testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
+    testImplementation("io.quarkus:quarkus-jacoco")
 }
 
 group = "fi.metatavu.timebank"
@@ -76,6 +78,10 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
+}
+
+coverallsJacoco{
+    reportPath = "build/jacoco-report/jacoco.xml"
 }
 
 val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
