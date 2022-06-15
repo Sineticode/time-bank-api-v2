@@ -17,6 +17,8 @@ abstract class AbstractTest {
     @ConfigProperty(name = "forecast.base.url")
     lateinit var forecastBaseUrl: String
 
+    data class ReqBody(val state: String)
+
     /**
      * Resets Wiremock scenario states
      */
@@ -61,13 +63,6 @@ abstract class AbstractTest {
 
     companion object {
         const val PERSONS_SCENARIO = "personsScenario"
-        const val HOLIDAYS_SCENARIO = "holidaysScenario"
-        const val TIMES_SCENARIO = "timesScenario"
         const val ERROR_STATE = "errorState"
-        const val UPDATE_STATE = "updateState"
     }
 }
-
-data class ReqBody(
-    val state: String
-)
