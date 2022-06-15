@@ -3,7 +3,6 @@ package fi.metatavu.timebank.api.test.functional.auth
 import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenProvider
 import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenTestBuilderAuthentication
 import fi.metatavu.timebank.api.test.functional.TestBuilder
-import fi.metatavu.timebank.api.test.functional.impl.DailyEntriesTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.impl.PersonsTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.impl.SynchronizeTestBuilderResource
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
@@ -24,7 +23,6 @@ class TestBuilderAuthentication(
 
     private var accessTokenProvider: AccessTokenProvider? = accessTokenProvider
 
-    val dailyEntries = DailyEntriesTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
     val persons = PersonsTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
     val synchronization = SynchronizeTestBuilderResource(testBuilder, this.accessTokenProvider, createClient())
 

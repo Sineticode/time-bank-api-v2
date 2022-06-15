@@ -1,11 +1,8 @@
-package fi.metatavu.timebank.api.test.functional.tests
+package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
-import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
-import fi.metatavu.timebank.api.test.functional.data.TestPersonsData
-import fi.metatavu.timebank.api.test.functional.data.TestTimeEntriesData
 import java.time.LocalDate
 
 /**
@@ -14,9 +11,17 @@ import java.time.LocalDate
 class TestData {
 
     companion object {
+
+        /**
+         * Gets mock Forecast API response to /v4/time_registrations
+         *
+         * @param before before LocalDate as string to filter time entries
+         * @param after after LocalDate as string to filter time entries
+         * @return ForecastTimeEntryResponse
+         */
         fun getForecastTimeEntryResponse(before: String? = null, after: String? = null): ForecastTimeEntryResponse {
             return if (after != null) {
-                val pageContents = getForecastTimeEntry().filter { forecastTimeEntry ->
+                val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
                     LocalDate.parse(forecastTimeEntry.date) > LocalDate.parse(after)
                 }
                 ForecastTimeEntryResponse(
@@ -28,7 +33,7 @@ class TestData {
                     message = null
                 )
             } else if (before != null) {
-                val pageContents = getForecastTimeEntry().filter { forecastTimeEntry ->
+                val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
                     LocalDate.parse(forecastTimeEntry.date) < LocalDate.parse(before)
                 }
                 ForecastTimeEntryResponse(
@@ -39,16 +44,22 @@ class TestData {
                     status = 200,
                     message = null
                 )
-        } else ForecastTimeEntryResponse(
-                pageContents = getForecastTimeEntry(),
+            } else ForecastTimeEntryResponse(
+                pageContents = TestTimeEntriesData.getForecastTimeEntries(),
                 pageNumber = 1,
-                pageSize = getForecastTimeEntry().size,
-                totalObjectCount = getForecastTimeEntry().size,
+                pageSize = TestTimeEntriesData.getForecastTimeEntries().size,
+                totalObjectCount = TestTimeEntriesData.getForecastTimeEntries().size,
                 status = 200,
                 message = null
             )
         }
 
+        /**
+         * Gets mock Forecast API response to /v4/time_registrations
+         * with time entries with updated values
+         *
+         * @return ForecastTimeEntryResponse
+          */
         fun getUpdatedForecastTimeEntryResponse(): ForecastTimeEntryResponse {
             return ForecastTimeEntryResponse(
                 pageContents = TestTimeEntriesData.getUpdatedForecastTimeEntry(),
@@ -60,6 +71,13 @@ class TestData {
             )
         }
 
+        /**
+         * Gets mock Forecast API response to /v4/time_registrations
+         * with 2000 random generated time entries
+         *
+         * @param pageNumber Integer 1 or 2
+         * @return ForecastTimeEntryResponse
+         */
         fun getGeneratedForecastTimeEntryResponse(pageNumber: Int): ForecastTimeEntryResponse {
             return ForecastTimeEntryResponse(
                 pageContents = TestTimeEntriesData.generateRandomForecastTimeEntries(pageNumber),
@@ -71,38 +89,44 @@ class TestData {
             )
         }
 
-        fun getForecastTimeEntry(id: Int? = null, person: Int? = null): List<ForecastTimeEntry> {
-            return if (id != null) {
-                TestTimeEntriesData.getForecastTimeEntries().filter { it.id == id }
-            } else if (person != null) {
-                TestTimeEntriesData.getForecastTimeEntries().filter { it.person == person }
-            } else {
-                TestTimeEntriesData.getForecastTimeEntries()
-            }
-        }
-
+        /**
+         * Gets one mock person by id
+         *
+         * @param id personId
+         * @return ForecastPerson
+         */
         fun getPerson(id: Int): ForecastPerson {
             return TestPersonsData.getPersons().filter { it.id == id }[0]
         }
 
+        /**
+         * Gets all mock persons
+         *
+         * @return List of ForecastPerson
+         */
         fun getPersons(): List<ForecastPerson> {
             return TestPersonsData.getPersons()
         }
 
+        /**
+         * Gets mock ForecastHolidays
+         *
+         * @return List of ForecastHolidays
+         */
         fun getHolidays(): List<ForecastHoliday> {
             return listOf(
                 ForecastHoliday(
-                id = 1,
-                holiday_calendar_id = 2,
-                year = 2022,
-                month = 6,
-                day = 5,
-                name = "Helluntai",
-                created_by = 0,
-                updated_by = 0,
-                created_at = "2022-05-01",
-                updated_at = "2022-05-01"
-            ))
+                    id = 1,
+                    holiday_calendar_id = 2,
+                    year = 2022,
+                    month = 6,
+                    day = 5,
+                    name = "Helluntai",
+                    created_by = 0,
+                    updated_by = 0,
+                    created_at = "2022-05-01",
+                    updated_at = "2022-05-01"
+                ))
         }
     }
 }

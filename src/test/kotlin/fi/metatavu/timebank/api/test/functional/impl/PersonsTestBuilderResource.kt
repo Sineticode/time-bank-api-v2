@@ -101,5 +101,4 @@ class PersonsTestBuilderResource(
             assertClientExceptionStatus(expectedStatus, ex)
         }
     }
-
 }

@@ -1,8 +1,9 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.TestBuilder
+import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
-import fi.metatavu.timebank.api.test.functional.resources.TestMockResource
+import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestMockResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestProfile(LocalTestProfile::class)
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
@@ -50,8 +51,8 @@ class SynchronizeTest: AbstractTest() {
             )
             val synchronizeUpdated = testBuilder.manager.synchronization.synchronizeEntries()
 
-            var expected = TestData.getForecastTimeEntry().size
-            val expectedAfter = TestData.getForecastTimeEntry().filter { it.date > "2022-05-01" }.size
+            var expected = TestData.getForecastTimeEntryResponse().pageContents!!.size
+            val expectedAfter = TestData.getForecastTimeEntryResponse().pageContents!!.filter { it.date > "2022-05-01" }.size
             expected -= expectedAfter
 
             assertEquals(expectedAfter, synchronizedAfter.message)

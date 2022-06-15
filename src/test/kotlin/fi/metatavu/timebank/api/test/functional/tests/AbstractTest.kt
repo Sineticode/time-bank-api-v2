@@ -17,6 +17,8 @@ abstract class AbstractTest {
     @ConfigProperty(name = "forecast.base.url")
     lateinit var forecastBaseUrl: String
 
+    data class ReqBody(val state: String)
+
     /**
      * Resets Wiremock scenario states
      */
@@ -67,7 +69,3 @@ abstract class AbstractTest {
         const val UPDATE_STATE = "updateState"
     }
 }
-
-data class ReqBody(
-    val state: String
-)

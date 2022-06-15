@@ -4,15 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
-import fi.metatavu.timebank.api.test.functional.tests.TestData
+import fi.metatavu.timebank.api.test.functional.data.TestData
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
 
 /**
  * Wiremock to mock Forecast API
  */
-class TestMockResource: QuarkusTestResourceLifecycleManager {
+class TestWiremockResource: QuarkusTestResourceLifecycleManager {
     private var wireMockServer = WireMockServer()
     private val objectMapper = ObjectMapper()
+
+    data class ForecastErrorResponse(val status: Int, val message: String)
+
 
     override fun start(): Map<String, String> {
         objectMapper.findAndRegisterModules()
@@ -92,7 +95,8 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
             get(urlPathEqualTo("/v4/time_registrations"))
                 .inScenario("timesScenario")
                 .whenScenarioStateIs(STARTED)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(
+                    TestData.getForecastTimeEntryResponse(
                     before = null,
                     after = null
                 )), 200))
@@ -134,7 +138,8 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
             get(urlPathEqualTo("/v4/time_registrations/updated_after/20220501T000000"))
                 .inScenario("timesScenario")
                 .whenScenarioStateIs(STARTED)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(
+                    TestData.getForecastTimeEntryResponse(
                     before = null,
                     after = "2022-05-01"
                 )), 200))
@@ -155,8 +160,3 @@ class TestMockResource: QuarkusTestResourceLifecycleManager {
         wireMockServer.stop()
     }
 }
-
-data class ForecastErrorResponse(
-    val status: Int,
-    val message: String
-)
