@@ -1,8 +1,11 @@
 package fi.metatavu.timebank.api.forecast.models
 
+import io.quarkus.runtime.annotations.RegisterForReflection
+
 /**
  * Data class for TimeEntry data coming from Forecast
  */
+@RegisterForReflection
 data class ForecastTimeEntry(
     val id: Int,
     val person: Int,
