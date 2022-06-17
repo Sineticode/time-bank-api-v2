@@ -18,30 +18,5 @@
   },
   {
     "name": "kotlin.KotlinVersion$Companion[]"
-  },
-  {
-    "name": "fi.metatavu.timebank.model.DailyEntry",
-    "allDeclaredConstructors": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "fi.metatavu.timebank.model.Error",
-    "allDeclaredConstructors": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "fi.metatavu.timebank.model.Person",
-    "allDeclaredConstructors": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "fi.metatavu.timebank.model.PersonTotalTime",
-    "allDeclaredConstructors": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "fi.metatavu.timebank.model.SyncResponse",
-    "allDeclaredConstructors": true,
-    "allDeclaredFields": true
   }
 ]

@@ -76,6 +76,7 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
+    dependsOn("generateApiSpec")
 }
 
 val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
@@ -85,6 +86,7 @@ val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
     setProperty("apiPackage", "${project.group}.spec")
     setProperty("invokerPackage", "${project.group}.invoker")
     setProperty("modelPackage", "${project.group}.model")
+    setProperty("templateDir", "$rootDir/openapi/api-spec")
 
     this.configOptions.put("library", "jaxrs-spec")
     this.configOptions.put("dateLibrary", "java8")
