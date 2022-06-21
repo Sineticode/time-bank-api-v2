@@ -24,11 +24,11 @@ class ForecastTimeEntryTranslator {
         translatedTimeEntry.entryId = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
         translatedTimeEntry.person = entity.person
-        translatedTimeEntry.internalTime = if (entity.non_project_time != null) entity.time_registered else 0
-        translatedTimeEntry.projectTime = if (entity.non_project_time != null) 0 else entity.time_registered
+        translatedTimeEntry.internalTime = if (entity.nonProjectTime != null) entity.timeRegistered else 0
+        translatedTimeEntry.projectTime = if (entity.nonProjectTime != null) 0 else entity.timeRegistered
         translatedTimeEntry.date = LocalDate.parse(entity.date)
-        translatedTimeEntry.createdAt = OffsetDateTime.parse(entity.created_at)
-        translatedTimeEntry.updatedAt = OffsetDateTime.parse(entity.updated_at)
+        translatedTimeEntry.createdAt = OffsetDateTime.parse(entity.createdAt)
+        translatedTimeEntry.updatedAt = OffsetDateTime.parse(entity.updatedAt)
         return translatedTimeEntry
     }
 

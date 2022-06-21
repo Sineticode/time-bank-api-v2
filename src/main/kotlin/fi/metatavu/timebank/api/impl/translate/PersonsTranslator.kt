@@ -13,8 +13,9 @@ class PersonsTranslator: AbstractTranslator<ForecastPerson, Person>() {
     override fun translate(entity: ForecastPerson): Person {
         return Person(
             id = entity.id,
-            firstName = entity.first_name,
-            lastName = entity.last_name ?: "",
+            firstName = entity.firstName,
+            lastName = entity.lastName,
+            email = entity.email,
             monday = entity.monday,
             tuesday = entity.tuesday,
             wednesday = entity.wednesday,
@@ -23,8 +24,9 @@ class PersonsTranslator: AbstractTranslator<ForecastPerson, Person>() {
             saturday = entity.saturday,
             sunday = entity.sunday,
             active = entity.active,
-            startDate = entity.start_date ?: "",
-            defaultRole = entity.default_role ?: 0
+            startDate = entity.startDate ?: "",
+            language = entity.language
+
         )
     }
 

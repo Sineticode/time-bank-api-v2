@@ -1,36 +1,41 @@
 package fi.metatavu.timebank.api.forecast.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.quarkus.runtime.annotations.RegisterForReflection
 
 /**
  * Data class for Person data coming from Forecast
  */
 @RegisterForReflection
-data class ForecastPerson(
-    val id: Int,
-    val first_name: String,
-    val last_name: String?,
-    val email: String?,
-    val monday: Int,
-    val tuesday: Int,
-    val wednesday: Int,
-    val thursday: Int,
-    val friday: Int,
-    val saturday: Int,
-    val sunday: Int,
-    val active: Boolean,
-    val default_role: Int?,
-    val cost: Double,
-    val language: String,
-    val created_by: Int?,
-    val updated_by: Int?,
-    val client_id: Int?,
-    val holiday_calendar_id: Int,
-    val start_date: String?,
-    val end_date: String?,
-    val created_at: String?,
-    val updated_at: String?,
-    val department_id: Any?,
-    val permissions: List<String>,
-    val is_system_user: Boolean
-)
+@JsonIgnoreProperties(ignoreUnknown = true)
+class ForecastPerson {
+    var id: Int = 0
+    @JsonProperty("first_name")
+    var firstName: String = ""
+    @JsonProperty("last_name")
+    var lastName: String = ""
+    var email: String = ""
+    var monday: Int = 0
+    var tuesday: Int = 0
+    var wednesday: Int = 0
+    var thursday: Int = 0
+    var friday: Int = 0
+    var saturday: Int = 0
+    var sunday: Int = 0
+    var active: Boolean = false
+    var language: String = ""
+    @JsonProperty("holiday_calendar_id")
+    var holidayCalendarId: Int = 0
+    @JsonProperty("start_date")
+    var startDate: String? = null
+    @JsonProperty("end_date")
+    var endDate: String? = null
+    @JsonProperty("created_at")
+    var createdAt: String = ""
+    @JsonProperty("updated_at")
+    var updatedAt: String? = null
+    @JsonProperty("is_system_user")
+    var isSystemUser: Boolean = false
+
+}

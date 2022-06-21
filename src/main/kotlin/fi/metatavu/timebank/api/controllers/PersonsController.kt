@@ -69,7 +69,7 @@ class PersonsController {
      * @return List of Forecast persons
      */
     fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
-        return persons.filter{ person -> person.active && !person.is_system_user }
+        return persons.filter{ person -> person.active && !person.isSystemUser }
     }
 
     /**
