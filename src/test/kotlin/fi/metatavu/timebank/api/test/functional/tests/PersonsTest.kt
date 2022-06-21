@@ -34,7 +34,7 @@ class PersonsTest: AbstractTest() {
     /**
      * Tests /v1/persons?active=false -endpoint
      */
-     @Test
+    @Test
     fun listActivePersons() {
         TestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons(active = false)

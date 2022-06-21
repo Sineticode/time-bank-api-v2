@@ -62,7 +62,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (entry.updatedAt!! > entry.createdAt!!) {
-            return if (existingEntry.first().equals(entry)) {
+            return if (existingEntry.first().areTwoObjectsSame(entry)) {
                 false
             } else {
                 deleteEntry(entry.forecastId!!)

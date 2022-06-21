@@ -12,7 +12,7 @@ class LocalTestProfile: QuarkusTestProfile {
             "quarkus.keycloak.devservices.realm-name" to "timebank",
             "quarkus.keycloak.devservices.enabled" to "true",
             "quarkus.keycloak.devservices.realm-path" to "kc.json",
-            "forecast.base.url" to ""
+            "forecast.base.url" to "http://localhost:8082"
         )
     }
 }

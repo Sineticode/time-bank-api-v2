@@ -9,6 +9,9 @@ import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.Person
 import org.junit.Assert
 
+/**
+ * Resource for testing Persons API
+ */
 class PersonsTestBuilderResource(
     testBuilder: TestBuilder,
     private val accessTokenProvider: AccessTokenProvider?,

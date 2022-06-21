@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test
 @TestProfile(LocalTestProfile::class)
 class SystemTest {
 
+    /**
+     * Tests /v1/system/ping -endpoint
+     */
     @Test
     fun testPingEndpoint() {
         given()

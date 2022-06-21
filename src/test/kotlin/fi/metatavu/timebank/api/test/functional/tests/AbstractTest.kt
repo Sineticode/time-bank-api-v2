@@ -51,7 +51,7 @@ abstract class AbstractTest {
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)
-                            )
+                        )
                         ))
                         .build()
                 ).execute()

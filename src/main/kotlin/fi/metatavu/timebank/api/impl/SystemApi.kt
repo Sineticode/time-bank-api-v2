@@ -1,10 +1,8 @@
 package fi.metatavu.timebank.api.impl
 
-import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.spec.SystemApi
 import javax.enterprise.context.RequestScoped
 import javax.ws.rs.core.Response
-import kotlin.random.Random
 
 /**
  * API implementation for System API
