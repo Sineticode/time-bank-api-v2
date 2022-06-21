@@ -7,7 +7,7 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t quarkus/time-bank-api-v2 .
+# docker build -f src/main/docker/Dockerfile.native -t metatavu/time-bank-api .
 #
 # Then run the container using:
 #
