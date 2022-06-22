@@ -10,19 +10,19 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ForecastTimeEntry {
-    val id: Int = 0
-    val person: Int = 0
+    var id: Int = 0
+    var person: Int = 0
     @JsonProperty("non_project_time")
-    val nonProjectTime: Int? = null
+    var nonProjectTime: Int? = null
     @JsonProperty("time_registered")
-    val timeRegistered: Int = 0
-    val date: String = ""
+    var timeRegistered: Int = 0
+    var date: String = ""
     @JsonProperty("created_by")
-    val createdBy: Int = 0
+    var createdBy: Int = 0
     @JsonProperty("updated_by")
-    val updatedBy: Int = 0
+    var updatedBy: Int = 0
     @JsonProperty("created_at")
-    val createdAt: String = ""
+    var createdAt: String = ""
     @JsonProperty("updated_at")
-    val updatedAt: String = ""
+    var updatedAt: String = ""
 }
