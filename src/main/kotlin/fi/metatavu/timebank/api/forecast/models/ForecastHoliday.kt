@@ -10,11 +10,11 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ForecastHoliday {
-    val id: Int = 0
+    var id: Int = 0
     @JsonProperty("holiday_calendar_id")
-    val holidayCalendarId: Int = 0
-    val year: Int = 0
-    val month: Int = 0
-    val day: Int = 0
-    val name: String = ""
+    var holidayCalendarId: Int = 0
+    var year: Int = 0
+    var month: Int = 0
+    var day: Int = 0
+    var name: String = ""
 }

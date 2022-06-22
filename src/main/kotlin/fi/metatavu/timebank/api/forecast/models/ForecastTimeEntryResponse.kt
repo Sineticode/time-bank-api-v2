@@ -9,7 +9,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ForecastTimeEntryResponse {
-    val pageContents: List<ForecastTimeEntry>? = null
-    val pageSize: Int = 0
-    val totalObjectCount: Int = 0
+    var pageContents: List<ForecastTimeEntry>? = null
+    var pageSize: Int = 0
+    var totalObjectCount: Int = 0
 }

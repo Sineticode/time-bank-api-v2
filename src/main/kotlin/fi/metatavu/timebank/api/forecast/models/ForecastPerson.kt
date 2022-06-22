@@ -28,7 +28,7 @@ class ForecastPerson {
     @JsonProperty("holiday_calendar_id")
     var holidayCalendarId: Int = 0
     @JsonProperty("start_date")
-    var startDate: String? = null
+    var startDate: String = ""
     @JsonProperty("end_date")
     var endDate: String? = null
     @JsonProperty("created_at")

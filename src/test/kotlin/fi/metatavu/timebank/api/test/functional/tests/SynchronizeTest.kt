@@ -77,7 +77,7 @@ class SynchronizeTest: AbstractTest() {
                 after = null
             )
 
-            assertEquals(2000, synchronized.message)
+            assertEquals(1200, synchronized.message)
         }
     }
 

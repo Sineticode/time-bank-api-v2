@@ -2,20 +2,14 @@ package fi.metatavu.timebank.api.test.functional.tests
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.*
-import org.eclipse.microprofile.config.inject.ConfigProperty
-import org.slf4j.Logger
-import javax.inject.Inject
+import org.eclipse.microprofile.config.ConfigProvider
 
 /**
  * Abstract Test class
  */
 abstract class AbstractTest {
 
-    @Inject
-    lateinit var logger: Logger
-
-    @ConfigProperty(name = "forecast.base.url")
-    lateinit var forecastBaseUrl: String
+    private var forecastBaseUrl = ConfigProvider.getConfig().getValue("forecast.base.url", String::class.java)
 
     data class ReqBody(val state: String)
 
@@ -34,7 +28,7 @@ abstract class AbstractTest {
                 ).execute()
                 .close()
         } catch (e: Error) {
-            logger.error("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
+            println("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 
@@ -57,7 +51,7 @@ abstract class AbstractTest {
                 ).execute()
                 .close()
         } catch (e: Error) {
-            logger.error("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
+            println("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 
