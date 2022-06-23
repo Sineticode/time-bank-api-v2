@@ -1,17 +1,59 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.test.functional.TestBuilder
+import io.quarkus.test.common.DevServicesContext
+import io.quarkus.test.junit.QuarkusTest
 import okhttp3.*
 import org.eclipse.microprofile.config.ConfigProvider
 
 /**
  * Abstract Test class
  */
-abstract class AbstractTest {
+@QuarkusTest
+class AbstractTest {
 
-    private var forecastBaseUrl = ConfigProvider.getConfig().getValue("forecast.base.url", String::class.java)
-
+    private var devServicesContext: DevServicesContext? = null
     data class ReqBody(val state: String)
+
+    /**
+     * Creates new test builder
+     *
+     * @return new test builder
+     */
+    protected fun createTestBuilder(): TestBuilder {
+        return TestBuilder(getConfig())
+    }
+
+    /**
+     * Returns config for tests.
+     *
+     * If tests are running in native mode, method returns config from devServicesContext and
+     * when tests are running in JVM mode method returns config from the Quarkus config
+     *
+     * @return config for tests
+     */
+    private fun getConfig(): Map<String, String> {
+        return getDevServiceConfig() ?: getQuarkusConfig()
+    }
+
+    /**
+     * Returns test config from dev services
+     *
+     * @return test config from dev services
+     */
+    private fun getDevServiceConfig(): Map<String, String>? {
+        return devServicesContext?.devServicesProperties()
+    }
+    /**
+     * Returns test config from Quarkus
+     *
+     * @return test config from Quarkus
+     */
+    private fun getQuarkusConfig(): Map<String, String> {
+        val config = ConfigProvider.getConfig()
+        return config.propertyNames.associateWith { config.getConfigValue(it).rawValue }
+    }
 
     /**
      * Resets Wiremock scenario states
@@ -22,7 +64,7 @@ abstract class AbstractTest {
             client
                 .newCall(
                     Request.Builder()
-                    .url("$forecastBaseUrl/__admin/scenarios/reset")
+                    .url("http://localhost:8082/__admin/scenarios/reset")
                     .post(RequestBody.create(null, ""))
                     .build()
                 ).execute()
@@ -41,7 +83,7 @@ abstract class AbstractTest {
             client
                 .newCall(
                     Request.Builder()
-                        .url("$forecastBaseUrl/__admin/scenarios/$scenario/state")
+                        .url("http://localhost:8082/__admin/scenarios/$scenario/state")
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)

@@ -1,15 +1,13 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.data.TestData
-import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
+import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
-import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
@@ -20,9 +18,9 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class)
+    QuarkusTestResource(TestWiremockResource::class),
+    QuarkusTestResource(TestKeycloakResource::class)
 )
-@TestProfile(LocalTestProfile::class)
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Order(2)
@@ -34,11 +32,12 @@ class PersonsTest: AbstractTest() {
     @BeforeEach
     fun resetScenariosBeforeEach() {
         resetScenarios()
+
     }
 
     @BeforeAll
     fun synchronizeBeforeTests() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.synchronization.synchronizeEntries()
         }
     }
@@ -48,7 +47,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listActivePersons() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons(active = false)
 
             assertEquals(5, persons.size)
@@ -61,7 +60,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listAllPersons() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons()
 
             assertEquals(2, persons.size)
@@ -76,7 +75,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
      fun listPersonTotalTimeForPersonAAllTime() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 1).id,
                 timespan = null
@@ -96,7 +95,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listPersonTotalTimeForPersonBYear() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 2).id,
                 timespan = Timespan.yEAR
@@ -134,7 +133,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listPersonTotalTimeForPersonCMonth() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.mONTH
@@ -180,7 +179,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listPersonTotalTimeForPersonCWeek() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = TestData.getPerson(id = 3).id,
                 timespan = Timespan.wEEK
@@ -227,7 +226,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listNonExistingPersonTimeEntries() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertTotalsFail(
                 expectedStatus = 404,
                 personId = 123
@@ -240,7 +239,7 @@ class PersonsTest: AbstractTest() {
      */
     @Test
     fun listPersonsWithNullToken() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.userWithNullToken.persons.assertListFailWithNullToken(expectedStatus = 401)
         }
     }
@@ -254,7 +253,7 @@ class PersonsTest: AbstractTest() {
             scenario = PERSONS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             testBuilder.manager.persons.assertListFail(expectedStatus = 400)
         }
     }

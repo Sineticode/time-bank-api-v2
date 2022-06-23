@@ -11,6 +11,9 @@
     },
     {
       "pattern": ".*.kotlin_builtins"
+    },
+    {
+      "pattern": ".*\\.xml$"
     }
   ]
 }

@@ -1,13 +1,11 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.data.TestData
-import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
+import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
-import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
@@ -17,9 +15,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class)
+    QuarkusTestResource(TestWiremockResource::class),
+    QuarkusTestResource(TestKeycloakResource::class)
 )
-@TestProfile(LocalTestProfile::class)
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Order(1)
@@ -38,7 +36,7 @@ class SynchronizeTest: AbstractTest() {
      */
     @Test
     fun testSynchronization() {
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val synchronizedAfter = testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = "2022-05-01"
@@ -71,7 +69,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = "timesScenario",
             state = "generatedStateOne"
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
             val synchronized = testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = null
@@ -90,7 +88,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = PERSONS_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
 
             testBuilder.manager.synchronization.assertSynchronizeFail(400)
         }
@@ -105,7 +103,7 @@ class SynchronizeTest: AbstractTest() {
             scenario = TIMES_SCENARIO,
             state = ERROR_STATE
         )
-        TestBuilder().use { testBuilder ->
+        createTestBuilder().use { testBuilder ->
 
             testBuilder.manager.synchronization.assertSynchronizeFail(400)
         }
