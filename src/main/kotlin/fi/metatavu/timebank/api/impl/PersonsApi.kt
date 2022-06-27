@@ -34,10 +34,14 @@ class PersonsApi: PersonsApi, AbstractApi() {
     override suspend fun listPersons(active: Boolean?): Response {
         loggedUserId ?: return createUnauthorized("Invalid token!")
 
-        val persons = personsController.listPersons(active = active) ?: return createNotFound("No persons found!")
+        return try {
+            val persons = personsController.listPersons(active = active) ?: return createNotFound("No persons found!")
 
-        val translatedPersons = personsTranslator.translate(entities = persons)
+            val translatedPersons = personsTranslator.translate(entities = persons)
 
-        return createOk(entity = translatedPersons)
+            createOk(entity = translatedPersons)
+        } catch (e: Error) {
+            createBadRequest(e.localizedMessage)
+        }
     }
 }

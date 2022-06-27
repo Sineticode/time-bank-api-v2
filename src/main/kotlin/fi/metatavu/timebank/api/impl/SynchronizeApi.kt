@@ -1,6 +1,7 @@
 package fi.metatavu.timebank.api.impl
 
 import fi.metatavu.timebank.api.controllers.SynchronizeController
+import fi.metatavu.timebank.model.SyncResponse
 import fi.metatavu.timebank.spec.SynchronizeApi
 import java.time.LocalDate
 import javax.enterprise.context.RequestScoped
@@ -19,13 +20,21 @@ class SynchronizeApi:  SynchronizeApi, AbstractApi() {
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
-        val synchronizedEntries = synchronizeController.synchronize(after)
-            ?: return createBadRequest(message = "Something went wrong with attempt to synchronize!")
+        try {
+            val synchronizedEntries = synchronizeController.synchronize(after)
 
-        if (synchronizedEntries == 0) {
-            return createNotFound(message = "Nothing to synchronize!")
+            if (synchronizedEntries == 0) {
+                return createOk(SyncResponse(code = 200, message = 0))
+            }
+
+            return createOk(
+                SyncResponse(
+                    code = 200,
+                    message = synchronizedEntries
+                )
+            )
+        } catch (e: Error) {
+            return createBadRequest(message = e.localizedMessage)
         }
-
-        return createOk(entity = "Synchronized $synchronizedEntries entries from Forecast!")
     }
 }

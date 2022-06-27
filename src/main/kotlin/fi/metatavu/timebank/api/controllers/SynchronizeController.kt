@@ -42,9 +42,9 @@ class SynchronizeController {
      * @param after YYYY-MM-DD LocalDate
      * @return Length of entries synchronized
      */
-    suspend fun synchronize(after: LocalDate?): Int? {
+    suspend fun synchronize(after: LocalDate?): Int {
         return try {
-            val forecastPersons = personsController.getPersonsFromForecast() ?: return null
+            val forecastPersons = personsController.getPersonsFromForecast()
 
             val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
 
@@ -67,8 +67,8 @@ class SynchronizeController {
 
             synchronized
         } catch (e: Error) {
-            logger.error(e.localizedMessage)
-            null
+            logger.error("Error during synchronization: ${e.localizedMessage}")
+            throw Error(e.localizedMessage)
         }
     }
 
@@ -87,17 +87,13 @@ class SynchronizeController {
         while (!retrievedAllEntries) {
             val resultString = forecastService.getTimeEntries(after, pageNumber)
 
-            if (resultString.isNullOrEmpty()) {
-                break
-            }
-
             val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
             val amountOfPages =
                 if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
                 else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
             logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
 
-            if (forecastTimeEntryResponse.pageNumber * forecastTimeEntryResponse.pageSize <= forecastTimeEntryResponse.totalObjectCount) {
+            if (pageNumber * forecastTimeEntryResponse.pageSize < forecastTimeEntryResponse.totalObjectCount) {
                 pageNumber++
             } else {
                 retrievedAllEntries = true

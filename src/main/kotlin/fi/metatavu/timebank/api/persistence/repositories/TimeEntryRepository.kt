@@ -6,8 +6,6 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.panache.common.Parameters
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import java.time.LocalDate
-import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.util.UUID
 import javax.enterprise.context.ApplicationScoped
 
@@ -51,21 +49,26 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
      * Persists new TimeEntry
+     * Replaces already stored entry if entry is updated
      *
      * @param entry TimeEntry
      * @return true for persisted false for not persisted
      */
     suspend fun persistEntry(entry: TimeEntry): Boolean {
-
-        if (find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending().isEmpty()) {
+        val existingEntry = find("forecastId", entry.forecastId).list<TimeEntry>().awaitSuspending()
+        if (existingEntry.isEmpty()) {
             Panache.withTransaction { persist(entry) }.awaitSuspending()
             return true
         }
 
-        if (entry.updatedAt!! > entry.createdAt!! && entry.updatedAt!! >= OffsetDateTime.now().minusDays(1)) {
-            deleteEntry(entry.forecastId ?: 1)
-            Panache.withTransaction { persist(entry) }.awaitSuspending()
-            return true
+        if (entry.updatedAt!! > entry.createdAt!!) {
+            return if (existingEntry.first().areTwoObjectsSame(entry)) {
+                false
+            } else {
+                deleteEntry(entry.forecastId!!)
+                Panache.withTransaction { persist(entry) }.awaitSuspending()
+                true
+            }
         }
 
         return false

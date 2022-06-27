@@ -34,12 +34,12 @@ class PersonsController {
      *
      * @return List of ForecastPersons
      */
-    suspend fun getPersonsFromForecast(): List<ForecastPerson>? {
+    suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
-            val resultString = forecastService.getPersons() ?: return null
+            val resultString = forecastService.getPersons()
             jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
         } catch (e: Error) {
-            logger.error("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when requesting persons from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
     }
@@ -49,15 +49,15 @@ class PersonsController {
      *
      * @return List of LocalDate
      */
-    suspend fun getHolidaysFromForecast(): List<LocalDate>? {
+    suspend fun getHolidaysFromForecast(): List<LocalDate> {
         return try {
-            val resultString = forecastService.getHolidays() ?: return null
+            val resultString = forecastService.getHolidays()
             val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
             forecastHolidays.map{ holiday ->
                 LocalDate.of(holiday.year, holiday.month, holiday.day)
             }
         } catch (e: Error) {
-            logger.error("Error when executing get request: ${e.localizedMessage}")
+            logger.error("Error when requesting holidays from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
         }
     }
@@ -78,13 +78,13 @@ class PersonsController {
      * @param active
      * @return List of Forecast persons
      */
-    suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
-        val persons = getPersonsFromForecast() ?: return null
+    suspend fun listPersons(active: Boolean? = true): List<ForecastPerson>? {
+        val persons = getPersonsFromForecast()
 
-        return if (active == true) {
-            filterActivePersons(persons)
-        } else {
+        return if (active == false) {
             persons
+        } else {
+            filterActivePersons(persons)
         }
     }
 
@@ -105,10 +105,10 @@ class PersonsController {
         return when (timespan) {
             Timespan.ALL_TIME -> {
                 listOf(calculatePersonTotalTime(
-                        personId = personId,
-                        days = dailyEntries,
-                        timespan = timespan
-                    )
+                    personId = personId,
+                    days = dailyEntries,
+                    timespan = timespan
+                )
                 )
             }
             Timespan.YEAR -> {
@@ -158,15 +158,28 @@ class PersonsController {
         var year: Int? = null
         var month: Int? = null
         var week: Int? = null
+        var startDate: LocalDate? = null
+        var endDate: LocalDate? = null
 
-        days.forEach{ day ->
+        days.forEachIndexed{ idx, day ->
             internalTime += day.internalTime
             projectTime += day.projectTime
             expected += day.expected
             year = if (timespan != Timespan.ALL_TIME) day.date.year else null
             month = if (timespan == Timespan.MONTH || timespan == Timespan.WEEK) day.date.monthValue else null
             week = if (timespan == Timespan.WEEK) day.date.get(weekOfYear) else null
+            if (idx == 0) endDate = day.date
+            if (idx == days.lastIndex) startDate = day.date
         }
+
+        val timePeriod = timespanDateStringBuilder(
+            timespan = timespan,
+            year = year,
+            month = month,
+            week = week,
+            startDate = startDate,
+            endDate = endDate
+        )
 
         return PersonTotalTime(
             balance = internalTime + projectTime - expected,
@@ -175,9 +188,27 @@ class PersonsController {
             internalTime = internalTime,
             projectTime = projectTime,
             personId = personId,
-            year = year,
-            monthNumber = month,
-            weekNumber = week
+            timePeriod = timePeriod
         )
+    }
+
+    /**
+     * Build string for the timespan date
+     *
+     * @param timespan of totals to display
+     * @param Year of current time period
+     * @param Month of current time period
+     * @param Week of current time period
+     * @param startDate date
+     * @param endDate date
+     * @return String timeperiod of given PersonTotalTime
+     */
+    private fun timespanDateStringBuilder(timespan: Timespan, year: Int?, month: Int?, week: Int?, startDate: LocalDate?, endDate: LocalDate?): String {
+        return when (timespan) {
+            Timespan.ALL_TIME -> "$startDate,$endDate"
+            Timespan.YEAR -> "$year"
+            Timespan.MONTH -> "$year,$month"
+            Timespan.WEEK -> "$year,$month,$week"
+        }
     }
 }

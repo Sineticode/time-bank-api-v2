@@ -18,13 +18,16 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
 
     override suspend fun listDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
         loggedUserId ?: return createUnauthorized("No logged in user!")
+        return try {
+            val entries = dailyEntryController.list(
+                personId = personId,
+                before = before,
+                after = after
+            ) ?: return createNotFound("No daily entries found!")
 
-        val entries = dailyEntryController.list(
-            personId = personId,
-            before = before,
-            after = after
-        ) ?: return createNotFound("No daily entries found!")
-
-        return createOk(entity = entries)
+            createOk(entity = entries)
+        } catch (e: Error) {
+            createBadRequest(e.localizedMessage)
+        }
     }
 }
