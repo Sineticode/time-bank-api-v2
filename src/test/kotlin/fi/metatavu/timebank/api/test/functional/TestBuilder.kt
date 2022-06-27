@@ -8,17 +8,17 @@ import fi.metatavu.jaxrs.test.functional.builder.auth.InvalidAccessTokenProvider
 import fi.metatavu.jaxrs.test.functional.builder.auth.KeycloakAccessTokenProvider
 import fi.metatavu.jaxrs.test.functional.builder.auth.NullAccessTokenProvider
 import fi.metatavu.timebank.api.test.functional.auth.TestBuilderAuthentication
-import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import org.eclipse.microprofile.config.ConfigProvider
 
+/**
+ * Abstract test builder class
+ */
 class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
 
-    val settings = ApiTestSettings
+    val manager = createTestBuilderAuthentication("manager", "test")
 
-    var manager = createTestBuilderAuthentication("manager", "test")
-
-    val notvalid: TestBuilderAuthentication = TestBuilderAuthentication(this, InvalidAccessTokenProvider())
+    val notValid: TestBuilderAuthentication = TestBuilderAuthentication(this, InvalidAccessTokenProvider())
 
     val userWithNullToken: TestBuilderAuthentication = TestBuilderAuthentication(this, NullAccessTokenProvider())
 
@@ -29,6 +29,13 @@ class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
         return TestBuilderAuthentication(this, authProvider)
     }
 
+    /**
+     * Creates test builder authenticator for given user
+     *
+     * @param username username
+     * @param password password
+     * @return test builder authenticator for given user
+     */
     private fun createTestBuilderAuthentication(username: String, password: String): TestBuilderAuthentication {
         val serverUrl = ConfigProvider.getConfig().getValue("quarkus.oidc.auth-server-url", String::class.java).substringBeforeLast("/").substringBeforeLast("/")
         val realm = ConfigProvider.getConfig().getValue("quarkus.keycloak.devservices.realm-name", String::class.java)

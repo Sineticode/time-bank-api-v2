@@ -14,8 +14,6 @@ internal class SpecifiedMySQLContainer(image: String): MySQLContainer<SpecifiedM
 @ApplicationScoped
 class TestMySQLResource: QuarkusTestResourceLifecycleManager {
 
-    private var isDbRunning = false
-
     private val db: MySQLContainer<*> = SpecifiedMySQLContainer("mysql:latest")
         .withDatabaseName(DATABASE)
         .withUsername(USERNAME)
@@ -26,7 +24,6 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager {
 
     override fun start(): Map<String, String> {
         db.start()
-        isDbRunning = true
         val config: MutableMap<String, String> = HashMap()
         config["quarkus.datasource.username"] = USERNAME
         config["quarkus.datasource.password"] = PASSWORD
@@ -35,18 +32,13 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager {
         return config
     }
 
-    fun truncateDatabase() {
-        db.execInContainer("TRUNCATE TABLE timeentry")
-    }
-
     override fun stop() {
         db.stop()
-        isDbRunning = false
     }
 
     companion object {
         const val DATABASE = "timebank-test"
-        const val USERNAME = "root"
-        const val PASSWORD = "root"
+        const val USERNAME = "timebank"
+        const val PASSWORD = "timebank"
     }
 }

@@ -78,7 +78,7 @@ class PersonsController {
      * @param active
      * @return List of Forecast persons
      */
-    suspend fun listPersons(active: Boolean?): List<ForecastPerson>? {
+    suspend fun listPersons(active: Boolean? = true): List<ForecastPerson>? {
         val persons = getPersonsFromForecast()
 
         return if (active == false) {
@@ -172,7 +172,14 @@ class PersonsController {
             if (idx == days.lastIndex) startDate = day.date
         }
 
-        val timePeriod = timespanDateStringBuilder(timespan, year, month, week, startDate, endDate)
+        val timePeriod = timespanDateStringBuilder(
+            timespan = timespan,
+            year = year,
+            month = month,
+            week = week,
+            startDate = startDate,
+            endDate = endDate
+        )
 
         return PersonTotalTime(
             balance = internalTime + projectTime - expected,
@@ -186,7 +193,7 @@ class PersonsController {
     }
 
     /**
-     * build string for the timespan date
+     * Build string for the timespan date
      *
      * @param timespan of totals to display
      * @param Year of current time period
@@ -194,7 +201,7 @@ class PersonsController {
      * @param Week of current time period
      * @param startDate date
      * @param endDate date
-     * @return
+     * @return String timeperiod of given PersonTotalTime
      */
     private fun timespanDateStringBuilder(timespan: Timespan, year: Int?, month: Int?, week: Int?, startDate: LocalDate?, endDate: LocalDate?): String {
         return when (timespan) {

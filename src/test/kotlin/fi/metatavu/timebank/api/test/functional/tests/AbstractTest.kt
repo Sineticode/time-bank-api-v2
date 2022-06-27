@@ -17,13 +17,14 @@ abstract class AbstractTest {
     @ConfigProperty(name = "forecast.base.url")
     lateinit var forecastBaseUrl: String
 
+    data class ReqBody(val state: String)
+
     /**
      * Resets Wiremock scenario states
      */
     fun resetScenarios() {
         try {
-            val client = OkHttpClient()
-            client
+            OkHttpClient()
                 .newCall(
                     Request.Builder()
                     .url("$forecastBaseUrl/__admin/scenarios/reset")
@@ -41,15 +42,14 @@ abstract class AbstractTest {
      */
     fun setScenario(scenario: String, state: String) {
         try {
-            val client = OkHttpClient()
-            client
+            OkHttpClient()
                 .newCall(
                     Request.Builder()
                         .url("$forecastBaseUrl/__admin/scenarios/$scenario/state")
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)
-                            )
+                        )
                         ))
                         .build()
                 ).execute()
@@ -61,13 +61,6 @@ abstract class AbstractTest {
 
     companion object {
         const val PERSONS_SCENARIO = "personsScenario"
-        const val HOLIDAYS_SCENARIO = "holidaysScenario"
-        const val TIMES_SCENARIO = "timesScenario"
         const val ERROR_STATE = "errorState"
-        const val UPDATE_STATE = "updateState"
     }
 }
-
-data class ReqBody(
-    val state: String
-)
