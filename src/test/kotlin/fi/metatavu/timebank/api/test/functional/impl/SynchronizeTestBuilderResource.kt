@@ -6,7 +6,6 @@ import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.SynchronizeApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
-import fi.metatavu.timebank.test.client.models.SyncResponse
 import fi.metatavu.timebank.test.client.models.TimeEntry
 import org.junit.Assert
 import java.util.concurrent.TimeUnit
@@ -37,7 +36,7 @@ class SynchronizeTestBuilderResource(
      * @param before before date
      * @param after after date
      */
-    fun synchronizeEntries(before: String? = null, after: String? = null): SyncResponse {
+    fun synchronizeEntries(before: String? = null, after: String? = null): Array<TimeEntry> {
         return api.synchronizeTimeEntries(
             before = before,
             after = after

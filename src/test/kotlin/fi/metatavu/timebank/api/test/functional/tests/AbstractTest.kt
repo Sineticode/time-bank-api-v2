@@ -14,6 +14,7 @@ import org.eclipse.microprofile.config.ConfigProvider
 class AbstractTest {
 
     private var devServicesContext: DevServicesContext? = null
+
     data class ReqBody(val state: String)
 
     /**

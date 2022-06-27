@@ -18,9 +18,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
     QuarkusTestResource(TestWiremockResource::class),
     QuarkusTestResource(TestKeycloakResource::class)
 )
-@TestClassOrder(ClassOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Order(1)
 class SynchronizeTest: AbstractTest() {
 
     /**
@@ -42,7 +40,6 @@ class SynchronizeTest: AbstractTest() {
                 after = "2022-05-01"
             )
             val synchronized = testBuilder.manager.synchronization.synchronizeEntries()
-            val synchronizedNotFound = testBuilder.manager.synchronization.synchronizeEntries()
             setScenario(
                 scenario = TIMES_SCENARIO,
                 state = UPDATE_STATE
@@ -53,10 +50,16 @@ class SynchronizeTest: AbstractTest() {
             val expectedAfter = TestData.getForecastTimeEntryResponse().pageContents!!.filter { it.date > "2022-05-01" }.size
             expected -= expectedAfter
 
-            assertEquals(expectedAfter, synchronizedAfter.message)
-            assertEquals(expected, synchronized.message)
-            assertEquals(0, synchronizedNotFound.message)
-            assertEquals(1, synchronizeUpdated.message)
+            assertEquals(expectedAfter, synchronizedAfter.size)
+            assertEquals(expected, synchronized.size)
+            assertEquals(1, synchronizeUpdated.size)
+
+            synchronized.forEach { synchronizedEntry ->
+                testBuilder.manager.timeEntries.clean(synchronizedEntry)
+            }
+            synchronizedAfter.forEach { synchronizedEnty ->
+                testBuilder.manager.timeEntries.clean(synchronizedEnty)
+            }
         }
     }
 
@@ -75,7 +78,7 @@ class SynchronizeTest: AbstractTest() {
                 after = null
             )
 
-            assertEquals(1200, synchronized.message)
+            assertEquals(1200, synchronized.size)
         }
     }
 

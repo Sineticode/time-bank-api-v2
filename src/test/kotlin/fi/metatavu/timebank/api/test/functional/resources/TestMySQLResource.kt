@@ -15,8 +15,6 @@ internal class SpecifiedMySQLContainer(image: String): MySQLContainer<SpecifiedM
 @ApplicationScoped
 class TestMySQLResource: QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
 
-    private var containerNetworkId: String? = null
-
     private val db: MySQLContainer<*> = SpecifiedMySQLContainer("mysql:latest")
         .withDatabaseName(DATABASE)
         .withUsername(USERNAME)
@@ -24,6 +22,8 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager, DevServicesContext
         .withCommand(
             "--lower_case_table_names=1"
         )
+
+    private var containerNetworkId: String? = null
 
     override fun setIntegrationTestContext(context: DevServicesContext?) {
         containerNetworkId = context?.containerNetworkId().toString()
