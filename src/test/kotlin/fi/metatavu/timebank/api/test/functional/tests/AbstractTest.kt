@@ -24,8 +24,7 @@ abstract class AbstractTest {
      */
     fun resetScenarios() {
         try {
-            val client = OkHttpClient()
-            client
+            OkHttpClient()
                 .newCall(
                     Request.Builder()
                     .url("$forecastBaseUrl/__admin/scenarios/reset")
@@ -43,8 +42,7 @@ abstract class AbstractTest {
      */
     fun setScenario(scenario: String, state: String) {
         try {
-            val client = OkHttpClient()
-            client
+            OkHttpClient()
                 .newCall(
                     Request.Builder()
                         .url("$forecastBaseUrl/__admin/scenarios/$scenario/state")
