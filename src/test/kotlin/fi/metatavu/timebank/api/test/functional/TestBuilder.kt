@@ -14,7 +14,7 @@ import org.eclipse.microprofile.config.ConfigProvider
 /**
  * Abstract test builder class
  */
-class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
+class TestBuilder(private val config: Map<String, String>): AbstractAccessTokenTestBuilder<ApiClient>() {
 
     val manager = createTestBuilderAuthentication("manager", "test")
 
@@ -38,7 +38,7 @@ class TestBuilder: AbstractAccessTokenTestBuilder<ApiClient>() {
      */
     private fun createTestBuilderAuthentication(username: String, password: String): TestBuilderAuthentication {
         val serverUrl = ConfigProvider.getConfig().getValue("quarkus.oidc.auth-server-url", String::class.java).substringBeforeLast("/").substringBeforeLast("/")
-        val realm = ConfigProvider.getConfig().getValue("quarkus.keycloak.devservices.realm-name", String::class.java)
+        val realm = "timebank"
         val clientId = "test"
         return TestBuilderAuthentication(this, KeycloakAccessTokenProvider(serverUrl, realm, clientId, username, password, null))
     }

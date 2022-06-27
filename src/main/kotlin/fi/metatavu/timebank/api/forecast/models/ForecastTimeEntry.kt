@@ -1,25 +1,28 @@
 package fi.metatavu.timebank.api.forecast.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.quarkus.runtime.annotations.RegisterForReflection
+
 /**
  * Data class for TimeEntry data coming from Forecast
  */
-data class ForecastTimeEntry(
-    val id: Int,
-    val person: Int,
-    val project: Int?,
-    val card: Int?,
-    val task: Int?,
-    val non_project_time: Int?,
-    val time_registered: Int,
-    val date: String,
-    val notes: String?,
-    val approval_status: String?,
-    val created_by: Int,
-    val updated_by: Int,
-    val created_at: String,
-    val updated_at: String,
-    val phase: Int?,
-    val task_project: String?,
-    val invoice_entry: Any?,
-    val invoice: Any?
-)
+@RegisterForReflection
+@JsonIgnoreProperties(ignoreUnknown = true)
+class ForecastTimeEntry {
+    var id: Int = 0
+    var person: Int = 0
+    @JsonProperty("non_project_time")
+    var nonProjectTime: Int? = null
+    @JsonProperty("time_registered")
+    var timeRegistered: Int = 0
+    var date: String = ""
+    @JsonProperty("created_by")
+    var createdBy: Int = 0
+    @JsonProperty("updated_by")
+    var updatedBy: Int = 0
+    @JsonProperty("created_at")
+    var createdAt: String = ""
+    @JsonProperty("updated_at")
+    var updatedAt: String = ""
+}

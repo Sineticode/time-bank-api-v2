@@ -1,13 +1,15 @@
 package fi.metatavu.timebank.api.forecast.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import io.quarkus.runtime.annotations.RegisterForReflection
+
 /**
  * Data class for ForecastTimeEntryResponse
  */
-data class ForecastTimeEntryResponse(
-    val pageContents: List<ForecastTimeEntry>?,
-    val pageNumber: Int,
-    val pageSize: Int,
-    val totalObjectCount: Int,
-    val status: Int,
-    val message: String?
-)
+@RegisterForReflection
+@JsonIgnoreProperties(ignoreUnknown = true)
+class ForecastTimeEntryResponse {
+    var pageContents: List<ForecastTimeEntry>? = null
+    var pageSize: Int = 0
+    var totalObjectCount: Int = 0
+}

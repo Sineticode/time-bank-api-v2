@@ -48,6 +48,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.testcontainers:testcontainers:1.17.2")
     testImplementation("org.testcontainers:mysql:1.17.2")
+    testImplementation("com.github.dasniko:testcontainers-keycloak:2.2.2")
     testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
 }
 
@@ -76,6 +77,7 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
+    dependsOn("generateApiSpec", "generateApiClient")
 }
 
 val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
@@ -85,6 +87,7 @@ val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
     setProperty("apiPackage", "${project.group}.spec")
     setProperty("invokerPackage", "${project.group}.invoker")
     setProperty("modelPackage", "${project.group}.model")
+    setProperty("templateDir", "$rootDir/openapi/api-spec")
 
     this.configOptions.put("library", "jaxrs-spec")
     this.configOptions.put("dateLibrary", "java8")
@@ -105,4 +108,5 @@ val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
     this.configOptions.put("dateLibrary", "string")
     this.configOptions.put("collectionType", "array")
     this.configOptions.put("serializationLibrary", "jackson")
+    this.configOptions.put("enumPropertyNaming", "UPPERCASE")
 }

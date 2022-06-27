@@ -6,7 +6,6 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
-import kotlin.reflect.full.memberProperties
 
 /**
  * TimeEntry JPA entity
@@ -43,13 +42,13 @@ class TimeEntry {
      * Compares object equality ignoring entryId
      */
     fun areTwoObjectsSame(timeEntry: TimeEntry): Boolean {
-        val baseValue = this
-        val differentFields = TimeEntry::class.memberProperties.filter {
-            val firstValue = it.get(baseValue)
-            val secondValue = it.get(timeEntry)
-            !Objects.equals(firstValue, secondValue)
-        }
-
-        return differentFields.size == 1
+        if (this === timeEntry) return true
+        return forecastId == timeEntry.forecastId &&
+                person == timeEntry.person &&
+                internalTime == timeEntry.internalTime &&
+                projectTime == timeEntry.projectTime &&
+                date == timeEntry.date &&
+                createdAt == timeEntry.createdAt &&
+                updatedAt == timeEntry.updatedAt
     }
 }

@@ -1,23 +1,59 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.test.functional.TestBuilder
+import io.quarkus.test.common.DevServicesContext
 import okhttp3.*
-import org.eclipse.microprofile.config.inject.ConfigProperty
-import org.slf4j.Logger
-import javax.inject.Inject
+import org.eclipse.microprofile.config.ConfigProvider
 
 /**
  * Abstract Test class
  */
 abstract class AbstractTest {
 
-    @Inject
-    lateinit var logger: Logger
-
-    @ConfigProperty(name = "forecast.base.url")
-    lateinit var forecastBaseUrl: String
+    private var devServicesContext: DevServicesContext? = null
 
     data class ReqBody(val state: String)
+
+    /**
+     * Creates new test builder
+     *
+     * @return new test builder
+     */
+    protected fun createTestBuilder(): TestBuilder {
+        return TestBuilder(getConfig())
+    }
+
+    /**
+     * Returns config for tests.
+     *
+     * If tests are running in native mode, method returns config from devServicesContext and
+     * when tests are running in JVM mode method returns config from the Quarkus config
+     *
+     * @return config for tests
+     */
+    private fun getConfig(): Map<String, String> {
+        return getDevServiceConfig() ?: getQuarkusConfig()
+    }
+
+    /**
+     * Returns test config from dev services
+     *
+     * @return test config from dev services
+     */
+    private fun getDevServiceConfig(): Map<String, String>? {
+        return devServicesContext?.devServicesProperties()
+    }
+
+    /**
+     * Returns test config from Quarkus
+     *
+     * @return test config from Quarkus
+     */
+    private fun getQuarkusConfig(): Map<String, String> {
+        val config = ConfigProvider.getConfig()
+        return config.propertyNames.associateWith { config.getConfigValue(it).rawValue }
+    }
 
     /**
      * Resets Wiremock scenario states
@@ -27,13 +63,13 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                    .url("$forecastBaseUrl/__admin/scenarios/reset")
+                    .url("http://localhost:8082/__admin/scenarios/reset")
                     .post(RequestBody.create(null, ""))
                     .build()
                 ).execute()
                 .close()
         } catch (e: Error) {
-            logger.error("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
+            println("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 
@@ -45,7 +81,7 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                        .url("$forecastBaseUrl/__admin/scenarios/$scenario/state")
+                        .url("http://localhost:8082/__admin/scenarios/$scenario/state")
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)
@@ -55,12 +91,15 @@ abstract class AbstractTest {
                 ).execute()
                 .close()
         } catch (e: Error) {
-            logger.error("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
+            println("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 
     companion object {
         const val PERSONS_SCENARIO = "personsScenario"
+        const val TIMES_SCENARIO = "timesScenario"
         const val ERROR_STATE = "errorState"
+        const val UPDATE_STATE = "updateState"
+        const val GENERATED_STATE = "generatedStateOne"
     }
 }

@@ -42,7 +42,7 @@ class SynchronizeController {
      * @param after YYYY-MM-DD LocalDate
      * @return Length of entries synchronized
      */
-    suspend fun synchronize(after: LocalDate?): Int {
+    suspend fun synchronize(after: LocalDate?): List<TimeEntry> {
         return try {
             val forecastPersons = personsController.getPersonsFromForecast()
 
@@ -50,7 +50,8 @@ class SynchronizeController {
 
             val entries = retrieveAllEntries(after)
 
-            var synchronized = 0
+            val synchronized = mutableListOf<TimeEntry>()
+            var duplicates = 0
 
             entries.forEachIndexed { idx, timeEntry ->
                 val person = persons.find { person -> person.id == timeEntry.person }
@@ -58,12 +59,14 @@ class SynchronizeController {
                 logger.info("Synchronizing TimeEntry ${idx + 1}/${entries.size} of $personName...")
 
                 if (timeEntryRepository.persistEntry(timeEntry)) {
-                    synchronized++
-                    logger.info("Synchronized TimeEntry #${synchronized}!")
+                    synchronized.add(timeEntry)
+                    logger.info("Synchronized TimeEntry #${idx + 1}!")
                 } else {
+                    duplicates++
                     logger.warn("Time Entry ${idx + 1}/${entries.size} already synchronized!")
                 }
             }
+            logger.info("Finished synchronization with: ${synchronized.size} entries synchronized... $duplicates entries NOT synchronized...")
 
             synchronized
         } catch (e: Error) {

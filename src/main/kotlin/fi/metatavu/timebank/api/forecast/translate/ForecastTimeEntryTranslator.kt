@@ -21,14 +21,14 @@ class ForecastTimeEntryTranslator {
      * @return TimeEntry
      */
     fun translate(entity: ForecastTimeEntry): TimeEntry {
-        val createdAt = LocalDateTime.parse(entity.created_at.replace("Z", ""))
-        val updatedAt = LocalDateTime.parse(entity.updated_at.replace("Z", ""))
+        val createdAt = LocalDateTime.parse(entity.createdAt.replace("Z", ""))
+        val updatedAt = LocalDateTime.parse(entity.updatedAt.replace("Z", ""))
         val translatedTimeEntry = TimeEntry()
         translatedTimeEntry.entryId = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
         translatedTimeEntry.person = entity.person
-        translatedTimeEntry.internalTime = if (entity.non_project_time != null) entity.time_registered else 0
-        translatedTimeEntry.projectTime = if (entity.non_project_time != null) 0 else entity.time_registered
+        translatedTimeEntry.internalTime = if (entity.nonProjectTime != null) entity.timeRegistered else 0
+        translatedTimeEntry.projectTime = if (entity.nonProjectTime != null) 0 else entity.timeRegistered
         translatedTimeEntry.date = LocalDate.parse(entity.date)
         translatedTimeEntry.createdAt = createdAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.updatedAt = updatedAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
