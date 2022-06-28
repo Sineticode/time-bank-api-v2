@@ -21,4 +21,26 @@
             <column name="updatedAt" type="datetime" />
         </createTable>
     </changeSet>
+    <changeSet id="worktimeCalendars" author="Ville Juutila">
+        <createTable tableName="WorktimeCalendar">
+            <column name="id" type="binary(16)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="personId" type="integer"/>
+            <column name="monday" type="integer" />
+            <column name="tuesday" type="integer" />
+            <column name="wednesday" type="integer" />
+            <column name="thursday" type="integer" />
+            <column name="friday" type="integer" />
+            <column name="saturday" type="integer" />
+            <column name="sunday" type="integer" />
+            <column name="calendarStart" type="date" />
+            <column name="calendarEnd" type="date" />
+        </createTable>
+        <addColumn tableName="TimeEntry">
+            <column name="worktimeCalendarId" type="binary(16)">
+                <constraints foreignKeyName="fk_timeentry_worktimecalendar" references="WorktimeCalendar(id)" />
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

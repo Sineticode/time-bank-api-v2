@@ -38,6 +38,9 @@ class TimeEntry {
     @Column
     var updatedAt: OffsetDateTime? = null
 
+    @Column
+    var worktimeCalendarId: UUID? = null
+
     /**
      * Compares object equality ignoring entryId
      */

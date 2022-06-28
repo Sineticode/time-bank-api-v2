@@ -1,8 +1,8 @@
 package fi.metatavu.timebank.api.controllers
 
-import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import java.time.LocalDate
 import fi.metatavu.timebank.model.DailyEntry
 import org.slf4j.Logger
@@ -15,6 +15,9 @@ import javax.inject.Inject
  */
 @ApplicationScoped
 class DailyEntryController {
+
+    @Inject
+    lateinit var worktimeCalendarController: WorktimeCalendarController
 
     @Inject
     lateinit var timeEntryRepository: TimeEntryRepository
@@ -49,6 +52,9 @@ class DailyEntryController {
         return try {
             val persons = personsController.getPersonsFromForecast()
             val holidays = personsController.getHolidaysFromForecast()
+            val worktimeCalendars = persons.map { person ->
+                worktimeCalendarController.checkWorktimeCalendar(person)
+            }
 
             val entries = timeEntryRepository.getAllEntries(
                 personId = personId,
@@ -60,11 +66,11 @@ class DailyEntryController {
 
             val dailyEntries = mutableListOf<DailyEntry>()
 
-            persons.forEach { person ->
+            worktimeCalendars.forEach { worktimeCalendar ->
                 entries
-                    .filter { timeEntry -> timeEntry.person == person.id }
+                    .filter { timeEntry -> timeEntry.person == worktimeCalendar.personId }
                     .groupBy { it.date }.values.map { day ->
-                        dailyEntries.add(calculateDailyEntries(day, person, holidays))
+                        dailyEntries.add(calculateDailyEntries(day, worktimeCalendar, holidays))
                     }
             }
 
@@ -83,7 +89,7 @@ class DailyEntryController {
      * @param holidays List of LocalDate
      * @return DailyEntry
      */
-    suspend fun calculateDailyEntries(entries: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
+    suspend fun calculateDailyEntries(entries: List<TimeEntry>, worktimeCalendar: WorktimeCalendar, holidays: List<LocalDate>): DailyEntry {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
@@ -95,13 +101,13 @@ class DailyEntryController {
         }
 
         val expected = getDailyExpected(
-            person = person,
+            worktimeCalendar = worktimeCalendar,
             holidays = holidays,
             day = date
         )
 
         return DailyEntry(
-            person = person.id,
+            person = worktimeCalendar.personId!!,
             internalTime = internalTime,
             projectTime = projectTime,
             logged = internalTime + projectTime,
@@ -118,17 +124,17 @@ class DailyEntryController {
      * @param holidays List of LocalDate
      * @return int minutes of expected work
      */
-    private suspend fun getDailyExpected(person: ForecastPerson, holidays: List<LocalDate>, day: LocalDate): Int {
+    private suspend fun getDailyExpected(worktimeCalendar: WorktimeCalendar, holidays: List<LocalDate>, day: LocalDate): Int {
         if (holidays.contains(day)) return 0
 
         return when (day.dayOfWeek) {
-            DayOfWeek.MONDAY -> person.monday
-            DayOfWeek.TUESDAY-> person.tuesday
-            DayOfWeek.WEDNESDAY -> person.wednesday
-            DayOfWeek.THURSDAY -> person.thursday
-            DayOfWeek.FRIDAY -> person.friday
-            DayOfWeek.SATURDAY -> person.saturday
-            DayOfWeek.SUNDAY -> person.sunday
+            DayOfWeek.MONDAY -> worktimeCalendar.monday!!
+            DayOfWeek.TUESDAY-> worktimeCalendar.tuesday!!
+            DayOfWeek.WEDNESDAY -> worktimeCalendar.wednesday!!
+            DayOfWeek.THURSDAY -> worktimeCalendar.thursday!!
+            DayOfWeek.FRIDAY -> worktimeCalendar.friday!!
+            DayOfWeek.SATURDAY -> worktimeCalendar.saturday!!
+            DayOfWeek.SUNDAY -> worktimeCalendar.sunday!!
             else -> throw Error("An unexpected date!")
         }
     }

@@ -20,7 +20,7 @@ class ForecastTimeEntryTranslator {
      * @param entity ForecastTimeEntry
      * @return TimeEntry
      */
-    fun translate(entity: ForecastTimeEntry): TimeEntry {
+    fun translate(entity: ForecastTimeEntry, worktimeCalendarIds: List<Pair<Int, UUID>>): TimeEntry {
         val createdAt = LocalDateTime.parse(entity.createdAt.replace("Z", ""))
         val updatedAt = LocalDateTime.parse(entity.updatedAt.replace("Z", ""))
         val translatedTimeEntry = TimeEntry()
@@ -32,6 +32,7 @@ class ForecastTimeEntryTranslator {
         translatedTimeEntry.date = LocalDate.parse(entity.date)
         translatedTimeEntry.createdAt = createdAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.updatedAt = updatedAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
+        translatedTimeEntry.worktimeCalendarId = worktimeCalendarIds.first { it.first == entity.person }.second
         return translatedTimeEntry
     }
 
@@ -41,7 +42,9 @@ class ForecastTimeEntryTranslator {
      * @param entities list of ForecastTimeEntries to translate
      * @return List of TimeEntries
      */
-    fun translate(entities: List<ForecastTimeEntry>): List<TimeEntry> {
-        return entities.map(this::translate)
+    fun translate(entities: List<ForecastTimeEntry>, worktimeCalendarIds: List<Pair<Int, UUID>>): List<TimeEntry> {
+        return entities.map { entity ->
+            translate(entity, worktimeCalendarIds)
+        }
     }
 }
