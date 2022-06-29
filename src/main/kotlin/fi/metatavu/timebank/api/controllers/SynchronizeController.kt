@@ -5,10 +5,10 @@ import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import org.slf4j.Logger
 import java.time.LocalDate
-import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -46,11 +46,11 @@ class SynchronizeController {
         return try {
             val forecastPersons = personsController.getPersonsFromForecast()
 
-            val worktimeCalendarIds = forecastPersons.map { person ->
-                Pair(person.id, worktimeCalendarController.checkWorktimeCalendar(person).id!!)
+            val worktimeCalendars = forecastPersons.map { person ->
+                worktimeCalendarController.checkWorktimeCalendar(person)
             }
 
-            val entries = retrieveAllEntries(after, worktimeCalendarIds)
+            val entries = retrieveAllEntries(after, worktimeCalendars)
 
             val synchronized = mutableListOf<TimeEntry>()
             var duplicates = 0
@@ -84,7 +84,7 @@ class SynchronizeController {
      * @param after YYYY-MM-DD LocalDate'
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendarIds: List<Pair<Int, UUID>>): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {
         var retrievedAllEntries = false
         val translatedEntries = mutableListOf<TimeEntry>()
         var pageNumber = 1
@@ -106,7 +106,7 @@ class SynchronizeController {
 
             translatedEntries.addAll(forecastTimeEntryTranslator.translate(
                     entities = forecastTimeEntryResponse.pageContents!!,
-                    worktimeCalendarIds = worktimeCalendarIds
+                    worktimeCalendars = worktimeCalendars
                 )
             )
         }

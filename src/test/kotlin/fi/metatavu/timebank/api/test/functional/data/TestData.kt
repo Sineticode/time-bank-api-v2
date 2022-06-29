@@ -99,6 +99,29 @@ class TestData {
         }
 
         /**
+         * Gets person whose worktime has been edited
+         *
+         * @return List of ForecastPerson
+         */
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            return TestPersonsData.getUpdatedPersons()
+        }
+
+        /**
+         * Gets time registrations for person whose worktime has been edited
+         *
+         * @return ForecastTimeEntryResponse
+         */
+        fun getForecastTimeEntryResponseForUpdatedPerson(): ForecastTimeEntryResponse {
+            val forecastResponse = ForecastTimeEntryResponse()
+            forecastResponse.pageContents = TestTimeEntriesData.getForecastTimeEntryForUpdatedPerson()
+            forecastResponse.pageSize = 1
+            forecastResponse.totalObjectCount = 1
+
+            return forecastResponse
+        }
+
+        /**
          * Gets mock ForecastHolidays
          *
          * @return List of ForecastHolidays

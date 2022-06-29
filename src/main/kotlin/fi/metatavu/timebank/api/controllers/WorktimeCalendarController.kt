@@ -18,18 +18,41 @@ class WorktimeCalendarController {
     lateinit var worktimeCalendarRepository: WorktimeCalendarRepository
 
     /**
+     * Gets all up-to-date WorktimeCalendars
+     *
+     * @return List of WorktimeCalendars
+     */
+    suspend fun getWorktimeCalendars(personId: Int?): List<WorktimeCalendar> {
+        return if (personId != null) {
+            worktimeCalendarRepository.getAllWorktimeCalendars(personId = personId)!!
+        } else {
+            worktimeCalendarRepository.getAllWorktimeCalendars()
+        }
+    }
+
+    /**
+     * Gets WorktimeCalendar based on ID
+     *
+     * @param id id
+     * @return WorktimeCalendar
+     */
+    suspend fun getWorktimeCalendar(id: UUID): WorktimeCalendar {
+        return worktimeCalendarRepository.getWorktimeCalendar(id)
+    }
+
+
+    /**
      * Checks if persisted WorktimeCalendar is up-to-date for given person.
-     * Returns most up-to-date WorktimeCalendar and true if new WorktimeCalendar is created.
+     * Returns most up-to-date WorktimeCalendar.
      * @param person person
-     * @return Pair<WorktimeCalendar, Boolean>
+     * @return WorktimeCalendar
      */
     suspend fun checkWorktimeCalendar(person: ForecastPerson): WorktimeCalendar {
-        var worktimeCalendar = worktimeCalendarRepository.getWorktimeCalendars(person.id)
-        if (worktimeCalendar == null) {
-            worktimeCalendar = createWorktimeCalendar(person)
-        }
-        val updatedWorktimeCalendar =  compareExpected(person, worktimeCalendar)
-        return if (updatedWorktimeCalendar == worktimeCalendar) {
+        val worktimeCalendar = worktimeCalendarRepository.getAllWorktimeCalendars(person.id)?.first()
+            ?: createWorktimeCalendar(person)
+
+        val updatedWorktimeCalendar = compareExpected(person, worktimeCalendar)
+        return if (updatedWorktimeCalendar === worktimeCalendar) {
             worktimeCalendar
         } else {
             worktimeCalendarRepository.updateWorktimeCalendar(worktimeCalendar.id!!)
@@ -40,7 +63,7 @@ class WorktimeCalendarController {
     /**
      * Compares most up-to-date WorktimeCalendar with
      * expected worktimes retrieved from Forecast.
-     * Returns a new WorktimeCalendar if old one is ended.
+     * Returns a new WorktimeCalendar if old one has ended.
      *
      * @param person Person
      * @param worktimeCalendar WorktimeCalendar

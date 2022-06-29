@@ -112,5 +112,29 @@ class TestPersonsData {
             personE.isSystemUser = false
             return listOf(personA, personB, personC, personD, personE)
         }
+        
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            val updatedPerson = ForecastPerson()
+            updatedPerson.id = 5
+            updatedPerson.firstName = "TesterE"
+            updatedPerson.lastName = "Updater"
+            updatedPerson.email = ""
+            updatedPerson.monday = 217
+            updatedPerson.tuesday = 217
+            updatedPerson.wednesday = 217
+            updatedPerson.thursday = 217
+            updatedPerson.friday = 0
+            updatedPerson.saturday = 0
+            updatedPerson.sunday = 0
+            updatedPerson.active = true
+            updatedPerson.language = "RUSSIAN"
+            updatedPerson.holidayCalendarId = 123456
+            updatedPerson.startDate = "2022-06-30"
+            updatedPerson.endDate = null
+            updatedPerson.createdAt = "2022-06-30"
+            updatedPerson.updatedAt = null
+            updatedPerson.isSystemUser = false
+            return listOf(updatedPerson)
+        }
     }
 }

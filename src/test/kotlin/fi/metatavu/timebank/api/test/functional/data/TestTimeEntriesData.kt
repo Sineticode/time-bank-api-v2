@@ -1,6 +1,8 @@
 package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import java.time.LocalDate
+import java.time.OffsetDateTime
 
 /**
  * Class for test time entries mock data
@@ -155,11 +157,11 @@ class TestTimeEntriesData {
             timeEntryP.person = 5
             timeEntryP.nonProjectTime = null
             timeEntryP.timeRegistered = 435
-            timeEntryP.date = "2022-06-30"
+            timeEntryP.date = "2022-06-23"
             timeEntryP.createdBy = 5
             timeEntryP.updatedBy = 5
-            timeEntryP.createdAt = "2022-06-30T12:00:00Z"
-            timeEntryP.updatedAt = "2022-06-30T12:00:00Z"
+            timeEntryP.createdAt = "2022-06-23T12:00:00Z"
+            timeEntryP.updatedAt = "2022-06-23T12:00:00Z"
             return listOf(timeEntryA, timeEntryB, timeEntryC, timeEntryD, timeEntryE,
                 timeEntryF, timeEntryG, timeEntryH, timeEntryI, timeEntryJ,
                 timeEntryK, timeEntryL, timeEntryM, timeEntryN, timeEntryP)
@@ -171,12 +173,26 @@ class TestTimeEntriesData {
             updatedTimeEntry.person = 5
             updatedTimeEntry.nonProjectTime = 789
             updatedTimeEntry.timeRegistered = 435
-            updatedTimeEntry.date = "2022-06-30"
+            updatedTimeEntry.date = "2022-06-23"
             updatedTimeEntry.createdBy = 1
             updatedTimeEntry.updatedBy = 1
-            updatedTimeEntry.createdAt = "2022-06-30T12:00:00Z"
-            updatedTimeEntry.updatedAt = "2022-06-30T16:07:33Z"
+            updatedTimeEntry.createdAt = "2022-06-23T12:00:00Z"
+            updatedTimeEntry.updatedAt = "2022-06-23T16:07:33Z"
             return listOf(updatedTimeEntry)
+        }
+        
+        fun getForecastTimeEntryForUpdatedPerson(): List<ForecastTimeEntry> {
+            val timeEntryA = ForecastTimeEntry()
+            timeEntryA.id = 15
+            timeEntryA.person = 5
+            timeEntryA.nonProjectTime = 789
+            timeEntryA.timeRegistered = 435
+            timeEntryA.date = LocalDate.now().toString()
+            timeEntryA.createdBy = 1
+            timeEntryA.updatedBy = 1
+            timeEntryA.createdAt = getTodayODT()
+            timeEntryA.updatedAt = getTodayODT()
+            return listOf(timeEntryA)
         }
 
         fun generateRandomForecastTimeEntries(pageNumber: Int): List<ForecastTimeEntry> {
@@ -215,6 +231,11 @@ class TestTimeEntriesData {
                 id++
             }
             return generatedEntries
+        }
+
+        private fun getTodayODT(): String {
+            val dateString = OffsetDateTime.now().toString().split("+")
+            return "${dateString[0]}Z"
         }
     }
 }

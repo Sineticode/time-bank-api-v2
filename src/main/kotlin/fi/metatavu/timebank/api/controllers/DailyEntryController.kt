@@ -7,6 +7,7 @@ import java.time.LocalDate
 import fi.metatavu.timebank.model.DailyEntry
 import org.slf4j.Logger
 import java.time.DayOfWeek
+import java.util.UUID
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -52,9 +53,6 @@ class DailyEntryController {
         return try {
             val persons = personsController.getPersonsFromForecast()
             val holidays = personsController.getHolidaysFromForecast()
-            val worktimeCalendars = persons.map { person ->
-                worktimeCalendarController.checkWorktimeCalendar(person)
-            }
 
             val entries = timeEntryRepository.getAllEntries(
                 personId = personId,
@@ -66,11 +64,12 @@ class DailyEntryController {
 
             val dailyEntries = mutableListOf<DailyEntry>()
 
-            worktimeCalendars.forEach { worktimeCalendar ->
+            persons.forEach { person ->
+                val personWorktimeCalendars = worktimeCalendarController.getWorktimeCalendars(personId = person.id)
                 entries
-                    .filter { timeEntry -> timeEntry.person == worktimeCalendar.personId }
+                    .filter { timeEntry -> timeEntry.person == person.id }
                     .groupBy { it.date }.values.map { day ->
-                        dailyEntries.add(calculateDailyEntries(day, worktimeCalendar, holidays))
+                        dailyEntries.add(calculateDailyEntries(day, personWorktimeCalendars, holidays))
                     }
             }
 
@@ -89,25 +88,28 @@ class DailyEntryController {
      * @param holidays List of LocalDate
      * @return DailyEntry
      */
-    suspend fun calculateDailyEntries(entries: List<TimeEntry>, worktimeCalendar: WorktimeCalendar, holidays: List<LocalDate>): DailyEntry {
+    suspend fun calculateDailyEntries(entries: List<TimeEntry>, worktimeCalendars: List<WorktimeCalendar>, holidays: List<LocalDate>): DailyEntry {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
+        var worktimeCalendarId: UUID? = null
+        var personId = 0
 
         entries.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
             projectTime += entry.projectTime ?: 0
             date = entry.date
+            personId = entry.person!!
+            worktimeCalendarId = entry.worktimeCalendarId
         }
-
         val expected = getDailyExpected(
-            worktimeCalendar = worktimeCalendar,
-            holidays = holidays,
-            day = date
+                worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
+                holidays = holidays,
+                day = date
         )
 
         return DailyEntry(
-            person = worktimeCalendar.personId!!,
+            person = personId,
             internalTime = internalTime,
             projectTime = projectTime,
             logged = internalTime + projectTime,

@@ -97,9 +97,12 @@ abstract class AbstractTest {
 
     companion object {
         const val PERSONS_SCENARIO = "personsScenario"
+        const val HOLIDAYS_SCENARIO = "holidaysScenario"
         const val TIMES_SCENARIO = "timesScenario"
         const val ERROR_STATE = "errorState"
-        const val UPDATE_STATE = "updateState"
-        const val GENERATED_STATE = "generatedStateOne"
+        const val UPDATE_STATE_ONE = "updateStateOne"
+        const val UPDATE_STATE_TWO = "updateStateTwo"
+        const val GENERATED_STATE_ONE = "generatedStateOne"
+        const val GENERATED_STATE_TWO = "generatedStateTwo"
     }
 }

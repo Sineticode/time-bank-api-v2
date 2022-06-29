@@ -74,4 +74,41 @@ class DailyEntriesTest: AbstractTest() {
             assertEquals(7, entriesAfter.size)
         }
     }
+
+    /**
+     * Tests /v1/dailyEntries?personId=5 -endpoint
+     */
+    @Test
+    fun testWorktimeCalendars() {
+        createTestBuilder().use { testBuilder ->
+            val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
+
+            setScenario(
+                scenario = "personsScenario",
+                state = "updateStateOne"
+            )
+            setScenario(
+                scenario = "timesScenario",
+                state = "updateStateTwo"
+            )
+
+            testBuilder.manager.synchronization.synchronizeEntries()
+            val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
+
+            secondEntries.forEach {
+                println(it.date)
+                println(it.balance)
+                println(it.person)
+                println(it.expected)
+                println(it.internalTime)
+                println(it.logged)
+                println(it.projectTime)
+            }
+            assertEquals(1, firstEntries.size)
+            assertEquals(2, secondEntries.size)
+            assertEquals(435, firstEntries[0].expected)
+            assertEquals(435, secondEntries[1].expected)
+            assertEquals(217, secondEntries[0].expected)
+        }
+    }
 }
