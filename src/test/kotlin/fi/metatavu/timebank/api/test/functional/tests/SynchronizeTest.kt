@@ -1,7 +1,6 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.data.TestData
-import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.common.QuarkusTestResource
@@ -17,8 +16,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class),
-    QuarkusTestResource(TestKeycloakResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SynchronizeTest: AbstractTest() {
@@ -83,6 +81,10 @@ class SynchronizeTest: AbstractTest() {
             val synchronized = testBuilder.manager.synchronization.synchronizeEntries()
 
             assertEquals(1200, synchronized.size)
+
+            synchronized.forEach { synchronizedEntry ->
+                testBuilder.manager.timeEntries.clean(synchronizedEntry)
+            }
         }
 
     }

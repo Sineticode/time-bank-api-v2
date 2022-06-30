@@ -1,7 +1,6 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.data.TestData
-import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
@@ -19,8 +18,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class),
-    QuarkusTestResource(TestKeycloakResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PersonsTest: AbstractTest() {

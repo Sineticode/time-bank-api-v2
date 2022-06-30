@@ -18,6 +18,7 @@ class TimeEntriesApi: TimeEntriesApi, AbstractApi() {
 
     override suspend fun deleteTimeEntry(entryId: UUID): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
+        if (!isAdmin()) return createUnauthorized(message = "Only admin is allowed to delete timeEntries!")
 
         timeEntryController.deleteEntry(entryId = entryId)
 

@@ -1,6 +1,5 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.test.client.models.TimeEntry
@@ -19,8 +18,7 @@ import org.junit.jupiter.api.TestInstance
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class),
-    QuarkusTestResource(TestKeycloakResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DailyEntriesTest: AbstractTest() {

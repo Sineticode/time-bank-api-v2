@@ -1,10 +1,12 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import fi.metatavu.timebank.api.logging.LoggerProducer
 import fi.metatavu.timebank.api.test.functional.TestBuilder
 import io.quarkus.test.common.DevServicesContext
 import okhttp3.*
 import org.eclipse.microprofile.config.ConfigProvider
+import org.slf4j.LoggerFactory
 
 /**
  * Abstract Test class
@@ -12,6 +14,10 @@ import org.eclipse.microprofile.config.ConfigProvider
 abstract class AbstractTest {
 
     private var devServicesContext: DevServicesContext? = null
+
+    private var logger = LoggerFactory.getLogger(LoggerProducer::class.java)
+
+    private var forecastBaseUrl = "http://localhost:8082"
 
     data class ReqBody(val state: String)
 
@@ -63,13 +69,13 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                    .url("http://localhost:8082/__admin/scenarios/reset")
+                    .url("${forecastBaseUrl}/__admin/scenarios/reset")
                     .post(RequestBody.create(null, ""))
                     .build()
                 ).execute()
                 .close()
         } catch (e: Error) {
-            println("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
+            logger.error("Un-expected error happened while resetting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 
@@ -81,7 +87,7 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                        .url("http://localhost:8082/__admin/scenarios/$scenario/state")
+                        .url("${forecastBaseUrl}/__admin/scenarios/$scenario/state")
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)
@@ -91,7 +97,7 @@ abstract class AbstractTest {
                 ).execute()
                 .close()
         } catch (e: Error) {
-            println("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
+            logger.error("Un-expected error happened while setting Wiremock Scenarios: ${e.localizedMessage}")
         }
     }
 

@@ -48,7 +48,6 @@ dependencies {
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.testcontainers:testcontainers:1.17.2")
     testImplementation("org.testcontainers:mysql:1.17.2")
-    testImplementation("com.github.dasniko:testcontainers-keycloak:2.2.2")
     testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
 }
 
