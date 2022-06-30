@@ -33,8 +33,8 @@ class SynchronizeTestBuilderResource(
      * @param before before date
      * @param after after date
      */
-    fun synchronizeEntries(before: String? = null, after: String? = null): Array<TimeEntry> {
-        return api.synchronizeTimeEntries(
+    fun synchronizeEntries(before: String? = null, after: String? = null) {
+        api.synchronizeTimeEntries(
             before = before,
             after = after
         )

@@ -19,8 +19,8 @@ class TimeEntriesTestBuilderResource(
     apiClient: ApiClient
 ): ApiTestBuilderResource<TimeEntry, ApiClient?>(testBuilder, apiClient) {
 
-    override fun clean(t: TimeEntry?) {
-        api.deleteTimeEntry(t!!.entryId)
+    override fun clean(t: TimeEntry) {
+        api.deleteTimeEntry(t.id!!)
     }
 
     override fun getApi(): TimeEntriesApi {
@@ -29,7 +29,23 @@ class TimeEntriesTestBuilderResource(
     }
 
     /**
-     * Asserts that deleting timeEntry failts with given status
+     * Lists all TimeEntries
+     *
+     * @param personId optional personId
+     * @param before optional before date
+     * @param after optional after date
+     * @return List of TimeEntries
+     */
+    fun getTimeEntries(personId: Int? = null, before: String? = null, after: String? = null): Array<TimeEntry> {
+        return api.listTimeEntries(
+            personId = personId,
+            before = before,
+            after = after
+        )
+    }
+
+    /**
+     * Asserts that deleting timeEntry fails with given status
      *
      * @param expectedStatus expected status code
      * @param id entryId

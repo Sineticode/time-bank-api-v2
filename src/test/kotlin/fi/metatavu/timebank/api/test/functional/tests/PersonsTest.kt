@@ -4,7 +4,6 @@ import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
-import fi.metatavu.timebank.test.client.models.TimeEntry
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
@@ -22,8 +21,6 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PersonsTest: AbstractTest() {
-
-    var synchronized = listOf<TimeEntry>()
     
     /**
      * Resets Wiremock scenario states before each test
@@ -39,7 +36,7 @@ class PersonsTest: AbstractTest() {
     @BeforeAll
     fun synchronizeBeforeTests() {
         createTestBuilder().use { testBuilder ->
-            synchronized = testBuilder.manager.synchronization.synchronizeEntries().toList()
+            testBuilder.manager.synchronization.synchronizeEntries()
         }
     }
 
@@ -49,8 +46,9 @@ class PersonsTest: AbstractTest() {
     @AfterAll
     fun cleanSynchronized() {
         createTestBuilder().use { testBuilder ->
-            synchronized.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
+            val entries = testBuilder.manager.timeEntries.getTimeEntries()
+            entries.forEach { timeEntry ->
+                testBuilder.manager.timeEntries.clean(timeEntry)
             }
         }
     }

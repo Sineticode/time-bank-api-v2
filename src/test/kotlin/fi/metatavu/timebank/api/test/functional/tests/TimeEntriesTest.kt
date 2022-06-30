@@ -4,6 +4,7 @@ import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,16 +32,14 @@ class TimeEntriesTest: AbstractTest() {
      * Tests /v1/timeEntries -endpoint DELETE method
      */
     @Test
-    fun testTimeEntriesDelete() {
+    fun testTimeEntries() {
         createTestBuilder().use { testBuilder ->
-            val synchronized = testBuilder.manager.synchronization.synchronizeEntries(
-                before = "2022-04-01"
-            )
+            testBuilder.manager.synchronization.synchronizeEntries()
+            val timeEntries = testBuilder.manager.timeEntries.getTimeEntries()
 
-            synchronized.forEach { timeEntry ->
-                testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntry.entryId)
-            }
-            synchronized.forEach { timeEntry ->
+            assertEquals(15, timeEntries.size)
+            testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].id!!)
+            timeEntries.forEach { timeEntry ->
                 testBuilder.manager.timeEntries.clean(timeEntry)
             }
         }
