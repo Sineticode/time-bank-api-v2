@@ -41,6 +41,9 @@ class TimeEntry {
     @Column
     var worktimeCalendarId: UUID? = null
 
+    @Column
+    var isVacation: Boolean? = false
+
     /**
      * Compares object equality ignoring entryId
      */

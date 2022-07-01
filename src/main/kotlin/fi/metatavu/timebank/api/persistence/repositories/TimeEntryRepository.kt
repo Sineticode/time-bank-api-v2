@@ -48,6 +48,16 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     }
 
     /**
+     * Gets all vacation timeEntries for given person
+     *
+     * @param personId persons id in Forecast
+     * @return List of timeEntries
+     */
+    suspend fun getAllVacations(personId: Int): List<TimeEntry> {
+        return find("personId = ?1 AND isVacation = ?2", personId, 1).list<TimeEntry>().awaitSuspending()
+    }
+
+    /**
      * Persists new TimeEntry
      * Replaces already stored entry if entry is updated
      *

@@ -43,4 +43,9 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="vacations" author="Ville Juutila">
+        <addColumn tableName="TimeEntry">
+            <column name="isVacation" type="boolean"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
