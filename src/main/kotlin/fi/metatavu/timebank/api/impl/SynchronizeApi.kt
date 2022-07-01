@@ -26,7 +26,7 @@ class SynchronizeApi: SynchronizeApi, AbstractApi() {
                 return createNoContent()
             }
 
-            return createCreated(entity = synchronizedEntries)
+            return createNoContent()
         } catch (e: Error) {
             return createBadRequest(message = e.localizedMessage)
         }

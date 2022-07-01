@@ -2,6 +2,7 @@ package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import java.time.LocalDate
 
@@ -20,31 +21,32 @@ class TestData {
          * @return ForecastTimeEntryResponse
          */
         fun getForecastTimeEntryResponse(before: String? = null, after: String? = null): ForecastTimeEntryResponse {
-            val forecastResponse = ForecastTimeEntryResponse()
             return if (after != null) {
                 val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
                     LocalDate.parse(forecastTimeEntry.date) > LocalDate.parse(after)
                 }
-                forecastResponse.pageContents = pageContents
-                forecastResponse.pageSize = pageContents.size
-                forecastResponse.totalObjectCount = pageContents.size
 
-                forecastResponse
+                createForecastTimeEntryResponse(
+                    pageContents = pageContents,
+                    pageSize = pageContents.size,
+                    totalObjectCount = pageContents.size
+                )
             } else if (before != null) {
                 val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
                     LocalDate.parse(forecastTimeEntry.date) < LocalDate.parse(before)
                 }
-                forecastResponse.pageContents = pageContents
-                forecastResponse.pageSize = pageContents.size
-                forecastResponse.totalObjectCount = pageContents.size
 
-                forecastResponse
+                createForecastTimeEntryResponse(
+                    pageContents = pageContents,
+                    pageSize = pageContents.size,
+                    totalObjectCount = pageContents.size
+                )
             } else {
-                forecastResponse.pageContents = TestTimeEntriesData.getForecastTimeEntries()
-                forecastResponse.pageSize = TestTimeEntriesData.getForecastTimeEntries().size
-                forecastResponse.totalObjectCount = TestTimeEntriesData.getForecastTimeEntries().size
-
-                forecastResponse
+                createForecastTimeEntryResponse(
+                    pageContents = TestTimeEntriesData.getForecastTimeEntries(),
+                    pageSize = TestTimeEntriesData.getForecastTimeEntries().size,
+                    totalObjectCount = TestTimeEntriesData.getForecastTimeEntries().size
+                )
             }
         }
 
@@ -55,12 +57,11 @@ class TestData {
          * @return ForecastTimeEntryResponse
          */
         fun getUpdatedForecastTimeEntryResponse(): ForecastTimeEntryResponse {
-            val forecastResponse = ForecastTimeEntryResponse()
-            forecastResponse.pageContents = TestTimeEntriesData.getUpdatedForecastTimeEntry()
-            forecastResponse.pageSize = 1
-            forecastResponse.totalObjectCount = 1
-
-            return forecastResponse
+            return createForecastTimeEntryResponse(
+                pageContents = TestTimeEntriesData.getUpdatedForecastTimeEntry(),
+                pageSize = 1,
+                totalObjectCount = 1
+            )
         }
 
         /**
@@ -71,12 +72,11 @@ class TestData {
          * @return ForecastTimeEntryResponse
          */
         fun getGeneratedForecastTimeEntryResponse(pageNumber: Int): ForecastTimeEntryResponse {
-            val forecastResponse = ForecastTimeEntryResponse()
-            forecastResponse.pageContents = TestTimeEntriesData.generateRandomForecastTimeEntries(pageNumber)
-            forecastResponse.pageSize = 1000
-            forecastResponse.totalObjectCount = 1200
-
-            return forecastResponse
+            return createForecastTimeEntryResponse(
+                pageContents = TestTimeEntriesData.generateRandomForecastTimeEntries(pageNumber),
+                pageSize = 1000,
+                totalObjectCount = 1200
+            )
         }
 
         /**
@@ -135,6 +135,19 @@ class TestData {
             holidayA.day = 5
             holidayA.name = "Helluntai"
             return listOf(holidayA)
+        }
+
+        private fun createForecastTimeEntryResponse(
+            pageContents: List<ForecastTimeEntry>,
+            pageSize: Int,
+            totalObjectCount: Int
+        ): ForecastTimeEntryResponse {
+            val newForecastResponse = ForecastTimeEntryResponse()
+            newForecastResponse.pageContents = pageContents
+            newForecastResponse.pageSize = pageSize
+            newForecastResponse.totalObjectCount = totalObjectCount
+
+            return newForecastResponse
         }
     }
 }

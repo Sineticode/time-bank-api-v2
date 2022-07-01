@@ -37,7 +37,7 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager, DevServicesContext
         var jdbcUrl = db.jdbcUrl
 
         if (containerNetworkId.isNullOrEmpty()) {
-            jdbcUrl = fixJdbcUrl(jdbcUrl)
+            jdbcUrl = getContainerJdbcUrl(jdbcUrl)
         }
 
         val config: MutableMap<String, String> = HashMap()
@@ -53,7 +53,13 @@ class TestMySQLResource: QuarkusTestResourceLifecycleManager, DevServicesContext
         db.stop()
     }
 
-    private fun fixJdbcUrl(jdbcUrl: String): String {
+    /**
+     * Changes DB host in JdbcUrl to DB host in container network
+     *
+     * @param jdbcUrl jdbcUrl
+     * @return jdbcUrl corrected jdbcUrl
+     */
+    private fun getContainerJdbcUrl(jdbcUrl: String): String {
         val hostPort = "${db.host}:${db.getMappedPort(MySQLContainer.MYSQL_PORT)}"
         val networkHostPort = "${db.currentContainerInfo.config.hostName}:${MySQLContainer.MYSQL_PORT}"
 

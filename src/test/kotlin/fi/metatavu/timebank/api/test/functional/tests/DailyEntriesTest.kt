@@ -1,9 +1,7 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
-import fi.metatavu.timebank.test.client.models.TimeEntry
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import org.junit.jupiter.api.AfterAll
@@ -19,13 +17,10 @@ import org.junit.jupiter.api.TestInstance
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class),
-    QuarkusTestResource(TestKeycloakResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DailyEntriesTest: AbstractTest() {
-
-    var synchronized = listOf<TimeEntry>()
 
     /**
      * Resets Wiremock scenario states before each test
@@ -41,7 +36,7 @@ class DailyEntriesTest: AbstractTest() {
     @BeforeAll
     fun synchronizeBeforeTests() {
         createTestBuilder().use { testBuilder ->
-            synchronized = testBuilder.manager.synchronization.synchronizeEntries().toList()
+            testBuilder.manager.synchronization.synchronizeEntries()
         }
     }
 
@@ -51,8 +46,9 @@ class DailyEntriesTest: AbstractTest() {
     @AfterAll
     fun cleanSynchronized() {
         createTestBuilder().use { testBuilder ->
-            synchronized.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
+            val entries = testBuilder.manager.timeEntries.getTimeEntries()
+            entries.forEach { timeEntry ->
+                testBuilder.manager.timeEntries.clean(timeEntry)
             }
         }
     }

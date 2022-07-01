@@ -1,7 +1,6 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.data.TestData
-import fi.metatavu.timebank.api.test.functional.resources.TestKeycloakResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.common.QuarkusTestResource
@@ -17,8 +16,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 @QuarkusTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
-    QuarkusTestResource(TestWiremockResource::class),
-    QuarkusTestResource(TestKeycloakResource::class)
+    QuarkusTestResource(TestWiremockResource::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SynchronizeTest: AbstractTest() {
@@ -37,34 +35,34 @@ class SynchronizeTest: AbstractTest() {
     @Test
     fun testSynchronization() {
         createTestBuilder().use { testBuilder ->
-            val synchronizedAfter = testBuilder.manager.synchronization.synchronizeEntries(
+            testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = "2022-05-01"
             )
-            val synchronized = testBuilder.manager.synchronization.synchronizeEntries()
+
+            val synchronizedAfter = testBuilder.manager.timeEntries.getTimeEntries()
+
+            synchronizedAfter.forEach { synchronizedEntry ->
+                testBuilder.manager.timeEntries.clean(synchronizedEntry)
+            }
+
+            testBuilder.manager.synchronization.synchronizeEntries()
 
             setScenario(
                 scenario = TIMES_SCENARIO,
                 state = UPDATE_STATE_ONE
             )
 
-            val synchronizedUpdated = testBuilder.manager.synchronization.synchronizeEntries()
+            testBuilder.manager.synchronization.synchronizeEntries()
+
+            val synchronizedAll = testBuilder.manager.timeEntries.getTimeEntries()
 
             val expectedAfter = TestData.getForecastTimeEntryResponse().pageContents!!.filter { it.date > "2022-05-01" }.size
-            val expectedUpdated = TestData.getUpdatedForecastTimeEntryResponse().pageContents!!.size
-            val expected = TestData.getForecastTimeEntryResponse().pageContents!!.size - expectedAfter
+            val expected = TestData.getForecastTimeEntryResponse().pageContents!!.size
 
             assertEquals(expectedAfter, synchronizedAfter.size)
-            assertEquals(expectedUpdated, synchronizedUpdated.size)
-            assertEquals(expected, synchronized.size)
-
-            synchronizedAfter.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
-            }
-            synchronized.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
-            }
-            synchronizedUpdated.forEach { synchronizedEntry ->
+            assertEquals(expected, synchronizedAll.size)
+            synchronizedAll.forEach { synchronizedEntry ->
                 testBuilder.manager.timeEntries.clean(synchronizedEntry)
             }
         }
@@ -80,9 +78,13 @@ class SynchronizeTest: AbstractTest() {
             state = GENERATED_STATE_ONE
         )
         createTestBuilder().use { testBuilder ->
-            val synchronized = testBuilder.manager.synchronization.synchronizeEntries()
+            testBuilder.manager.synchronization.synchronizeEntries()
+            val timeEntries = testBuilder.manager.timeEntries.getTimeEntries()
+            assertEquals(1200, timeEntries.size)
 
-            assertEquals(1200, synchronized.size)
+            timeEntries.forEach { timeEntry ->
+                testBuilder.manager.timeEntries.clean(timeEntry)
+            }
         }
 
     }

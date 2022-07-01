@@ -9,7 +9,6 @@ import fi.metatavu.jaxrs.test.functional.builder.auth.KeycloakAccessTokenProvide
 import fi.metatavu.jaxrs.test.functional.builder.auth.NullAccessTokenProvider
 import fi.metatavu.timebank.api.test.functional.auth.TestBuilderAuthentication
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
-import org.eclipse.microprofile.config.ConfigProvider
 
 /**
  * Abstract test builder class
@@ -17,9 +16,8 @@ import org.eclipse.microprofile.config.ConfigProvider
 class TestBuilder(private val config: Map<String, String>): AbstractAccessTokenTestBuilder<ApiClient>() {
 
     val manager = createTestBuilderAuthentication("manager", "test")
-
+    val userA = createTestBuilderAuthentication("test", "password")
     val notValid: TestBuilderAuthentication = TestBuilderAuthentication(this, InvalidAccessTokenProvider())
-
     val userWithNullToken: TestBuilderAuthentication = TestBuilderAuthentication(this, NullAccessTokenProvider())
 
     override fun createTestBuilderAuthentication(
@@ -28,7 +26,6 @@ class TestBuilder(private val config: Map<String, String>): AbstractAccessTokenT
     ): AuthorizedTestBuilderAuthentication<ApiClient, AccessTokenProvider> {
         return TestBuilderAuthentication(this, authProvider)
     }
-
     /**
      * Creates test builder authenticator for given user
      *
@@ -37,8 +34,8 @@ class TestBuilder(private val config: Map<String, String>): AbstractAccessTokenT
      * @return test builder authenticator for given user
      */
     private fun createTestBuilderAuthentication(username: String, password: String): TestBuilderAuthentication {
-        val serverUrl = ConfigProvider.getConfig().getValue("quarkus.oidc.auth-server-url", String::class.java).substringBeforeLast("/").substringBeforeLast("/")
-        val realm = "timebank"
+        val serverUrl = config.getValue("quarkus.oidc.auth-server-url").substringBeforeLast("/").substringBeforeLast("/")
+        val realm = config.getValue("quarkus.oidc.auth-server-url").substringAfterLast("/")
         val clientId = "test"
         return TestBuilderAuthentication(this, KeycloakAccessTokenProvider(serverUrl, realm, clientId, username, password, null))
     }
