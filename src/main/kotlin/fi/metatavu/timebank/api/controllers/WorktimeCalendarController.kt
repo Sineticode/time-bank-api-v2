@@ -18,19 +18,6 @@ class WorktimeCalendarController {
     lateinit var worktimeCalendarRepository: WorktimeCalendarRepository
 
     /**
-     * Gets all up-to-date WorktimeCalendars
-     *
-     * @return List of WorktimeCalendars
-     */
-    suspend fun getWorktimeCalendars(personId: Int?): List<WorktimeCalendar> {
-        return if (personId != null) {
-            worktimeCalendarRepository.getAllWorktimeCalendars(personId = personId)!!
-        } else {
-            worktimeCalendarRepository.getAllWorktimeCalendars()
-        }
-    }
-
-    /**
      * Gets WorktimeCalendar based on ID
      *
      * @param id id
@@ -40,7 +27,6 @@ class WorktimeCalendarController {
         return worktimeCalendarRepository.getWorktimeCalendar(id)
     }
 
-
     /**
      * Checks if persisted WorktimeCalendar is up-to-date for given person.
      * Returns most up-to-date WorktimeCalendar.
@@ -48,7 +34,7 @@ class WorktimeCalendarController {
      * @return WorktimeCalendar
      */
     suspend fun checkWorktimeCalendar(person: ForecastPerson): WorktimeCalendar {
-        val worktimeCalendar = worktimeCalendarRepository.getAllWorktimeCalendars(person.id)?.first()
+        val worktimeCalendar = worktimeCalendarRepository.getUpToDateWorktimeCalendar(person.id)
             ?: createWorktimeCalendar(person)
 
         val updatedWorktimeCalendar = compareExpected(person, worktimeCalendar)

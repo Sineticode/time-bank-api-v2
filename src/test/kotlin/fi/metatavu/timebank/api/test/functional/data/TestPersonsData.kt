@@ -102,7 +102,29 @@ class TestPersonsData {
                     isSystemUser = false,
                 )
             )
+        }
 
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            return listOf(
+                createTestPerson(
+                    id = 5,
+                    firstName = "TesterE",
+                    lastName = "Updater",
+                    monday = 215,
+                    tuesday = 217,
+                    wednesday = 217,
+                    thursday = 217,
+                    friday = 217,
+                    saturday = 0,
+                    sunday = 0,
+                    active = true,
+                    language = "RUSSIAN",
+                    holidayCalendarId = 123456,
+                    startDate = "2022-06-30",
+                    createdAt = "2022-06-30",
+                    isSystemUser = false
+                )
+            )
         }
 
         private fun createTestPerson(
@@ -142,30 +164,6 @@ class TestPersonsData {
             newPerson.isSystemUser = isSystemUser
 
             return newPerson
-        }
-        
-        fun getUpdatedPersons(): List<ForecastPerson> {
-            val updatedPerson = ForecastPerson()
-            updatedPerson.id = 5
-            updatedPerson.firstName = "TesterE"
-            updatedPerson.lastName = "Updater"
-            updatedPerson.email = ""
-            updatedPerson.monday = 217
-            updatedPerson.tuesday = 217
-            updatedPerson.wednesday = 217
-            updatedPerson.thursday = 217
-            updatedPerson.friday = 0
-            updatedPerson.saturday = 0
-            updatedPerson.sunday = 0
-            updatedPerson.active = true
-            updatedPerson.language = "RUSSIAN"
-            updatedPerson.holidayCalendarId = 123456
-            updatedPerson.startDate = "2022-06-30"
-            updatedPerson.endDate = null
-            updatedPerson.createdAt = "2022-06-30"
-            updatedPerson.updatedAt = null
-            updatedPerson.isSystemUser = false
-            return listOf(updatedPerson)
         }
     }
 }

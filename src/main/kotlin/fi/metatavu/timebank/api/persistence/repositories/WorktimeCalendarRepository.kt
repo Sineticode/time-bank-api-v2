@@ -14,26 +14,18 @@ import javax.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class WorktimeCalendarRepository: PanacheRepositoryBase<WorktimeCalendar, UUID> {
 
-
     /**
-     * Gets all up-to-date WorktimeCalendars
-     *
-     * @return List of WorktimeCalendars
-     */
-    suspend fun getAllWorktimeCalendars(): List<WorktimeCalendar> {
-        return list("calendarEnd = NULL").awaitSuspending()
-    }
-
-    /**
-     * Gets WorktimeCalendars for given person
+     * Gets most up-to-date WorktimeCalendars for given person
      *
      * @param personId person id
-     * @return List of WorktimeCalendars
+     * @return WorktimeCalendars
      */
-    suspend fun getAllWorktimeCalendars(personId: Int): List<WorktimeCalendar>? {
-        return list("personId", personId)
-            .awaitSuspending()
-            .filter { it.calendarEnd == null }
+    suspend fun getUpToDateWorktimeCalendar(personId: Int): WorktimeCalendar? {
+        return try {
+            find("personId = ?1 AND calendarEnd = ?2", personId, null).singleResult<WorktimeCalendar?>().awaitSuspending()
+        } catch (ex: Exception) {
+            null
+        }
     }
 
     /**

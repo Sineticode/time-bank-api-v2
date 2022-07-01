@@ -1,5 +1,6 @@
 package fi.metatavu.timebank.api.controllers
 
+import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
@@ -65,11 +66,10 @@ class DailyEntryController {
             val dailyEntries = mutableListOf<DailyEntry>()
 
             persons.forEach { person ->
-                val personWorktimeCalendars = worktimeCalendarController.getWorktimeCalendars(personId = person.id)
                 entries
                     .filter { timeEntry -> timeEntry.person == person.id }
                     .groupBy { it.date }.values.map { day ->
-                        dailyEntries.add(calculateDailyEntries(day, personWorktimeCalendars, holidays))
+                        dailyEntries.add(calculateDailyEntries(day, person, holidays))
                     }
             }
 
@@ -88,7 +88,7 @@ class DailyEntryController {
      * @param holidays List of LocalDate
      * @return DailyEntry
      */
-    suspend fun calculateDailyEntries(entries: List<TimeEntry>, worktimeCalendars: List<WorktimeCalendar>, holidays: List<LocalDate>): DailyEntry {
+    suspend fun calculateDailyEntries(entries: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()

@@ -113,12 +113,11 @@ class TestData {
          * @return ForecastTimeEntryResponse
          */
         fun getForecastTimeEntryResponseForUpdatedPerson(): ForecastTimeEntryResponse {
-            val forecastResponse = ForecastTimeEntryResponse()
-            forecastResponse.pageContents = TestTimeEntriesData.getForecastTimeEntryForUpdatedPerson()
-            forecastResponse.pageSize = 1
-            forecastResponse.totalObjectCount = 1
-
-            return forecastResponse
+            return createForecastTimeEntryResponse(
+                pageContents = TestTimeEntriesData.getForecastTimeEntryForUpdatedPerson(),
+                pageSize = 1,
+                totalObjectCount = 1
+            )
         }
 
         /**

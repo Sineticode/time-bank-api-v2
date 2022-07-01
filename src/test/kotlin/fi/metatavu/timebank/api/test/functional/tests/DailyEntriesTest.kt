@@ -91,15 +91,6 @@ class DailyEntriesTest: AbstractTest() {
             testBuilder.manager.synchronization.synchronizeEntries()
             val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
 
-            secondEntries.forEach {
-                println(it.date)
-                println(it.balance)
-                println(it.person)
-                println(it.expected)
-                println(it.internalTime)
-                println(it.logged)
-                println(it.projectTime)
-            }
             assertEquals(1, firstEntries.size)
             assertEquals(2, secondEntries.size)
             assertEquals(435, firstEntries[0].expected)
