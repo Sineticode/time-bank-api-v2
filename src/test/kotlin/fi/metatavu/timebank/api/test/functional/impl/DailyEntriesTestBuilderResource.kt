@@ -34,11 +34,12 @@ class DailyEntriesTestBuilderResource(
      * @param after optional after date
      * @return list of DailyEntries
      */
-    fun getDailyEntries(personId: Int? = null, before: String? = null, after: String? = null): Array<DailyEntry> {
+    fun getDailyEntries(personId: Int? = null, before: String? = null, after: String? = null, vacation: Boolean? = null): Array<DailyEntry> {
         return api.listDailyEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
     }
 }

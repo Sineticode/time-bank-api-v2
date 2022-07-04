@@ -23,7 +23,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
      * @param after LocalDate to retrieve entries after given date
      * @return List of timeEntries
      */
-    suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry> {
+    suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
         val stringBuilder = StringBuilder()
         val parameters = Parameters()
 
@@ -33,28 +33,23 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (before != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date < :before" else "date < :before")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date <= :before" else "date <= :before")
             parameters.and("before", before)
         }
 
         if (after != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date > :after" else "date > :after")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date >= :after" else "date >= :after")
             parameters.and("after", after)
+        }
+
+        if (vacation != null) {
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "vacation = :vacation")
+            parameters.and("vacation", vacation)
         }
 
         stringBuilder.append(" order by date DESC")
 
         return find(stringBuilder.toString(), parameters).list<TimeEntry>().awaitSuspending()
-    }
-
-    /**
-     * Gets all vacation timeEntries for given person
-     *
-     * @param personId persons id in Forecast
-     * @return List of timeEntries
-     */
-    suspend fun getAllVacations(personId: Int): List<TimeEntry> {
-        return find("personId = ?1 AND isVacation = ?2", personId, 1).list<TimeEntry>().awaitSuspending()
     }
 
     /**

@@ -64,10 +64,12 @@ class DailyEntriesTest: AbstractTest() {
             val entriesBefore = testBuilder.manager.dailyEntries.getDailyEntries(before = "2022-04-30")
             val entriesAfter = testBuilder.manager.dailyEntries.getDailyEntries(after = "2022-05-01")
 
-            assertEquals(15, allEntries.size)
-            assertEquals(4, entriesForPersonA.size)
+            assertEquals(16, allEntries.size)
+            assertEquals(5, entriesForPersonA.size)
             assertEquals(7, entriesBefore.size)
-            assertEquals(7, entriesAfter.size)
+            assertEquals(8, entriesAfter.size)
+            assertEquals(0, entriesAfter[0].expected)
+            assertEquals(true, entriesAfter[0].isVacation)
         }
     }
 

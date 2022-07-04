@@ -5,6 +5,7 @@ import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.utils.VacationUtils
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
 import fi.metatavu.timebank.model.Timespan
@@ -28,6 +29,9 @@ class PersonsController {
 
     @Inject
     lateinit var logger: Logger
+
+    @Inject
+    lateinit var vacationUtils: VacationUtils
 
     /**
      * List persons data from Forecast API
@@ -80,6 +84,11 @@ class PersonsController {
      */
     suspend fun listPersons(active: Boolean? = true): List<ForecastPerson>? {
         val persons = getPersonsFromForecast()
+        persons.forEach { forecastPerson ->
+            val vacationAmounts = vacationUtils.getPersonsVacations(forecastPerson)
+            forecastPerson.unspentVacations = vacationAmounts.first
+            forecastPerson.spentVacations = vacationAmounts.second
+        }
 
         return if (active == false) {
             persons
@@ -99,7 +108,8 @@ class PersonsController {
         val dailyEntries = dailyEntryController.makeDailyEntries(
             personId = personId,
             before = null,
-            after = null
+            after = null,
+            vacation = false
         ) ?: return null
 
         return when (timespan) {

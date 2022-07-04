@@ -76,12 +76,14 @@ class PersonsTest: AbstractTest() {
 
             assertEquals(2, persons.size)
             assertEquals(TestData.getPerson(id = 1).firstName, persons[0].firstName)
+            assertEquals(29, persons[0].unspentVacations)
+            assertEquals(1, persons[0].spentVacations)
             testBuilder.notValid.persons.assertListFail(401)
         }
     }
 
     /**
-     * Tests /v1/persons/1/total -endpoint
+     * Tests /v1/persons/2/total -endpoint
      * timespan defaults to ALL_TIME
      */
     @Test

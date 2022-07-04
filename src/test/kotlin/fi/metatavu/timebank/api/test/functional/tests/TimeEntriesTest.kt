@@ -37,7 +37,7 @@ class TimeEntriesTest: AbstractTest() {
             testBuilder.manager.synchronization.synchronizeEntries()
             val timeEntries = testBuilder.manager.timeEntries.getTimeEntries()
 
-            assertEquals(15, timeEntries.size)
+            assertEquals(17, timeEntries.size)
             testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].id!!)
             timeEntries.forEach { timeEntry ->
                 testBuilder.manager.timeEntries.clean(timeEntry)

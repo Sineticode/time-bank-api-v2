@@ -18,7 +18,8 @@ class TimeEntryTranslator: AbstractTranslator<TimeEntry, fi.metatavu.timebank.mo
             date = entity.date!!,
             createdAt = entity.createdAt!!,
             updatedAt = entity.updatedAt!!,
-            id = entity.entryId
+            id = entity.entryId,
+            isVacation = entity.isVacation!!
         )
     }
 

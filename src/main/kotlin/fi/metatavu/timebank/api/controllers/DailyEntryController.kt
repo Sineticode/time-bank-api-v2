@@ -38,8 +38,8 @@ class DailyEntryController {
      * @param after LocalDate to retrieve entries after given date
      * @return List of DailyEntries
      */
-    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?): List<DailyEntry>? {
-        return makeDailyEntries(personId, before, after)
+    suspend fun list(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<DailyEntry>? {
+        return makeDailyEntries(personId, before, after, vacation)
     }
 
     /**
@@ -50,7 +50,7 @@ class DailyEntryController {
      * @param after LocalDate to retrieve entries after given date
      * @return List of DailyEntries
      */
-    suspend fun makeDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<DailyEntry>? {
+    suspend fun makeDailyEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<DailyEntry>? {
         return try {
             val persons = personsController.getPersonsFromForecast()
             val holidays = personsController.getHolidaysFromForecast()
@@ -58,7 +58,8 @@ class DailyEntryController {
             val entries = timeEntryRepository.getAllEntries(
                 personId = personId,
                 before = before,
-                after = after
+                after = after,
+                vacation = vacation
             )
 
             if (entries.isEmpty()) return null
@@ -92,8 +93,9 @@ class DailyEntryController {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
-        var worktimeCalendarId: UUID? = null
         var personId = 0
+        var worktimeCalendarId: UUID? = null
+        val isVacation = entries.any { it.isVacation!! }
 
         entries.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
@@ -102,11 +104,11 @@ class DailyEntryController {
             personId = entry.person!!
             worktimeCalendarId = entry.worktimeCalendarId
         }
-        val expected = getDailyExpected(
-                worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
-                holidays = holidays,
-                day = date
-        )
+        val expected = if (isVacation) 0 else getDailyExpected(
+                                worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
+                                holidays = holidays,
+                                day = date
+                            )
 
         return DailyEntry(
             person = personId,
@@ -115,7 +117,8 @@ class DailyEntryController {
             logged = internalTime + projectTime,
             expected = expected,
             balance = internalTime + projectTime - expected,
-            date = date
+            date = date,
+            isVacation = isVacation
         )
     }
 

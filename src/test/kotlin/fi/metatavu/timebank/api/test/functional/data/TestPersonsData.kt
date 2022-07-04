@@ -25,8 +25,8 @@ class TestPersonsData {
                     active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = "2021-07-31",
+                    createdAt = "2021-07-31",
                     isSystemUser = false
                 ),
                 createTestPerson(
@@ -110,7 +110,7 @@ class TestPersonsData {
                     id = 5,
                     firstName = "TesterE",
                     lastName = "Updater",
-                    monday = 215,
+                    monday = 217,
                     tuesday = 217,
                     wednesday = 217,
                     thursday = 217,
