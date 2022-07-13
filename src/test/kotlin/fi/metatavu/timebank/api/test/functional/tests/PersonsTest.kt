@@ -1,12 +1,14 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.data.TestData
+import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
@@ -19,6 +21,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
     QuarkusTestResource(TestMySQLResource::class),
     QuarkusTestResource(TestWiremockResource::class)
 )
+@TestProfile(LocalTestProfile::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PersonsTest: AbstractTest() {
     
@@ -78,6 +81,8 @@ class PersonsTest: AbstractTest() {
             assertEquals(TestData.getPerson(id = 1).firstName, persons[0].firstName)
             assertEquals(29, persons[0].unspentVacations)
             assertEquals(1, persons[0].spentVacations)
+            assertEquals(10, persons[0].minimumBillableRate)
+            assertEquals(50, persons[1].minimumBillableRate)
             testBuilder.notValid.persons.assertListFail(401)
         }
     }

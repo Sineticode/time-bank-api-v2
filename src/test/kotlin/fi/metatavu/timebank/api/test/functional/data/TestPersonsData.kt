@@ -15,6 +15,7 @@ class TestPersonsData {
                     id = 1,
                     firstName = "TesterA",
                     lastName = "TestA",
+                    email = "testerA@test.fi",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -131,6 +132,7 @@ class TestPersonsData {
             id: Int,
             firstName: String,
             lastName: String,
+            email: String = "",
             monday: Int,
             tuesday: Int,
             wednesday: Int,
@@ -149,6 +151,7 @@ class TestPersonsData {
             newPerson.id = id
             newPerson.firstName = firstName
             newPerson.lastName = lastName
+            newPerson.email = email
             newPerson.monday = monday
             newPerson.tuesday = tuesday
             newPerson.wednesday = wednesday

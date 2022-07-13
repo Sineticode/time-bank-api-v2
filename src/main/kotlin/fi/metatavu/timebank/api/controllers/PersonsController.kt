@@ -5,6 +5,7 @@ import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.keycloak.KeycloakController
 import fi.metatavu.timebank.api.utils.VacationUtils
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
@@ -32,6 +33,9 @@ class PersonsController {
 
     @Inject
     lateinit var vacationUtils: VacationUtils
+
+    @Inject
+    lateinit var keycloakController: KeycloakController
 
     /**
      * List persons data from Forecast API
@@ -88,6 +92,7 @@ class PersonsController {
             val vacationAmounts = vacationUtils.getPersonsVacations(forecastPerson)
             forecastPerson.unspentVacations = vacationAmounts.first
             forecastPerson.spentVacations = vacationAmounts.second
+            forecastPerson.minimumBillableRate = keycloakController.getUsersMinimumBillableRate(forecastPerson.email)
         }
 
         return if (active == false) {
@@ -109,7 +114,7 @@ class PersonsController {
             personId = personId,
             before = null,
             after = null,
-            vacation = false
+            vacation = null
         ) ?: return null
 
         return when (timespan) {

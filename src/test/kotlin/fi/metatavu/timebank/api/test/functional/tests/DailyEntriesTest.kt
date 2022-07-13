@@ -1,9 +1,11 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
+import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.TestInstance
     QuarkusTestResource(TestMySQLResource::class),
     QuarkusTestResource(TestWiremockResource::class)
 )
+@TestProfile(LocalTestProfile::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DailyEntriesTest: AbstractTest() {
 
@@ -66,7 +69,7 @@ class DailyEntriesTest: AbstractTest() {
 
             assertEquals(16, allEntries.size)
             assertEquals(5, entriesForPersonA.size)
-            assertEquals(7, entriesBefore.size)
+            assertEquals(8, entriesBefore.size)
             assertEquals(8, entriesAfter.size)
             assertEquals(0, entriesAfter[0].expected)
             assertEquals(true, entriesAfter[0].isVacation)

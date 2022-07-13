@@ -43,7 +43,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (vacation != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "vacation = :vacation")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "isVacation = :vacation")
             parameters.and("vacation", vacation)
         }
 
