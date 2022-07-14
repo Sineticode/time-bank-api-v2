@@ -24,7 +24,10 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
 
         personsStubs(wireMockServer)
 
-        return mapOf(Pair("forecast.base.url", wireMockServer.baseUrl()))
+        return mapOf(
+            "forecast.base.url" to  wireMockServer.baseUrl(),
+            "forecast.api.key" to "noapikey"
+        )
     }
 
     /**

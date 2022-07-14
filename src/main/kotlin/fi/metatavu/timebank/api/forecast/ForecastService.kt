@@ -5,7 +5,6 @@ import okhttp3.Request
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
 import java.time.LocalDate
-import java.util.Optional
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
 
@@ -19,7 +18,7 @@ class ForecastService {
     lateinit var forecastBaseUrl: String
 
     @ConfigProperty(name = "forecast.api.key")
-    lateinit var forecastApiKey: Optional<String>
+    lateinit var forecastApiKey: String
 
     @Inject
     lateinit var logger: Logger
@@ -34,7 +33,7 @@ class ForecastService {
         return try {
             val client = OkHttpClient()
             val request = Request.Builder().url("${forecastBaseUrl}${path}")
-                .addHeader("X-FORECAST-API-KEY", forecastApiKey.get())
+                .addHeader("X-FORECAST-API-KEY", forecastApiKey)
                 .build()
             val response = client.newCall(request).execute()
             when (response.code()) {
