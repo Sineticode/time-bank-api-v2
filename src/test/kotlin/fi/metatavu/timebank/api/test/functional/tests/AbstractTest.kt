@@ -14,7 +14,7 @@ abstract class AbstractTest {
     @Inject
     lateinit var logger: Logger
 
-    @ConfigProperty(name = "forecast.base.url")
+    @ConfigProperty(name = "forecast.base.url", defaultValue="http://localhost:8082")
     lateinit var forecastBaseUrl: String
 
     data class ReqBody(val state: String)
