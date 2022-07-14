@@ -17,7 +17,7 @@ class ForecastService {
     @ConfigProperty(name = "forecast.base.url")
     lateinit var forecastBaseUrl: String
 
-    @ConfigProperty(name = "forecast.api.key")
+    @ConfigProperty(name = "forecast.api.key", defaultValue = "")
     lateinit var forecastApiKey: String
 
     @Inject
