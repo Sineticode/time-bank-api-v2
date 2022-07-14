@@ -14,8 +14,8 @@ abstract class AbstractTest {
     @Inject
     lateinit var logger: Logger
 
-    @ConfigProperty(name = "forecast.base.url", defaultValue="http://localhost:8082")
-    lateinit var forecastBaseUrl: String
+//    @ConfigProperty(name = "forecast.base.url", defaultValue="http://localhost:8082")
+//    lateinit var forecastBaseUrl: String
 
     data class ReqBody(val state: String)
 
@@ -27,7 +27,7 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                    .url("$forecastBaseUrl/__admin/scenarios/reset")
+                    .url("http://localhost:8082/__admin/scenarios/reset")
                     .post(RequestBody.create(null, ""))
                     .build()
                 ).execute()
@@ -45,7 +45,7 @@ abstract class AbstractTest {
             OkHttpClient()
                 .newCall(
                     Request.Builder()
-                        .url("$forecastBaseUrl/__admin/scenarios/$scenario/state")
+                        .url("http://localhost:8082/__admin/scenarios/$scenario/state")
                         .put(RequestBody.create(
                             MediaType.parse("application/json"),
                             jacksonObjectMapper().writeValueAsString(ReqBody(state = state)

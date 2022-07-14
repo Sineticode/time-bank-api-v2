@@ -21,7 +21,6 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         wireMockServer = WireMockServer(8082)
         wireMockServer.start()
         configureFor("localhost", 8082)
-        println("WireMockServer.baseUrl: ${ wireMockServer.baseUrl() }")
 
         personsStubs(wireMockServer)
 
