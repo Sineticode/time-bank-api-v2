@@ -106,3 +106,11 @@ val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
     this.configOptions.put("collectionType", "array")
     this.configOptions.put("serializationLibrary", "jackson")
 }
+
+tasks.named("compileKotlin") {
+    dependsOn(generateApiSpec)
+}
+
+tasks.named("compileTestKotlin") {
+    dependsOn(generateApiClient)
+}
