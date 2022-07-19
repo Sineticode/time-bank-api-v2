@@ -35,9 +35,9 @@ abstract class AbstractApi {
         }
 
     /**
-     * Checks if user is manager
+     * Checks if user is admin
      *
-     * @return if user is manager
+     * @return if user is admin
      */
     protected fun isAdmin(): Boolean {
         return identity.hasRole("admin")

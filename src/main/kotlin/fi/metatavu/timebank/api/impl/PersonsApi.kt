@@ -2,6 +2,7 @@ package fi.metatavu.timebank.api.impl
 
 import fi.metatavu.timebank.api.controllers.PersonsController
 import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
+import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.Timespan
 import fi.metatavu.timebank.spec.PersonsApi
 import javax.enterprise.context.RequestScoped
@@ -40,6 +41,17 @@ class PersonsApi: PersonsApi, AbstractApi() {
             val translatedPersons = personsTranslator.translate(entities = persons)
 
             createOk(entity = translatedPersons)
+        } catch (e: Error) {
+            createBadRequest(e.localizedMessage)
+        }
+    }
+
+    override suspend fun updatePerson(personId: Int, person: Person): Response {
+        loggedUserId ?: return createUnauthorized("Invalid token!")
+        if (!isAdmin()) return createUnauthorized("Only admin is allowed to perform this action!")
+
+        return try {
+            createOk(entity = personsController.updatePerson(person))
         } catch (e: Error) {
             createBadRequest(e.localizedMessage)
         }

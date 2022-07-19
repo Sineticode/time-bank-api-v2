@@ -5,6 +5,7 @@ import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.admin.client.resource.UsersResource
 import javax.enterprise.context.ApplicationScoped
+import org.keycloak.representations.idm.UserRepresentation
 
 /**
  * Class for Keycloak controller
@@ -31,20 +32,52 @@ class KeycloakController {
     private lateinit var realm: String
 
     /**
+     * Gets given UserRepresentation from List of UserResources
+     *
+     * @param email email
+     * @return UserResource
+     */
+    fun getUserByEmail(email: String): UserRepresentation? {
+        val users = getUserResources()?.list()
+
+        return users?.find { it.email == email }
+    }
+
+    /**
      * Gets minimumBillableRate attribute for Person
      * If not set will return default value of 50 (%)
      *
+     * @param email Persons email
      * @return Int minimumBillableRate
      */
-    fun getUsersMinimumBillableRate(username: String): Int {
-        val user = getUserResources()?.search(username)
-
-        if (user.isNullOrEmpty()) return 50
+    fun getUsersMinimumBillableRate(email: String): Int {
+        val user = getUserByEmail(email) ?: return 50
 
         return try {
-            user.first().attributes["minimumBillableRate"]!!.first().toInt()
+            user.attributes["minimumBillableRate"]!!.first().toInt()
         } catch (e: NullPointerException) {
+            updateUsersMinimumBillableRate(email, 50)
             50
+        }
+    }
+
+    /**
+     * Updates Persons minimumBillableRate attribute
+     *
+     * @param email Persons email
+     * @param  newMinimumBillableRate Int
+     * @return Int minimumBillableRate
+     */
+    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int) {
+        val user = getUserByEmail(email) ?: return
+        val usersResource = getUserResources()?.get(user.id)
+
+        try {
+            user.attributes["minimumBillableRate"] = listOf(newMinimumBillableRate.toString())
+            usersResource?.update(user)
+        } catch (e: NullPointerException) {
+            user.attributes = mapOf("minimumBillableRate" to listOf(newMinimumBillableRate.toString()))
+            usersResource?.update(user)
         }
     }
 
