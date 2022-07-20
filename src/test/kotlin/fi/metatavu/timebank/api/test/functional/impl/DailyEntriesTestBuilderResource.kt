@@ -5,7 +5,9 @@ import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.DailyEntriesApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
+import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.models.DailyEntry
+import org.junit.Assert
 
 /**
  * Test builder resource for DailyEntries API
@@ -41,5 +43,24 @@ class DailyEntriesTestBuilderResource(
             after = after,
             vacation = vacation
         )
+    }
+
+    /**
+     * Asserts that listing DailyEntries fails with given status
+     *
+     * @param expectedStatus expected status code
+     */
+    fun assertListFail(expectedStatus: Int) {
+        try {
+            api.listDailyEntries(
+                personId = 100000,
+                before = null,
+                after = null,
+                vacation = false
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
     }
 }
