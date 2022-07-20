@@ -104,11 +104,11 @@ class DailyEntryController {
             personId = entry.person!!
             worktimeCalendarId = entry.worktimeCalendarId
         }
-        val expected = if (isVacation) 0 else getDailyExpected(
-                                worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
-                                holidays = holidays,
-                                day = date
-                            )
+        val expected = getDailyExpected(
+                            worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
+                            holidays = holidays,
+                            day = date
+                        )
 
         return DailyEntry(
             person = personId,
