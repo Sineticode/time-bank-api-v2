@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.allopen") version "1.6.10"
     id("io.quarkus")
     id("org.openapi.generator") version "5.4.0"
+    jacoco
     id("com.github.nbaztec.coveralls-jacoco") version "1.2.14"
 }
 
@@ -81,11 +82,19 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn("generateApiClient", "generateApiSpec")
 }
 
-coverallsJacoco{
+coverallsJacoco {
     reportPath = "build/jacoco-report/jacoco.xml"
 }
 
-val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+
+val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class) {
     setProperty("generatorName", "kotlin-server")
     setProperty("inputSpec",  "$rootDir/time-bank-api-spec/swagger.yaml")
     setProperty("outputDir", "$buildDir/generated/api-spec")
@@ -103,7 +112,7 @@ val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class){
     this.configOptions.put("additionalModelTypeAnnotations", "@io.quarkus.runtime.annotations.RegisterForReflection")
 }
 
-val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
+val generateApiClient = tasks.register("generateApiClient",GenerateTask::class) {
     setProperty("generatorName", "kotlin")
     setProperty("library", "jvm-okhttp3")
     setProperty("inputSpec",  "$rootDir/time-bank-api-spec/swagger.yaml")
