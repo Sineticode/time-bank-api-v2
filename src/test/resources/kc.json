@@ -376,7 +376,7 @@
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
-      "email": "testerA@test.fi",
+      "email" : "testerb@test.fi",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "A3okqV2T/ybXTVEgKfosoSjP8Yc9IZbFP/SY4cEd6hag7TABQrQ6nUSuwagGt96l8cw1DTijO75PqX6uiTXMzw==",
@@ -400,6 +400,7 @@
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
+      "email": "testera@test.fi",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "A3okqV2T/ybXTVEgKfosoSjP8Yc9IZbFP/SY4cEd6hag7TABQrQ6nUSuwagGt96l8cw1DTijO75PqX6uiTXMzw==",
@@ -428,6 +429,7 @@
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
+      "email" : "testerc@test.fi",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "JV3DUNLjqOadjbBOtC4rvacQI553CGaDGAzBS8MR5ReCr7SwF3E6CsW3T7/XO8ITZAsch8+A/6loeuCoVLLJrg==",
@@ -440,6 +442,11 @@
         "createdDate" : 1554245879227,
         "config" : { }
       } ],
+      "attributes": {
+        "minimumBillableRate": [
+          "25"
+        ]
+      },
       "disableableCredentialTypes" : [ "password" ],
       "requiredActions" : [ ],
       "realmRoles" : [ "confidential", "user" ],

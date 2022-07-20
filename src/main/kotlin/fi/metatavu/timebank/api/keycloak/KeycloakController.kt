@@ -40,7 +40,7 @@ class KeycloakController {
     fun getUserByEmail(email: String): UserRepresentation? {
         val users = getUserResources()?.list()
 
-        return users?.find { it.email == email }
+        return users?.find { it.email == email.lowercase() }
     }
 
     /**

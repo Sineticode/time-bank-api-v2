@@ -4,6 +4,7 @@ import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
+import fi.metatavu.timebank.test.client.models.Person
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
@@ -84,6 +85,53 @@ class PersonsTest: AbstractTest() {
             assertEquals(10, persons[0].minimumBillableRate)
             assertEquals(50, persons[1].minimumBillableRate)
             testBuilder.notValid.persons.assertListFail(401)
+        }
+    }
+
+    /**
+     * Tests /v1/persons/1 -endpoint PUT method
+     */
+    @Test
+    fun updatePersons() {
+        createTestBuilder().use { testBuilder ->
+            val person = testBuilder.manager.persons.getPersons(active = false).find { it.id == 2 }!!
+            val newPerson = Person(
+                id = person.id,
+                firstName = person.firstName,
+                lastName = person.lastName,
+                email = person.email,
+                monday = person.monday,
+                tuesday = person.tuesday,
+                wednesday = person.wednesday,
+                thursday = person.thursday,
+                friday = person.friday,
+                saturday = person.saturday,
+                sunday = person.sunday,
+                active = person.active,
+                unspentVacations = person.unspentVacations,
+                spentVacations = person.spentVacations,
+                minimumBillableRate = 50,
+                language = person.language,
+                startDate = person.startDate
+            )
+            val updatedPerson = testBuilder.manager.persons.updatePerson(
+                personId = newPerson.id,
+                person = newPerson
+            )
+
+            assertEquals(25,person .minimumBillableRate)
+            assertEquals(50, updatedPerson.minimumBillableRate)
+            testBuilder.userA.persons.assertUpdateFail(
+                person = newPerson,
+                expectedStatus = 401
+            )
+
+            // Quarkus Devservices are not restarted between test runs,
+            // hence resetting Keycloak attribute is necessary for consequent test runs.
+            testBuilder.manager.persons.updatePerson(
+                personId = person.id,
+                person = person
+            )
         }
     }
 

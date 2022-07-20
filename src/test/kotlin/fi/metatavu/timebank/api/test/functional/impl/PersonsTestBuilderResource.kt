@@ -56,12 +56,44 @@ class PersonsTestBuilderResource(
     }
 
     /**
+     * Updates given Person minimumBillableRate
+     *
+     * @param personId PersonId
+     * @param person Person
+     * @return person updated Person
+     */
+    fun updatePerson(personId: Int, person: Person): Person {
+        return api.updatePerson(
+            personId = personId,
+            person = person
+        )
+    }
+
+    /**
+     * Asserts that updating Person minimumBillableRate fails with given status
+     *
+     * @param person Person
+     * @param expectedStatus expected status code
+     */
+    fun assertUpdateFail(person: Person,expectedStatus: Int) {
+        try {
+            api.updatePerson(
+                personId = person.id,
+                person = person
+            )
+            Assert.fail(String.format("Expected fail with status, $expectedStatus"))
+        } catch (ex: ClientException) {
+            assertClientExceptionStatus(expectedStatus, ex)
+        }
+    }
+
+    /**
      * Asserts that listing persons fails with given status
      *
      * @param expectedStatus expected status code
      */
     fun assertListFail(expectedStatus: Int) {
-        try{
+        try {
             api.listPersons(
                 active = null
             )
