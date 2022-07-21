@@ -87,11 +87,12 @@ coverallsJacoco {
 }
 
 tasks.test {
+    println("Jacoco version: ${jacoco.toolVersion}")
     finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+    configure<JacocoTaskExtension> {
+        excludeClassLoaders = listOf("*QuarkusClassLoader*")
+        setDestinationFile(layout.buildDirectory.file("jacoco-quarkus.exec").get().asFile)
+    }
 }
 
 val generateApiSpec = tasks.register("generateApiSpec",GenerateTask::class) {
