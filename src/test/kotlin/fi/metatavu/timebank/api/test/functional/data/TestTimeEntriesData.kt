@@ -205,7 +205,7 @@ class TestTimeEntriesData {
                     created_by = 1,
                     updated_by = 1,
                     created_at = "2022-02-28T04:53:33+02:00",
-                    updated_at = "2022-03-01T04:53:33+02:00",
+                    updated_at = "2022-02-28T04:53:33+02:00",
                     phase = null,
                     task_project = null,
                     invoice_entry = null,
