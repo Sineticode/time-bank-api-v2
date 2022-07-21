@@ -1,5 +1,5 @@
 # time-bank-api-v2 Project
-
+[![Coverage Status](https://coveralls.io/repos/github/Metatavu/time-bank-api-v2/badge.svg?branch=feature-9-upload-coveralls-dev2)](https://coveralls.io/github/Metatavu/time-bank-api-v2?branch=feature-9-upload-coveralls-dev2)   
 Start a Docker MYSQL image with
 ```
 docker run --name quarkus-mysql-dev -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:latest
