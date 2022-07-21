@@ -87,7 +87,6 @@ coverallsJacoco {
 }
 
 tasks.test {
-    println("Jacoco version: ${jacoco.toolVersion}")
     finalizedBy(tasks.jacocoTestReport)
     configure<JacocoTaskExtension> {
         excludeClassLoaders = listOf("*QuarkusClassLoader*")
