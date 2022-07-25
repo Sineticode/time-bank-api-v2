@@ -9,6 +9,11 @@ class TestTimeEntriesData {
 
     companion object {
 
+        /**
+         * Gets list of mock ForecastTimeEntries
+         *
+         * @return List of ForecastTimeEntries
+         */
         fun getForecastTimeEntries(): List<ForecastTimeEntry> {
             return listOf(
                 createTestTimeEntry(
@@ -149,6 +154,12 @@ class TestTimeEntriesData {
             )
         }
 
+        /**
+         * Gets list of mock ForecastTimeEntries.
+         * Mocks that an existing entry has been updated.
+         *
+         * @return List of ForecastTimeEntries
+         */
         fun getUpdatedForecastTimeEntry(): List<ForecastTimeEntry> {
             return listOf(
                 createTestTimeEntry(
@@ -163,6 +174,12 @@ class TestTimeEntriesData {
             )
         }
 
+        /**
+         * Gets list of mock ForecastTimeEntries.
+         * Mocks paginated API response where is more than one page of entries.
+         *
+         * @return List of ForecastTimeEntries
+         */
         fun generateRandomForecastTimeEntries(pageNumber: Int): List<ForecastTimeEntry> {
             val generatedEntries = mutableListOf<ForecastTimeEntry>()
             val amountToGenerate = if (pageNumber == 1) 1000 else 200
@@ -198,7 +215,19 @@ class TestTimeEntriesData {
 
             return generatedEntries
         }
-        
+
+        /**
+         * Helper method for simplifying creating of ForecastTimeEntry objects
+         *
+         * @param id id
+         * @param person person
+         * @param nonProjectTime nonProjectTime
+         * @param timeRegistered timeRegistered
+         * @param date date
+         * @param createdAt createdAt
+         * @param updatedAt
+         * @return ForecastTimeEntry
+         */
         private fun createTestTimeEntry(
             id: Int,
             person: Int,

@@ -6,6 +6,9 @@ import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.junit.QuarkusIntegrationTest
 import io.quarkus.test.common.QuarkusTestResource
 
+/**
+ * Native tests for Persons API
+ */
 @QuarkusIntegrationTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
