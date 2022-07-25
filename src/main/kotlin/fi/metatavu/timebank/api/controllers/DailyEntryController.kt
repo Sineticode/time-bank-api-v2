@@ -92,7 +92,8 @@ class DailyEntryController {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
-        lateinit var worktimeCalendarId: UUID
+        val worktimeCalendar = entries.first().worktimeCalendar ?:
+            throw Error("Missing WorktimeCalendar in TimeEntry.")
         var personId = 0
 
         entries.forEach{ entry ->
@@ -100,11 +101,10 @@ class DailyEntryController {
             projectTime += entry.projectTime ?: 0
             date = entry.date
             personId = entry.person!!
-            worktimeCalendarId = entry.worktimeCalendar?.id!!
         }
 
         val expected = getDailyExpected(
-            worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId),
+            worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendar.id!!),
             holidays = holidays,
             day = date
         )
