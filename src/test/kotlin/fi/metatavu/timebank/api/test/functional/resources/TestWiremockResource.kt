@@ -38,7 +38,7 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
     private fun personsStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v2/persons"))
-                .inScenario("personsState")
+                .inScenario("personsScenario")
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersons()), 200))
         )
