@@ -68,7 +68,6 @@ class DailyEntriesTest: AbstractTest() {
             assertEquals(5, entriesForPersonA.size)
             assertEquals(8, entriesBefore.size)
             assertEquals(8, entriesAfter.size)
-            assertEquals(0, entriesAfter[0].expected)
             assertEquals(true, entriesAfter[0].isVacation)
         }
     }

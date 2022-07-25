@@ -98,7 +98,7 @@ class DailyEntryController {
         var date = LocalDate.now()
         val worktimeCalendar = entriesOfDay.first().worktimeCalendar ?:
             throw Error("Missing WorktimeCalendar in TimeEntry.")
-        var personId = entriesOfDay.first().person
+        var personId = entriesOfDay.first().person!!
         val isVacation = entriesOfDay.any { it.isVacation!! }
 
         entriesOfDay.forEach{ entry ->
