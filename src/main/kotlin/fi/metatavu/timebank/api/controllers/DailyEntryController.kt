@@ -92,7 +92,7 @@ class DailyEntryController {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
-        var worktimeCalendarId: UUID? = null
+        lateinit var worktimeCalendarId: UUID
         var personId = 0
 
         entries.forEach{ entry ->
@@ -100,12 +100,13 @@ class DailyEntryController {
             projectTime += entry.projectTime ?: 0
             date = entry.date
             personId = entry.person!!
-            worktimeCalendarId = entry.worktimeCalendarId
+            worktimeCalendarId = entry.worktimeCalendar?.id!!
         }
+
         val expected = getDailyExpected(
-                worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId!!),
-                holidays = holidays,
-                day = date
+            worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendarId),
+            holidays = holidays,
+            day = date
         )
 
         return DailyEntry(
@@ -122,7 +123,7 @@ class DailyEntryController {
     /**
      * Gets persons expected workhours (in minutes) per day
      *
-     * @param person ForecastPerson
+     * @param worktimeCalendar WorkTimeCalendar
      * @param holidays List of LocalDate
      * @return int minutes of expected work
      */

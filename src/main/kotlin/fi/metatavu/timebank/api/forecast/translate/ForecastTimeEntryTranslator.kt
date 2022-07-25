@@ -19,6 +19,7 @@ class ForecastTimeEntryTranslator {
      * Translates ForecastTimeEntry into TimeEntry
      *
      * @param entity ForecastTimeEntry
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return TimeEntry
      */
     fun translate(entity: ForecastTimeEntry, worktimeCalendars: List<WorktimeCalendar>): TimeEntry {
@@ -33,7 +34,8 @@ class ForecastTimeEntryTranslator {
         translatedTimeEntry.date = LocalDate.parse(entity.date)
         translatedTimeEntry.createdAt = createdAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.updatedAt = updatedAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
-        translatedTimeEntry.worktimeCalendarId = worktimeCalendars.find { it.personId == entity.person }?.id
+        translatedTimeEntry.worktimeCalendar = worktimeCalendars.find { it.personId == entity.person }
+
         return translatedTimeEntry
     }
 
@@ -41,6 +43,7 @@ class ForecastTimeEntryTranslator {
      * Translates list of ForecastTimeEntries
      *
      * @param entities list of ForecastTimeEntries to translate
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
     fun translate(entities: List<ForecastTimeEntry>, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {

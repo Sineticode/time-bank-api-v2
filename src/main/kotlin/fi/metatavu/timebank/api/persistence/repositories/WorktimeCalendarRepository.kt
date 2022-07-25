@@ -22,7 +22,7 @@ class WorktimeCalendarRepository: PanacheRepositoryBase<WorktimeCalendar, UUID> 
      */
     suspend fun getUpToDateWorktimeCalendar(personId: Int): WorktimeCalendar? {
         return try {
-            find("personId = ?1 AND calendarEnd = ?2", personId, null).singleResult<WorktimeCalendar?>().awaitSuspending()
+            find("personId = ?1 AND calendarEnd = NULL", personId).singleResult<WorktimeCalendar?>().awaitSuspending()
         } catch (ex: Exception) {
             null
         }

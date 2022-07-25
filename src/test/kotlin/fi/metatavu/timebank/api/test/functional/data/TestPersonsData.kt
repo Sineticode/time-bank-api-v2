@@ -109,13 +109,19 @@ class TestPersonsData {
             )
         }
 
+        /**
+         * Gets list of mock ForecastPersons
+         * Mocks person whose expected worktimes has changed.
+         *
+         * @return List of ForecastPersons
+         */
         fun getUpdatedPersons(): List<ForecastPerson> {
             return listOf(
                 createTestPerson(
                     id = 5,
                     firstName = "TesterE",
                     lastName = "Updater",
-                    monday = 215,
+                    monday = 217,
                     tuesday = 217,
                     wednesday = 217,
                     thursday = 217,

@@ -176,6 +176,12 @@ class TestTimeEntriesData {
             )
         }
 
+        /**
+         * Gets list of mock ForecastTimeEntries.
+         * Contains entry for person whose expected worktime has changed.
+         *
+         * @return List of ForecastTimeEntries
+         */
         fun getForecastTimeEntryForUpdatedPerson(): List<ForecastTimeEntry> {
             return listOf(
                 createTestTimeEntry(
@@ -267,6 +273,11 @@ class TestTimeEntriesData {
             return newTimeEntry
         }
 
+        /**
+         * Gets today date as OffsetDateTime and removes time offset
+         *
+         * @return String OffsetDateTime without time offset
+         */
         private fun getTodayODT(): String {
             val dateString = OffsetDateTime.now().toString().split("+")
             return "${dateString[0]}Z"

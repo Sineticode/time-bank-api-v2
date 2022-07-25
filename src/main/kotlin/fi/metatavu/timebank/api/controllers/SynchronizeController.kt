@@ -82,6 +82,7 @@ class SynchronizeController {
      * and translates the received ForecastTimeEntries to TimeEntries.
      *
      * @param after YYYY-MM-DD LocalDate'
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
     private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {
