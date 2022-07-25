@@ -1,17 +1,20 @@
 package fi.metatavu.timebank.api.forecast.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.quarkus.runtime.annotations.RegisterForReflection
+
 /**
  * Data class for holiday data coming from Forecast
  */
-data class ForecastHoliday(
-    val id: Int,
-    val holiday_calendar_id: Int,
-    val year: Int,
-    val month: Int,
-    val day: Int,
-    val name: String,
-    val created_by: Int,
-    val updated_by: Int,
-    val created_at: String,
-    val updated_at: String
-)
+@RegisterForReflection
+@JsonIgnoreProperties(ignoreUnknown = true)
+class ForecastHoliday {
+    var id: Int = 0
+    @JsonProperty("holiday_calendar_id")
+    var holidayCalendarId: Int = 0
+    var year: Int = 0
+    var month: Int = 0
+    var day: Int = 0
+    var name: String = ""
+}

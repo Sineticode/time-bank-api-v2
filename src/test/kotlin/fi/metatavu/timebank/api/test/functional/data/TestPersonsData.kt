@@ -10,17 +10,16 @@ class TestPersonsData {
     companion object {
 
         /**
-         * Gets list mock ForecastPersons
+         * Gets list of mock ForecastPersons
          *
          * @return List of ForecastPersons
          */
         fun getPersons(): List<ForecastPerson> {
             return listOf(
-                ForecastPerson(
+                createTestPerson(
                     id = 1,
-                    first_name = "TesterA",
-                    last_name = "TestA",
-                    email = null,
+                    firstName = "TesterA",
+                    lastName = "TestA",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -29,26 +28,16 @@ class TestPersonsData {
                     saturday = 0,
                     sunday = 0,
                     active = true,
-                    default_role = null,
-                    cost = 0.0,
                     language = "ENGLISH_UK",
-                    created_by = null,
-                    updated_by = null,
-                    client_id = null,
-                    holiday_calendar_id = 123456,
-                    start_date = "2022-05-11",
-                    end_date = null,
-                    created_at = null,
-                    updated_at = null,
-                    department_id = null,
-                    permissions = listOf("Test"),
-                    is_system_user = false
+                    holidayCalendarId = 123456,
+                    startDate = "2022-05-11",
+                    createdAt = "2022-05-11",
+                    isSystemUser = false
                 ),
-                ForecastPerson(
+                createTestPerson(
                     id = 2,
-                    first_name = "TesterB",
-                    last_name = "TestB",
-                    email = null,
+                    firstName = "TesterB",
+                    lastName = "TestB",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -57,26 +46,16 @@ class TestPersonsData {
                     saturday = 0,
                     sunday = 0,
                     active = false,
-                    default_role = null,
-                    cost = 0.0,
                     language = "ENGLISH_UK",
-                    created_by = null,
-                    updated_by = null,
-                    client_id = null,
-                    holiday_calendar_id = 123456,
-                    start_date = "2022-05-05",
-                    end_date = null,
-                    created_at = null,
-                    updated_at = null,
-                    department_id = null,
-                    permissions = listOf("Test"),
-                    is_system_user = false
+                    holidayCalendarId = 123456,
+                    startDate = "2022-05-05",
+                    createdAt = "2022-05-05",
+                    isSystemUser = false
                 ),
-                ForecastPerson(
+                createTestPerson(
                     id = 3,
-                    first_name = "TesterC",
-                    last_name = "TestC",
-                    email = null,
+                    firstName = "TesterC",
+                    lastName = "TestC",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -85,26 +64,16 @@ class TestPersonsData {
                     saturday = 0,
                     sunday = 0,
                     active = false,
-                    default_role = null,
-                    cost = 0.0,
-                    language = "ENGLISH_UK",
-                    created_by = null,
-                    updated_by = null,
-                    client_id = null,
-                    holiday_calendar_id = 123456,
-                    start_date = "2022-05-11",
-                    end_date = null,
-                    created_at = null,
-                    updated_at = null,
-                    department_id = null,
-                    permissions = listOf("Test"),
-                    is_system_user = false
+                    language = "FINNISH",
+                    holidayCalendarId = 123456,
+                    startDate = "2022-05-11",
+                    createdAt = "2022-05-11",
+                    isSystemUser = false
                 ),
-                ForecastPerson(
+                createTestPerson(
                     id = 4,
-                    first_name = "TEST_API_SYSTEM",
-                    last_name = null,
-                    email = null,
+                    firstName = "TEST_API_SYSTEM",
+                    lastName = "",
                     monday = 0,
                     tuesday = 0,
                     wednesday = 0,
@@ -113,22 +82,92 @@ class TestPersonsData {
                     saturday = 0,
                     sunday = 0,
                     active = true,
-                    default_role = null,
-                    cost = 0.0,
                     language = "ENGLISH_UK",
-                    created_by = null,
-                    updated_by = null,
-                    client_id = null,
-                    holiday_calendar_id = 123456,
-                    start_date = "2022-05-11",
-                    end_date = null,
-                    created_at = null,
-                    updated_at = null,
-                    department_id = null,
-                    permissions = listOf("Test"),
-                    is_system_user = true
+                    holidayCalendarId = 123456,
+                    startDate = "2022-05-11",
+                    createdAt = "2022-05-11",
+                    isSystemUser = true
+                ),
+                createTestPerson(
+                    id = 5,
+                    firstName = "TesterE",
+                    lastName = "Updater",
+                    monday = 435,
+                    tuesday = 435,
+                    wednesday = 435,
+                    thursday = 435,
+                    friday = 435,
+                    saturday = 0,
+                    sunday = 0,
+                    active = true,
+                    language = "RUSSIAN",
+                    holidayCalendarId = 123456,
+                    startDate = "2022-06-30",
+                    createdAt = "2022-06-30",
+                    isSystemUser = false,
                 )
             )
+
+        }
+
+        /**
+         * Helper method for simplifying creating of ForecastPerson objects
+         *
+         * @param id id
+         * @param firstName firstName
+         * @param lastName lastName
+         * @param monday monday expected worktime
+         * @param tuesday tuesday expected worktime
+         * @param wednesday wednesday expected worktime
+         * @param thursday thursday expected worktime
+         * @param friday friday expected worktime
+         * @param saturday saturday expected worktime
+         * @param sunday sunday expected worktime
+         * @param active active
+         * @param language language
+         * @param holidayCalendarId holidayCalendarId
+         * @param startDate startDate
+         * @param createdAt createdAt
+         * @param isSystemUser isSystemUser
+         * @return ForecastPerson
+         */
+        private fun createTestPerson(
+            id: Int,
+            firstName: String,
+            lastName: String,
+            monday: Int,
+            tuesday: Int,
+            wednesday: Int,
+            thursday: Int,
+            friday: Int,
+            saturday: Int,
+            sunday: Int,
+            active: Boolean,
+            language: String,
+            holidayCalendarId: Int,
+            startDate: String,
+            createdAt: String,
+            isSystemUser: Boolean
+        ): ForecastPerson {
+            val newPerson = ForecastPerson()
+            newPerson.id = id
+            newPerson.firstName = firstName
+            newPerson.lastName = lastName
+            newPerson.monday = monday
+            newPerson.tuesday = tuesday
+            newPerson.wednesday = wednesday
+            newPerson.thursday = thursday
+            newPerson.friday = friday
+            newPerson.saturday = saturday
+            newPerson.sunday = sunday
+            newPerson.active = active
+            newPerson.language = language
+            newPerson.holidayCalendarId = holidayCalendarId
+            newPerson.startDate = startDate
+            newPerson.createdAt = createdAt
+            newPerson.isSystemUser = isSystemUser
+
+            return newPerson
         }
     }
 }

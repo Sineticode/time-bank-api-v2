@@ -83,6 +83,19 @@ abstract class AbstractApi {
     }
 
     /**
+     * Constructs created response
+     *
+     * @param entity created entity
+     * @return response
+     */
+    protected fun createCreated(entity: Any): Response {
+        return Response
+            .status(Response.Status.CREATED)
+            .entity(entity)
+            .build()
+    }
+
+    /**
      * Constructs no content response
      *
      * @param entity payload

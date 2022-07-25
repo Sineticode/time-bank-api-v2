@@ -62,7 +62,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (entry.updatedAt!! > entry.createdAt!!) {
-            return if (existingEntry.first().areTwoObjectsSame(entry)) {
+            return if (existingEntry.first() == entry) {
                 false
             } else {
                 deleteEntry(entry.forecastId!!)
@@ -75,11 +75,20 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     }
 
     /**
-     * Deletes persisted TimeEntry
+     * Deletes persisted TimeEntry based on forecastId
      *
      * @param forecastId id of time registration in Forecast
      */
     suspend fun deleteEntry(forecastId: Int) {
         Panache.withTransaction { delete("forecastId", forecastId) }.awaitSuspending()
+    }
+
+    /**
+     * Deletes persisted TimeEntry based on entryId
+     *
+     * @param entryId id of time registration
+     */
+    suspend fun deleteEntry(entryId: UUID) {
+        Panache.withTransaction { deleteById(entryId) }.awaitSuspending()
     }
 }
