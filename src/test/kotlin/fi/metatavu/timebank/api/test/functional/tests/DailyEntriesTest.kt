@@ -66,7 +66,7 @@ class DailyEntriesTest: AbstractTest() {
 
             assertEquals(15, allEntries.size)
             assertEquals(4, entriesForPersonA.size)
-            assertEquals(7, entriesBefore.size)
+            assertEquals(8, entriesBefore.size)
             assertEquals(7, entriesAfter.size)
         }
     }
