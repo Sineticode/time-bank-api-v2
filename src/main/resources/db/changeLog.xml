@@ -22,7 +22,7 @@
         </createTable>
     </changeSet>
     <changeSet id="worktimeCalendars" author="Ville Juutila">
-        <createTable tableName="WorktimeCalendar">
+        <createTable tableName="worktimeCalendar">
             <column name="id" type="binary(16)">
                 <constraints primaryKey="true" />
             </column>
@@ -38,8 +38,8 @@
             <column name="calendarEnd" type="date" />
         </createTable>
         <addColumn tableName="TimeEntry">
-            <column name="worktimeCalendarId" type="binary(16)">
-                <constraints foreignKeyName="fk_timeentry_worktimecalendar" references="WorktimeCalendar(id)" />
+            <column name="worktimeCalendar_id" type="binary(16)">
+                <constraints foreignKeyName="FK_TIME_ENTRY_WORKTIME_CALENDAR" referencedTableName="worktimeCalendar" referencedColumnNames="id" />
             </column>
         </addColumn>
     </changeSet>

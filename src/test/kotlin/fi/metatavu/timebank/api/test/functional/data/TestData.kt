@@ -136,6 +136,14 @@ class TestData {
             return listOf(holidayA)
         }
 
+        /**
+         * Helper method for simplifying creating of ForecastTimeEntryResponse objects
+         *
+         * @param pageContents List of ForecastTimeEntries
+         * @param pageSize Int
+         * @param totalObjectCount Int
+         * @return ForecastTimeEntryResponse
+         */
         private fun createForecastTimeEntryResponse(
             pageContents: List<ForecastTimeEntry>,
             pageSize: Int,

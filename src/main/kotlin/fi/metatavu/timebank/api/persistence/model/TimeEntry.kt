@@ -6,6 +6,7 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.ManyToOne
 
 /**
  * TimeEntry JPA entity
@@ -38,8 +39,8 @@ class TimeEntry {
     @Column
     var updatedAt: OffsetDateTime? = null
 
-    @Column
-    var worktimeCalendarId: UUID? = null
+    @ManyToOne
+    var worktimeCalendar: WorktimeCalendar? = null
 
     @Column
     var isVacation: Boolean? = false
@@ -47,14 +48,16 @@ class TimeEntry {
     /**
      * Compares object equality ignoring entryId
      */
-    fun areTwoObjectsSame(timeEntry: TimeEntry): Boolean {
-        if (this === timeEntry) return true
-        return forecastId == timeEntry.forecastId &&
-                person == timeEntry.person &&
-                internalTime == timeEntry.internalTime &&
-                projectTime == timeEntry.projectTime &&
-                date == timeEntry.date &&
-                createdAt == timeEntry.createdAt &&
-                updatedAt == timeEntry.updatedAt
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        other as TimeEntry
+        return forecastId == other.forecastId &&
+            person == other.person &&
+            internalTime == other.internalTime &&
+            projectTime == other.projectTime &&
+            date == other.date &&
+            createdAt == other.createdAt &&
+            updatedAt == other.updatedAt  &&
+            worktimeCalendar == other.worktimeCalendar
     }
 }

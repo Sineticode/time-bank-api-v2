@@ -30,6 +30,7 @@ class WorktimeCalendarController {
     /**
      * Checks if persisted WorktimeCalendar is up-to-date for given person.
      * Returns most up-to-date WorktimeCalendar.
+     *
      * @param person person
      * @return WorktimeCalendar
      */
@@ -38,7 +39,8 @@ class WorktimeCalendarController {
             ?: createWorktimeCalendar(person)
 
         val updatedWorktimeCalendar = compareExpected(person, worktimeCalendar)
-        return if (updatedWorktimeCalendar === worktimeCalendar) {
+
+        return if (updatedWorktimeCalendar == worktimeCalendar) {
             worktimeCalendar
         } else {
             worktimeCalendarRepository.updateWorktimeCalendar(worktimeCalendar.id!!)
@@ -64,6 +66,7 @@ class WorktimeCalendarController {
             person.friday == worktimeCalendar.friday &&
             person.saturday == worktimeCalendar.saturday &&
             person.sunday == worktimeCalendar.sunday
+
         return if (isCalendarUpToDate) {
             worktimeCalendar
         } else {
@@ -91,6 +94,7 @@ class WorktimeCalendarController {
             calendarStart = LocalDate.now()
         )
         worktimeCalendarRepository.persistWorktimeCalendar(newWorktimeCalendar)
+
         return newWorktimeCalendar
     }
 }
