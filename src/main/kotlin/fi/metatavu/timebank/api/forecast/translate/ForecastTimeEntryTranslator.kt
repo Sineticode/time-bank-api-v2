@@ -2,6 +2,7 @@ package fi.metatavu.timebank.api.forecast.translate
 
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -18,9 +19,10 @@ class ForecastTimeEntryTranslator {
      * Translates ForecastTimeEntry into TimeEntry
      *
      * @param entity ForecastTimeEntry
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return TimeEntry
      */
-    fun translate(entity: ForecastTimeEntry): TimeEntry {
+    fun translate(entity: ForecastTimeEntry, worktimeCalendars: List<WorktimeCalendar>): TimeEntry {
         val createdAt = LocalDateTime.parse(entity.createdAt.replace("Z", ""))
         val updatedAt = LocalDateTime.parse(entity.updatedAt.replace("Z", ""))
         val translatedTimeEntry = TimeEntry()
@@ -32,6 +34,8 @@ class ForecastTimeEntryTranslator {
         translatedTimeEntry.date = LocalDate.parse(entity.date)
         translatedTimeEntry.createdAt = createdAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.updatedAt = updatedAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
+        translatedTimeEntry.worktimeCalendar = worktimeCalendars.find { it.personId == entity.person }
+
         return translatedTimeEntry
     }
 
@@ -39,9 +43,12 @@ class ForecastTimeEntryTranslator {
      * Translates list of ForecastTimeEntries
      *
      * @param entities list of ForecastTimeEntries to translate
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    fun translate(entities: List<ForecastTimeEntry>): List<TimeEntry> {
-        return entities.map(this::translate)
+    fun translate(entities: List<ForecastTimeEntry>, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {
+        return entities.map { entity ->
+            translate(entity, worktimeCalendars)
+        }
     }
 }

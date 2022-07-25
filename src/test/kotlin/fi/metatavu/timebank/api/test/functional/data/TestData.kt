@@ -99,6 +99,28 @@ class TestData {
         }
 
         /**
+         * Gets person whose worktime has been edited
+         *
+         * @return List of ForecastPerson
+         */
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            return TestPersonsData.getUpdatedPersons()
+        }
+
+        /**
+         * Gets time registrations for person whose worktime has been edited
+         *
+         * @return ForecastTimeEntryResponse
+         */
+        fun getForecastTimeEntryResponseForUpdatedPerson(): ForecastTimeEntryResponse {
+            return createForecastTimeEntryResponse(
+                pageContents = TestTimeEntriesData.getForecastTimeEntryForUpdatedPerson(),
+                pageSize = 1,
+                totalObjectCount = 1
+            )
+        }
+
+        /**
          * Gets mock ForecastHolidays
          *
          * @return List of ForecastHolidays

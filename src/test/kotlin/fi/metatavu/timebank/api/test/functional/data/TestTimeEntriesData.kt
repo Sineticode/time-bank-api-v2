@@ -1,6 +1,8 @@
 package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import java.time.LocalDate
+import java.time.OffsetDateTime
 
 /**
  * Class for test time entries mock data
@@ -176,6 +178,26 @@ class TestTimeEntriesData {
 
         /**
          * Gets list of mock ForecastTimeEntries.
+         * Contains entry for person whose expected worktime has changed.
+         *
+         * @return List of ForecastTimeEntries
+         */
+        fun getForecastTimeEntryForUpdatedPerson(): List<ForecastTimeEntry> {
+            return listOf(
+                createTestTimeEntry(
+                    id = 15,
+                    person = 5,
+                    nonProjectTime = 789,
+                    timeRegistered = 435,
+                    date = LocalDate.now().toString(),
+                    createdAt = getTodayODT(),
+                    updatedAt = getTodayODT()
+                )
+            )
+        }
+
+        /**
+         * Gets list of mock ForecastTimeEntries.
          * Mocks paginated API response where is more than one page of entries.
          *
          * @return List of ForecastTimeEntries
@@ -249,6 +271,16 @@ class TestTimeEntriesData {
             newTimeEntry.updatedAt = updatedAt
 
             return newTimeEntry
+        }
+
+        /**
+         * Gets today date as OffsetDateTime and removes time offset
+         *
+         * @return String OffsetDateTime without time offset
+         */
+        private fun getTodayODT(): String {
+            val dateString = OffsetDateTime.now().toString().split("+")
+            return "${dateString[0]}Z"
         }
     }
 }

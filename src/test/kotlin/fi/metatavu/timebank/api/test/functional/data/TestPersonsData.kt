@@ -107,7 +107,35 @@ class TestPersonsData {
                     isSystemUser = false,
                 )
             )
+        }
 
+        /**
+         * Gets list of mock ForecastPersons
+         * Mocks person whose expected worktimes has changed.
+         *
+         * @return List of ForecastPersons
+         */
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            return listOf(
+                createTestPerson(
+                    id = 5,
+                    firstName = "TesterE",
+                    lastName = "Updater",
+                    monday = 217,
+                    tuesday = 217,
+                    wednesday = 217,
+                    thursday = 217,
+                    friday = 217,
+                    saturday = 0,
+                    sunday = 0,
+                    active = true,
+                    language = "RUSSIAN",
+                    holidayCalendarId = 123456,
+                    startDate = "2022-06-30",
+                    createdAt = "2022-06-30",
+                    isSystemUser = false
+                )
+            )
         }
 
         /**

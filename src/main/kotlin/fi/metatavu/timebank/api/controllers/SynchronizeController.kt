@@ -4,8 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
-import fi.metatavu.timebank.api.impl.translate.PersonsTranslator
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import org.slf4j.Logger
 import java.time.LocalDate
@@ -17,6 +17,9 @@ import javax.inject.Inject
  */
 @ApplicationScoped
 class SynchronizeController {
+
+    @Inject
+    lateinit var worktimeCalendarController: WorktimeCalendarController
 
     @Inject
     lateinit var personsController: PersonsController
@@ -31,9 +34,6 @@ class SynchronizeController {
     lateinit var forecastTimeEntryTranslator: ForecastTimeEntryTranslator
 
     @Inject
-    lateinit var personsTranslator: PersonsTranslator
-
-    @Inject
     lateinit var logger: Logger
 
     /**
@@ -46,15 +46,17 @@ class SynchronizeController {
         return try {
             val forecastPersons = personsController.getPersonsFromForecast()
 
-            val persons = personsTranslator.translate(personsController.filterActivePersons(forecastPersons))
+            val worktimeCalendars = forecastPersons.map { person ->
+                worktimeCalendarController.checkWorktimeCalendar(person)
+            }
 
-            val entries = retrieveAllEntries(after)
+            val entries = retrieveAllEntries(after, worktimeCalendars)
 
             val synchronized = mutableListOf<TimeEntry>()
             var duplicates = 0
 
             entries.forEachIndexed { idx, timeEntry ->
-                val person = persons.find { person -> person.id == timeEntry.person }
+                val person = forecastPersons.find { person -> person.id == timeEntry.person }
                 val personName = "${person?.lastName}, ${person?.firstName}"
                 logger.info("Synchronizing TimeEntry ${idx + 1}/${entries.size} of $personName...")
 
@@ -80,9 +82,10 @@ class SynchronizeController {
      * and translates the received ForecastTimeEntries to TimeEntries.
      *
      * @param after YYYY-MM-DD LocalDate'
+     * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(after: LocalDate?): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {
         var retrievedAllEntries = false
         val translatedEntries = mutableListOf<TimeEntry>()
         var pageNumber = 1
@@ -102,7 +105,11 @@ class SynchronizeController {
                 retrievedAllEntries = true
             }
 
-            translatedEntries.addAll(forecastTimeEntryTranslator.translate(forecastTimeEntryResponse.pageContents!!))
+            translatedEntries.addAll(forecastTimeEntryTranslator.translate(
+                    entities = forecastTimeEntryResponse.pageContents!!,
+                    worktimeCalendars = worktimeCalendars
+                )
+            )
         }
 
         return translatedEntries

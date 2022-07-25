@@ -50,7 +50,7 @@ class SynchronizeTest: AbstractTest() {
 
             setScenario(
                 scenario = TIMES_SCENARIO,
-                state = UPDATE_STATE
+                state = UPDATE_STATE_ONE
             )
 
             testBuilder.manager.synchronization.synchronizeEntries()
@@ -75,7 +75,7 @@ class SynchronizeTest: AbstractTest() {
     fun testSynchronizationLoop() {
         setScenario(
             scenario = TIMES_SCENARIO,
-            state = GENERATED_STATE
+            state = GENERATED_STATE_ONE
         )
         createTestBuilder().use { testBuilder ->
             testBuilder.manager.synchronization.synchronizeEntries()

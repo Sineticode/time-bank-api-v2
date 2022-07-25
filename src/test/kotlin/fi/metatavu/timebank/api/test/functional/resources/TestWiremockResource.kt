@@ -42,7 +42,6 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersons()), 200))
         )
-
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v2/persons"))
                 .inScenario("personsScenario")
@@ -52,6 +51,13 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
                     status = 401,
                     message = "Server failed to authenticate the request."
                 )), 401))
+        )
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v2/persons"))
+                .inScenario("personsScenario")
+                .whenScenarioStateIs("updateStateOne")
+                .willSetStateTo(STARTED)
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedPersons()), 200))
         )
     }
 
@@ -103,9 +109,16 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v4/time_registrations"))
                 .inScenario("timesScenario")
-                .whenScenarioStateIs("updateState")
+                .whenScenarioStateIs("updateStateOne")
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedForecastTimeEntryResponse()), 200))
+        )
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v4/time_registrations"))
+                .inScenario("timesScenario")
+                .whenScenarioStateIs("updateStateTwo")
+                .willSetStateTo(STARTED)
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponseForUpdatedPerson()), 200))
         )
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v4/time_registrations"))
