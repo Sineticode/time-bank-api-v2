@@ -33,12 +33,12 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (before != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date < :before" else "date < :before")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date <= :before" else "date <= :before")
             parameters.and("before", before)
         }
 
         if (after != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date > :after" else "date > :after")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date >= :after" else "date >= :after")
             parameters.and("after", after)
         }
 
@@ -62,7 +62,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (entry.updatedAt!! > entry.createdAt!!) {
-            return if (existingEntry.first().areTwoObjectsSame(entry)) {
+            return if (existingEntry.first() == entry) {
                 false
             } else {
                 deleteEntry(entry.forecastId!!)

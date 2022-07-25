@@ -27,7 +27,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         timeRegistrationStubs(wireMockServer)
 
         return mapOf(
-            "forecast.base.url" to wireMockServer.baseUrl()
+            "forecast.base.url" to  wireMockServer.baseUrl(),
+            "forecast.api.key" to "noapikey"
         )
     }
 

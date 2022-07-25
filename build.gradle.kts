@@ -109,3 +109,11 @@ val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
     this.configOptions.put("serializationLibrary", "jackson")
     this.configOptions.put("enumPropertyNaming", "UPPERCASE")
 }
+
+tasks.named("compileKotlin") {
+    dependsOn(generateApiSpec)
+}
+
+tasks.named("compileTestKotlin") {
+    dependsOn(generateApiClient)
+}
