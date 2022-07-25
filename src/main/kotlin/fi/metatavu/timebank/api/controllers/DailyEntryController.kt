@@ -8,7 +8,6 @@ import java.time.LocalDate
 import fi.metatavu.timebank.model.DailyEntry
 import org.slf4j.Logger
 import java.time.DayOfWeek
-import java.util.UUID
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -68,8 +67,12 @@ class DailyEntryController {
             persons.forEach { person ->
                 entries
                     .filter { timeEntry -> timeEntry.person == person.id }
-                    .groupBy { it.date }.values.map { day ->
-                        dailyEntries.add(calculateDailyEntries(day, person, holidays))
+                    .groupBy { it.date }.values.map { entriesOfDay ->
+                        dailyEntries.add(calculateDailyEntries(
+                            entriesOfDay = entriesOfDay,
+                            person = person,
+                            holidays = holidays
+                        ))
                     }
             }
 
@@ -83,20 +86,20 @@ class DailyEntryController {
     /**
      * Totals TimeEntries to DailyEntries
      *
-     * @param entries List of TimeEntries
+     * @param entriesOfDay List of TimeEntries
      * @param person ForecastPerson
      * @param holidays List of LocalDate
      * @return DailyEntry
      */
-    suspend fun calculateDailyEntries(entries: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
+    suspend fun calculateDailyEntries(entriesOfDay: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
         var internalTime = 0
         var projectTime = 0
         var date = LocalDate.now()
-        val worktimeCalendar = entries.first().worktimeCalendar ?:
+        val worktimeCalendar = entriesOfDay.first().worktimeCalendar ?:
             throw Error("Missing WorktimeCalendar in TimeEntry.")
         var personId = 0
 
-        entries.forEach{ entry ->
+        entriesOfDay.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
             projectTime += entry.projectTime ?: 0
             date = entry.date
