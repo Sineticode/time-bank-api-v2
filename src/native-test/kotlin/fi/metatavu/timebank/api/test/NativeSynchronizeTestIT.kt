@@ -1,0 +1,19 @@
+package fi.metatavu.timebank.api.test
+
+import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
+import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
+import io.quarkus.test.junit.QuarkusIntegrationTest
+import io.quarkus.test.common.QuarkusTestResource
+import fi.metatavu.timebank.api.test.functional.tests.SynchronizeTest
+
+/**
+ * Native tests for Synchronize API
+ */
+@QuarkusIntegrationTest
+@QuarkusTestResource.List(
+    QuarkusTestResource(TestMySQLResource::class),
+    QuarkusTestResource(TestWiremockResource::class)
+)
+class NativeSynchronizeTestIT: SynchronizeTest() {
+
+}
