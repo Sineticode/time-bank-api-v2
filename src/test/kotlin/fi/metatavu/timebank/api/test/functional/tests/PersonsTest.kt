@@ -25,7 +25,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 @TestProfile(LocalTestProfile::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PersonsTest: AbstractTest() {
-    
+
     /**
      * Resets Wiremock scenario states before each test
      */

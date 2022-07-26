@@ -21,6 +21,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
      * @param personId persons id in Forecast
      * @param before LocalDate to retrieve entries before given date
      * @param after LocalDate to retrieve entries after given date
+     * @param vacation filter vacation days
      * @return List of timeEntries
      */
     suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
@@ -67,7 +68,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (entry.updatedAt!! > entry.createdAt!!) {
-            return if (existingEntry.first().areTwoObjectsSame(entry)) {
+            return if (existingEntry.first() == entry) {
                 false
             } else {
                 deleteEntry(entry.forecastId!!)

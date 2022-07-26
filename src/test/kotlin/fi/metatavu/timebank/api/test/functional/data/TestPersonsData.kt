@@ -9,6 +9,11 @@ class TestPersonsData {
 
     companion object {
 
+        /**
+         * Gets list of mock ForecastPersons
+         *
+         * @return List of ForecastPersons
+         */
         fun getPersons(): List<ForecastPerson> {
             return listOf(
                 createTestPerson(
@@ -107,6 +112,12 @@ class TestPersonsData {
             )
         }
 
+        /**
+         * Gets list of mock ForecastPersons
+         * Mocks person whose expected worktimes has changed.
+         *
+         * @return List of ForecastPersons
+         */
         fun getUpdatedPersons(): List<ForecastPerson> {
             return listOf(
                 createTestPerson(
@@ -130,6 +141,27 @@ class TestPersonsData {
             )
         }
 
+        /**
+         * Helper method for simplifying creating of ForecastPerson objects
+         *
+         * @param id id
+         * @param firstName firstName
+         * @param lastName lastName
+         * @param monday monday expected worktime
+         * @param tuesday tuesday expected worktime
+         * @param wednesday wednesday expected worktime
+         * @param thursday thursday expected worktime
+         * @param friday friday expected worktime
+         * @param saturday saturday expected worktime
+         * @param sunday sunday expected worktime
+         * @param active active
+         * @param language language
+         * @param holidayCalendarId holidayCalendarId
+         * @param startDate startDate
+         * @param createdAt createdAt
+         * @param isSystemUser isSystemUser
+         * @return ForecastPerson
+         */
         private fun createTestPerson(
             id: Int,
             firstName: String,

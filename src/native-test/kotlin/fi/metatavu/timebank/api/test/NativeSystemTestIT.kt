@@ -8,7 +8,9 @@ import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusIntegrationTest
 import io.quarkus.test.junit.TestProfile
 
-
+/**
+ * Native tests for System API
+ */
 @QuarkusIntegrationTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),

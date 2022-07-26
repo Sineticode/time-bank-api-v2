@@ -8,6 +8,9 @@ import io.quarkus.test.common.QuarkusTestResource
 import fi.metatavu.timebank.api.test.functional.tests.SynchronizeTest
 import io.quarkus.test.junit.TestProfile
 
+/**
+ * Native tests for Synchronize API
+ */
 @QuarkusIntegrationTest
 @QuarkusTestResource.List(
     QuarkusTestResource(TestMySQLResource::class),
