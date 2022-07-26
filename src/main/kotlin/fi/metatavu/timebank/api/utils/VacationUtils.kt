@@ -8,6 +8,7 @@ import java.time.Year
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 import kotlin.math.roundToInt
+import org.eclipse.microprofile.config.ConfigProvider
 
 /**
  * Vacation Utils class
@@ -41,19 +42,19 @@ class VacationUtils {
         val spentVacations = vacations.size
         val unspentVacations: Int
 
-        return if (personStartDate < lastVacationAccumulationStart || personStartDate == LocalDate.parse("2021-07-31") ) {
+        if (personStartDate < lastVacationAccumulationStart || personStartDate == LocalDate.parse("2021-07-31")) {
             unspentVacations = (12 * 2.5 - spentVacations).roundToInt()
-            Pair(unspentVacations, spentVacations)
         } else {
             var accumulatedVacationMonths = Period.between(personStartDate, vacationAccumulationEnd.plusDays(1)).months
             if (accumulatedVacationMonths < 0) accumulatedVacationMonths = 0
             unspentVacations = (accumulatedVacationMonths * 2.5 - spentVacations).roundToInt()
-            Pair(unspentVacations, spentVacations)
         }
+
+        return Pair(unspentVacations, spentVacations)
     }
 
     companion object {
-        const val VACATION_ID = 228255
+        val VACATION_ID = ConfigProvider.getConfig().getValue("forecast.vacation.id", Int::class.java) ?: 228255
         val vacationAccumulationStart = checkVacationAccumulationStart()
         val vacationAccumulationEnd = checkVacationAccumulationEnd()
         val lastVacationAccumulationStart = checkLastVacationAccumulationStart()

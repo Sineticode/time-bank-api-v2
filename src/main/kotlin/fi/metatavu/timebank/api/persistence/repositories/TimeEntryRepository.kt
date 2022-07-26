@@ -21,6 +21,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
      * @param personId persons id in Forecast
      * @param before LocalDate to retrieve entries before given date
      * @param after LocalDate to retrieve entries after given date
+     * @param vacation filter vacation days
      * @return List of timeEntries
      */
     suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
@@ -43,7 +44,7 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         }
 
         if (vacation != null) {
-            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "vacation = :vacation")
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "isVacation = :vacation")
             parameters.and("vacation", vacation)
         }
 
