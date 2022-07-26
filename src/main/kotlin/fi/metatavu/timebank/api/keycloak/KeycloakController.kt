@@ -32,7 +32,7 @@ class KeycloakController {
     private lateinit var realm: String
 
     /**
-     * Gets given UserRepresentation from List of UserResources
+     * Gets UserRepresentation from List of UserResources based on given email
      *
      * @param email email
      * @return UserResource
@@ -51,10 +51,10 @@ class KeycloakController {
      * @return Int minimumBillableRate
      */
     fun getUsersMinimumBillableRate(email: String): Int {
-        val user = getUserByEmail(email) ?: return 50
+        val user = getUserByEmail(email)
 
         return try {
-            user.attributes["minimumBillableRate"]!!.first().toInt()
+            user!!.attributes["minimumBillableRate"]!!.first()!!.toInt()
         } catch (e: NullPointerException) {
             updateUsersMinimumBillableRate(email, 50)
             50
@@ -68,8 +68,8 @@ class KeycloakController {
      * @param  newMinimumBillableRate Int
      * @return Int minimumBillableRate
      */
-    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int) {
-        val user = getUserByEmail(email) ?: return
+    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int): Boolean {
+        val user = getUserByEmail(email) ?: return false
         val usersResource = getUserResources()?.get(user.id)
 
         try {
@@ -79,6 +79,8 @@ class KeycloakController {
             user.attributes = mapOf("minimumBillableRate" to listOf(newMinimumBillableRate.toString()))
             usersResource?.update(user)
         }
+
+        return true
     }
 
     /**
