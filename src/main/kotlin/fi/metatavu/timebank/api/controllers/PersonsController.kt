@@ -49,9 +49,11 @@ class PersonsController {
             throw Error("Invalid minimumBillableRate!")
         }
 
-        if (!keycloakController.updateUsersMinimumBillableRate(person.email, person.minimumBillableRate)) {
+        if (keycloakController.getUserByEmail(person.email) == null) {
             throw Error("Invalid e-mail!")
         }
+
+        keycloakController.updateUsersMinimumBillableRate(person.email, person.minimumBillableRate)
 
         return Person(
             id = person.id,

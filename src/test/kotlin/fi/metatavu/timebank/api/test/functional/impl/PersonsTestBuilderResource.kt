@@ -6,6 +6,7 @@ import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.PersonsApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
+import fi.metatavu.timebank.test.client.infrastructure.ServerException
 import fi.metatavu.timebank.test.client.models.Person
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
@@ -75,15 +76,18 @@ class PersonsTestBuilderResource(
      * @param person Person
      * @param expectedStatus expected status code
      */
-    fun assertUpdateFail(person: Person,expectedStatus: Int) {
+    fun assertUpdateFail(person: Person, expectedStatus: Int) {
         try {
             api.updatePerson(
                 personId = person.id,
                 person = person
             )
             Assert.fail(String.format("Expected fail with status, $expectedStatus"))
-        } catch (ex: ClientException) {
-            assertClientExceptionStatus(expectedStatus, ex)
+        } catch (ex: java.lang.RuntimeException) {
+            when (ex) {
+                is ClientException -> assertClientExceptionStatus(expectedStatus, ex)
+                is ServerException -> assertServerExceptionStatus(expectedStatus, ex)
+            }
         }
     }
 

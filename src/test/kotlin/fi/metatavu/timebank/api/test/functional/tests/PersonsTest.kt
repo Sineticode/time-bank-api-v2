@@ -89,12 +89,13 @@ class PersonsTest: AbstractTest() {
     }
 
     /**
-     * Tests /v1/persons/1 -endpoint PUT method
+     * Tests handling Keycloak user attributes via v/1/persons/{personId} -endpoint PUT method
      */
     @Test
     fun updatePersons() {
         createTestBuilder().use { testBuilder ->
             val person = testBuilder.manager.persons.getPersons(active = false).find { it.id == 2 }!!
+            val secondPerson = testBuilder.manager.persons.getPersons(active = false).find { it.id == 3}!!
             val newPerson = Person(
                 id = person.id,
                 firstName = person.firstName,
@@ -125,9 +126,13 @@ class PersonsTest: AbstractTest() {
                 person = newPerson,
                 expectedStatus = 401
             )
+            testBuilder.manager.persons.assertUpdateFail(
+                person = secondPerson,
+                expectedStatus = 500
+            )
 
             // Quarkus Devservices are not restarted between test runs,
-            // hence resetting Keycloak attribute is necessary for consequent test runs.
+            // hence resetting edited Keycloak attribute is necessary for consequent test runs.
             testBuilder.manager.persons.updatePerson(
                 personId = person.id,
                 person = person

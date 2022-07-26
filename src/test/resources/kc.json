@@ -376,7 +376,7 @@
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
-      "email" : "testerb@test.fi",
+      "email" : "testerb@example.com",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "A3okqV2T/ybXTVEgKfosoSjP8Yc9IZbFP/SY4cEd6hag7TABQrQ6nUSuwagGt96l8cw1DTijO75PqX6uiTXMzw==",
@@ -396,11 +396,11 @@
       "groups" : [ ]
     }, {
       "id" : "eb4123a3-b722-4798-9af5-8957f823659a",
-      "username" : "testerA@test.fi",
+      "username" : "testerA@example.com",
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
-      "email": "testera@test.fi",
+      "email": "testera@example.com",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "A3okqV2T/ybXTVEgKfosoSjP8Yc9IZbFP/SY4cEd6hag7TABQrQ6nUSuwagGt96l8cw1DTijO75PqX6uiTXMzw==",
@@ -429,7 +429,7 @@
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
-      "email" : "testerc@test.fi",
+      "email" : "testerc@example.com",
       "credentials" : [ {
         "type" : "password",
         "hashedSaltedValue" : "JV3DUNLjqOadjbBOtC4rvacQI553CGaDGAzBS8MR5ReCr7SwF3E6CsW3T7/XO8ITZAsch8+A/6loeuCoVLLJrg==",

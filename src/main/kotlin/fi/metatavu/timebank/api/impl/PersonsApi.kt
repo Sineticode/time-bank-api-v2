@@ -53,7 +53,7 @@ class PersonsApi: PersonsApi, AbstractApi() {
         return try {
             createOk(entity = personsController.updatePerson(person))
         } catch (e: Error) {
-            createBadRequest(e.localizedMessage)
+            createInternalServerError(e.localizedMessage)
         }
     }
 }

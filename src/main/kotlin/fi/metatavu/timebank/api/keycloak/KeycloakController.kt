@@ -55,7 +55,7 @@ class KeycloakController {
 
         return try {
             user!!.attributes["minimumBillableRate"]!!.first()!!.toInt()
-        } catch (e: NullPointerException) {
+        } catch (e: Exception) {
             updateUsersMinimumBillableRate(email, 50)
             50
         }
@@ -68,8 +68,8 @@ class KeycloakController {
      * @param  newMinimumBillableRate Int
      * @return Int minimumBillableRate
      */
-    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int): Boolean {
-        val user = getUserByEmail(email) ?: return false
+    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int) {
+        val user = getUserByEmail(email) ?: return
         val usersResource = getUserResources()?.get(user.id)
 
         try {
@@ -79,8 +79,6 @@ class KeycloakController {
             user.attributes = mapOf("minimumBillableRate" to listOf(newMinimumBillableRate.toString()))
             usersResource?.update(user)
         }
-
-        return true
     }
 
     /**
