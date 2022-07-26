@@ -42,6 +42,9 @@ class TimeEntry {
     @ManyToOne
     var worktimeCalendar: WorktimeCalendar? = null
 
+    @Column
+    var isVacation: Boolean? = false
+
     /**
      * Compares object equality ignoring entryId
      */

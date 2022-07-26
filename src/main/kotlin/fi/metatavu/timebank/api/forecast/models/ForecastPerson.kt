@@ -37,4 +37,6 @@ class ForecastPerson {
     var updatedAt: String? = null
     @JsonProperty("is_system_user")
     var isSystemUser: Boolean = false
+    var unspentVacations: Int = 0
+    var spentVacations: Int = 0
 }

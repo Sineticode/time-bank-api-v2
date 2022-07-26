@@ -34,13 +34,15 @@ class TimeEntriesTestBuilderResource(
      * @param personId optional personId
      * @param before optional before date
      * @param after optional after date
+     * @param vacation optional vacation filter
      * @return List of TimeEntries
      */
-    fun getTimeEntries(personId: Int? = null, before: String? = null, after: String? = null): Array<TimeEntry> {
+    fun getTimeEntries(personId: Int? = null, before: String? = null, after: String? = null, vacation: Boolean? = null): Array<TimeEntry> {
         return api.listTimeEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
     }
 

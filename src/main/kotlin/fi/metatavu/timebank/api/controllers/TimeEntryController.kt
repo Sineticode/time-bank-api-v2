@@ -22,13 +22,15 @@ class TimeEntryController {
      * @param personId personId
      * @param before before
      * @param after after
+     * @param vacation vacation
      * @return List of TimeEntries
      */
-    suspend fun getEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry> {
+    suspend fun getEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
         return timeEntryRepository.getAllEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
     }
 

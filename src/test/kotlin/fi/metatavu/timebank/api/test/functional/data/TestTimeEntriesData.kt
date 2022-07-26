@@ -152,6 +152,24 @@ class TestTimeEntriesData {
                     date = "2022-06-30",
                     createdAt = "2022-06-30T12:00:00Z",
                     updatedAt = "2022-06-30T12:00:00Z"
+                ),
+                createTestTimeEntry(
+                    id = 15,
+                    person = 1,
+                    nonProjectTime = 228255,
+                    timeRegistered = 435,
+                    date = "2022-07-04",
+                    createdAt = "2022-07-04T08:00:00Z",
+                    updatedAt = "2022-07-04T08:00:00Z"
+                ),
+                createTestTimeEntry(
+                    id = 16,
+                    person = 1,
+                    nonProjectTime = null,
+                    timeRegistered = 42,
+                    date = "2022-07-04",
+                    createdAt = "2022-07-04T11:00:00Z",
+                    updatedAt = "2022-07-04T11:00:00Z"
                 )
             )
         }

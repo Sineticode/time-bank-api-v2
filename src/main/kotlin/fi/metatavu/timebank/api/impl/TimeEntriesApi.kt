@@ -30,13 +30,14 @@ class TimeEntriesApi: TimeEntriesApi, AbstractApi() {
         return createNoContent()
     }
 
-    override suspend fun listTimeEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
+    override suspend fun listTimeEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
         val entries = timeEntryController.getEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
 
         if (entries.isEmpty()) {

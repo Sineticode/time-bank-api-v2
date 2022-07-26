@@ -3,6 +3,7 @@ package fi.metatavu.timebank.api.forecast.translate
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
+import fi.metatavu.timebank.api.utils.VacationUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -35,7 +36,7 @@ class ForecastTimeEntryTranslator {
         translatedTimeEntry.createdAt = createdAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.updatedAt = updatedAt.atZone(ZoneId.of("Europe/Helsinki")).toOffsetDateTime()
         translatedTimeEntry.worktimeCalendar = worktimeCalendars.find { it.personId == entity.person }
-
+        translatedTimeEntry.isVacation = entity.nonProjectTime == VacationUtils.VACATION_ID
         return translatedTimeEntry
     }
 
