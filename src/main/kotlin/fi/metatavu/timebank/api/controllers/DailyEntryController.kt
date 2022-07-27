@@ -47,8 +47,6 @@ class DailyEntryController {
         )
     }
 
-
-
     /**
      * Makes list of DailyEntries
      *

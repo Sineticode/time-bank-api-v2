@@ -39,4 +39,5 @@ class ForecastPerson {
     var isSystemUser: Boolean = false
     var unspentVacations: Int = 0
     var spentVacations: Int = 0
+    var minimumBillableRate: Int = 0
 }

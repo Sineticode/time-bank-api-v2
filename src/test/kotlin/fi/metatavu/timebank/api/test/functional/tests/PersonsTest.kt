@@ -1,12 +1,15 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
 import fi.metatavu.timebank.api.test.functional.data.TestData
+import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
+import fi.metatavu.timebank.test.client.models.Person
 import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
@@ -19,6 +22,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
     QuarkusTestResource(TestMySQLResource::class),
     QuarkusTestResource(TestWiremockResource::class)
 )
+@TestProfile(LocalTestProfile::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PersonsTest: AbstractTest() {
 
@@ -78,7 +82,61 @@ class PersonsTest: AbstractTest() {
             assertEquals(TestData.getPerson(id = 1).firstName, persons[0].firstName)
             assertEquals(29, persons[0].unspentVacations)
             assertEquals(1, persons[0].spentVacations)
+            assertEquals(10, persons[0].minimumBillableRate)
+            assertEquals(50, persons[1].minimumBillableRate)
             testBuilder.notValid.persons.assertListFail(401)
+        }
+    }
+
+    /**
+     * Tests handling Keycloak user attributes via v/1/persons/{personId} -endpoint PUT method
+     */
+    @Test
+    fun updatePersons() {
+        createTestBuilder().use { testBuilder ->
+            val person = testBuilder.manager.persons.getPersons(active = false).find { it.id == 2 }!!
+            val secondPerson = testBuilder.manager.persons.getPersons(active = false).find { it.id == 3}!!
+            val newPerson = Person(
+                id = person.id,
+                firstName = person.firstName,
+                lastName = person.lastName,
+                email = person.email,
+                monday = person.monday,
+                tuesday = person.tuesday,
+                wednesday = person.wednesday,
+                thursday = person.thursday,
+                friday = person.friday,
+                saturday = person.saturday,
+                sunday = person.sunday,
+                active = person.active,
+                unspentVacations = person.unspentVacations,
+                spentVacations = person.spentVacations,
+                minimumBillableRate = 50,
+                language = person.language,
+                startDate = person.startDate
+            )
+            val updatedPerson = testBuilder.manager.persons.updatePerson(
+                personId = newPerson.id,
+                person = newPerson
+            )
+
+            assertEquals(25,person .minimumBillableRate)
+            assertEquals(50, updatedPerson.minimumBillableRate)
+            testBuilder.userA.persons.assertUpdateFail(
+                person = newPerson,
+                expectedStatus = 401
+            )
+            testBuilder.manager.persons.assertUpdateFail(
+                person = secondPerson,
+                expectedStatus = 500
+            )
+
+            // Quarkus Devservices are not restarted between test runs,
+            // hence resetting edited Keycloak attribute is necessary for consequent test runs.
+            testBuilder.manager.persons.updatePerson(
+                personId = person.id,
+                person = person
+            )
         }
     }
 

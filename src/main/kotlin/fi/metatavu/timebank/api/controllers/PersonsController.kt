@@ -5,9 +5,11 @@ import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.keycloak.KeycloakController
 import fi.metatavu.timebank.api.utils.VacationUtils
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
+import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.Timespan
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -32,6 +34,47 @@ class PersonsController {
 
     @Inject
     lateinit var vacationUtils: VacationUtils
+
+    @Inject
+    lateinit var keycloakController: KeycloakController
+
+    /**
+     * Updates Person minimumBillableRate in Keycloak
+     *
+     * @param person Person
+     * @return person Person
+     */
+    suspend fun updatePerson(person: Person): Person {
+        if (person.minimumBillableRate > 100 || person.minimumBillableRate < 0) {
+            throw Error("Invalid minimumBillableRate!")
+        }
+
+        if (keycloakController.getUserByEmail(person.email) == null) {
+            throw Error("Invalid e-mail!")
+        }
+
+        keycloakController.updateUsersMinimumBillableRate(person.email, person.minimumBillableRate)
+
+        return Person(
+            id = person.id,
+            firstName = person.firstName,
+            lastName = person.firstName,
+            email = person.email,
+            monday = person.monday,
+            tuesday = person.tuesday,
+            wednesday = person.wednesday,
+            thursday = person.thursday,
+            friday = person.friday,
+            saturday = person.saturday,
+            sunday = person.sunday,
+            active = person.active,
+            unspentVacations = person.unspentVacations,
+            spentVacations = person.spentVacations,
+            minimumBillableRate = keycloakController.getUsersMinimumBillableRate(person.email),
+            language = person.language,
+            startDate = person.startDate
+        )
+    }
 
     /**
      * List persons data from Forecast API
@@ -88,6 +131,7 @@ class PersonsController {
             val vacationAmounts = vacationUtils.getPersonsVacations(forecastPerson)
             forecastPerson.unspentVacations = vacationAmounts.first
             forecastPerson.spentVacations = vacationAmounts.second
+            forecastPerson.minimumBillableRate = keycloakController.getUsersMinimumBillableRate(forecastPerson.email)
         }
 
         return if (active == false) {
@@ -109,7 +153,7 @@ class PersonsController {
             personId = personId,
             before = null,
             after = null,
-            vacation = false
+            vacation = null
         ) ?: return null
 
         return when (timespan) {

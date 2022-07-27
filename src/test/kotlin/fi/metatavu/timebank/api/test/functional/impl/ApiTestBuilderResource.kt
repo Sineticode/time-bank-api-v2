@@ -4,6 +4,7 @@ import fi.metatavu.jaxrs.test.functional.builder.AbstractAccessTokenApiTestBuild
 import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
+import fi.metatavu.timebank.test.client.infrastructure.ServerException
 import org.junit.Assert
 
 /**
@@ -41,7 +42,7 @@ abstract class ApiTestBuilderResource<T, A>(
      * @param expectedStatus expected status code
      * @param e server exception
      */
-    protected fun assertServerExceptionStatus(expectedStatus: Int, e: ClientException) {
+    protected fun assertServerExceptionStatus(expectedStatus: Int, e: ServerException) {
         Assert.assertEquals(expectedStatus, e.statusCode)
     }
 }

@@ -27,7 +27,8 @@ class PersonsTranslator: AbstractTranslator<ForecastPerson, Person>() {
             startDate = entity.startDate,
             language = entity.language,
             unspentVacations = entity.unspentVacations,
-            spentVacations = entity.spentVacations
+            spentVacations = entity.spentVacations,
+            minimumBillableRate = entity.minimumBillableRate
         )
     }
 
