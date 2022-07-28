@@ -32,31 +32,18 @@ class KeycloakController {
     private lateinit var realm: String
 
     /**
-     * Gets UserRepresentation from List of UserResources based on given email
-     *
-     * @param email email
-     * @return UserResource
-     */
-    fun getUserByEmail(email: String): UserRepresentation? {
-        val users = getUserResources()?.list()
-
-        return users?.find { it.email == email.lowercase() }
-    }
-
-    /**
      * Gets minimumBillableRate attribute for Person
-     * If not set will return default value of 50 (%)
+     * If not set will set and return default value of 50 (%)
      *
-     * @param email Persons email
+     * @param user UserRepresentation
      * @return Int minimumBillableRate
      */
-    fun getUsersMinimumBillableRate(email: String): Int {
-        val user = getUserByEmail(email)
+    fun getUsersMinimumBillableRate(user: UserRepresentation): Int {
 
         return try {
-            user!!.attributes["minimumBillableRate"]!!.first()!!.toInt()
+            user.attributes["minimumBillableRate"]!!.first()!!.toInt()
         } catch (e: Exception) {
-            updateUsersMinimumBillableRate(email, 50)
+            updateUsersMinimumBillableRate(user, 50)
             50
         }
     }
@@ -64,13 +51,12 @@ class KeycloakController {
     /**
      * Updates Persons minimumBillableRate attribute
      *
-     * @param email Persons email
+     * @param user UserRepresentation
      * @param  newMinimumBillableRate Int
      * @return Int minimumBillableRate
      */
-    fun updateUsersMinimumBillableRate(email: String, newMinimumBillableRate: Int) {
-        val user = getUserByEmail(email) ?: return
-        val usersResource = getUserResources()?.get(user.id)
+    fun updateUsersMinimumBillableRate(user: UserRepresentation, newMinimumBillableRate: Int) {
+        val usersResource = getUsersResource()?.get(user.id)
 
         try {
             user.attributes["minimumBillableRate"] = listOf(newMinimumBillableRate.toString())
@@ -87,7 +73,7 @@ class KeycloakController {
      *
      * @return UsersResource
      */
-    private fun getUserResources(): UsersResource? {
+    fun getUsersResource(): UsersResource? {
         val keycloakClient = getKeycloakClient()
         val foundRealm = keycloakClient.realm(realm) ?: return null
 
