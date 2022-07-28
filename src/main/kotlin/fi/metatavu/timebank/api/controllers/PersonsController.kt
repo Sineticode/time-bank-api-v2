@@ -49,11 +49,10 @@ class PersonsController {
             throw Error("Invalid minimumBillableRate!")
         }
 
-        if (keycloakController.getUserByEmail(person.email) == null) {
-            throw Error("Invalid e-mail!")
-        }
+        val keycloakUser = keycloakController.getUsersResource()?.list()?.find { it.email == person.email.lowercase() }
+            ?: throw Error("Invalid e-mail!")
 
-        keycloakController.updateUsersMinimumBillableRate(person.email, person.minimumBillableRate)
+        keycloakController.updateUsersMinimumBillableRate(keycloakUser, person.minimumBillableRate)
 
         return Person(
             id = person.id,
@@ -70,7 +69,7 @@ class PersonsController {
             active = person.active,
             unspentVacations = person.unspentVacations,
             spentVacations = person.spentVacations,
-            minimumBillableRate = keycloakController.getUsersMinimumBillableRate(person.email),
+            minimumBillableRate = keycloakController.getUsersMinimumBillableRate(keycloakUser),
             language = person.language,
             startDate = person.startDate
         )
@@ -127,11 +126,15 @@ class PersonsController {
      */
     suspend fun listPersons(active: Boolean? = true): List<ForecastPerson>? {
         val persons = getPersonsFromForecast()
+        val keycloakUsers = keycloakController.getUsersResource()?.list() ?: return null
+
         persons.forEach { forecastPerson ->
+            val keycloakUser = keycloakUsers.find { it.email == forecastPerson.email.lowercase() }
+            val minimumBillableRate = if (keycloakUser == null) 50 else keycloakController.getUsersMinimumBillableRate(keycloakUser)
             val vacationAmounts = vacationUtils.getPersonsVacations(forecastPerson)
             forecastPerson.unspentVacations = vacationAmounts.first
             forecastPerson.spentVacations = vacationAmounts.second
-            forecastPerson.minimumBillableRate = keycloakController.getUsersMinimumBillableRate(forecastPerson.email)
+            forecastPerson.minimumBillableRate = minimumBillableRate
         }
 
         return if (active == false) {
