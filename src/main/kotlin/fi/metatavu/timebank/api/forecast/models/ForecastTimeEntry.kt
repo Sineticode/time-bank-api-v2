@@ -10,7 +10,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ForecastTimeEntry {
-    var id: Int = 0
+    var id: Int? = null
     var person: Int = 0
     @JsonProperty("non_project_time")
     var nonProjectTime: Int? = null

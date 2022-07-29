@@ -20,7 +20,7 @@ class TimeEntriesTestBuilderResource(
 ): ApiTestBuilderResource<TimeEntry, ApiClient?>(testBuilder, apiClient) {
 
     override fun clean(t: TimeEntry) {
-        api.deleteTimeEntry(t.id!!)
+        api.deleteTimeEntry(t.entryId)
     }
 
     override fun getApi(): TimeEntriesApi {

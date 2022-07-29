@@ -2,15 +2,19 @@ package fi.metatavu.timebank.api.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
+import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
-import org.slf4j.Logger
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
+import org.slf4j.Logger
 
 /**
  * Controller for synchronization Forecast time registrations with Time-bank
@@ -44,13 +48,13 @@ class SynchronizeController {
      */
     suspend fun synchronize(after: LocalDate?): List<TimeEntry> {
         return try {
-            val forecastPersons = personsController.getPersonsFromForecast()
+            val forecastPersons = personsController.filterActivePersons(personsController.getPersonsFromForecast())
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
 
-            val entries = retrieveAllEntries(after, worktimeCalendars)
+            val entries = retrieveAllEntries(after, worktimeCalendars, forecastPersons)
 
             val synchronized = mutableListOf<TimeEntry>()
             var duplicates = 0
@@ -85,8 +89,9 @@ class SynchronizeController {
      * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>, forecastPersons: List<ForecastPerson>): List<TimeEntry> {
         var retrievedAllEntries = false
+        val forecastTimeEntries = mutableListOf<ForecastTimeEntry>()
         val translatedEntries = mutableListOf<TimeEntry>()
         var pageNumber = 1
 
@@ -105,13 +110,77 @@ class SynchronizeController {
                 retrievedAllEntries = true
             }
 
-            translatedEntries.addAll(forecastTimeEntryTranslator.translate(
-                    entities = forecastTimeEntryResponse.pageContents!!,
-                    worktimeCalendars = worktimeCalendars
-                )
-            )
+            forecastTimeEntries.addAll(forecastTimeEntryResponse.pageContents!!)
         }
 
+        translatedEntries.addAll(forecastTimeEntryTranslator.translate(
+            entities = synchronizationDayValidator(forecastTimeEntries, forecastPersons),
+            worktimeCalendars = worktimeCalendars
+        ))
+
         return translatedEntries
+    }
+
+    private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
+        val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
+        val daysBetween = ChronoUnit.DAYS.between(LocalDate.parse(sortedEntries.first().date), LocalDate.now())
+
+        persons.forEach { forecastPerson ->
+            val personEntries = sortedEntries.filter { it.person == forecastPerson.id }
+            for (dayNumber in 0..daysBetween) {
+                val currentDate = LocalDate.parse(sortedEntries.first().date)?.plusDays(dayNumber)
+
+                if (personEntries.find { LocalDate.parse(it.date) == currentDate } == null) {
+                    val existingEntry = timeEntryRepository.getAllEntries(
+                        personId = forecastPerson.id,
+                        before = currentDate,
+                        after = currentDate,
+                        vacation = null
+                    )
+                    if (existingEntry.isEmpty()) {
+                        sortedEntries.add(
+                            createForecastTimeEntry(
+                                id = null,
+                                person = forecastPerson.id,
+                                nonProjectTime = 123456,
+                                timeRegistered = 0,
+                                date = currentDate.toString(),
+                                createdBy = forecastPerson.id,
+                                updatedBy = forecastPerson.id,
+                                createdAt = "${LocalDateTime.from(currentDate?.atStartOfDay())}Z",
+                                updatedAt = "${LocalDateTime.from(currentDate?.atStartOfDay())}Z"
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        return sortedEntries
+    }
+
+    private fun createForecastTimeEntry(
+        id: Int?,
+        person: Int,
+        nonProjectTime: Int,
+        timeRegistered: Int,
+        date: String,
+        createdBy: Int,
+        updatedBy: Int,
+        createdAt: String,
+        updatedAt: String
+    ): ForecastTimeEntry {
+        val newTimeEntry = ForecastTimeEntry()
+        newTimeEntry.id = id
+        newTimeEntry.person = person
+        newTimeEntry.nonProjectTime = nonProjectTime
+        newTimeEntry.timeRegistered = timeRegistered
+        newTimeEntry.date = date
+        newTimeEntry.createdBy = createdBy
+        newTimeEntry.updatedBy = updatedBy
+        newTimeEntry.createdAt = createdAt
+        newTimeEntry.updatedAt = updatedAt
+
+        return newTimeEntry
     }
 }
