@@ -123,12 +123,19 @@ class SynchronizeController {
 
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
         val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
-        val daysBetween = ChronoUnit.DAYS.between(LocalDate.parse(sortedEntries.first().date), LocalDate.now())
+        var firstDate = LocalDate.parse(sortedEntries.first().date)
+        var daysBetween = ChronoUnit.DAYS.between(firstDate, LocalDate.now())
 
         persons.forEach { forecastPerson ->
+            if (LocalDate.parse(forecastPerson.startDate) > firstDate) {
+                daysBetween = ChronoUnit.DAYS.between(LocalDate.parse(forecastPerson.startDate), LocalDate.now())
+                firstDate = LocalDate.parse(forecastPerson.startDate)
+            }
+
             val personEntries = sortedEntries.filter { it.person == forecastPerson.id }
+
             for (dayNumber in 0..daysBetween) {
-                val currentDate = LocalDate.parse(sortedEntries.first().date)?.plusDays(dayNumber)
+                val currentDate = firstDate.plusDays(dayNumber)
 
                 if (personEntries.find { LocalDate.parse(it.date) == currentDate } == null) {
                     val existingEntry = timeEntryRepository.getAllEntries(
@@ -137,6 +144,7 @@ class SynchronizeController {
                         after = currentDate,
                         vacation = null
                     )
+
                     if (existingEntry.isEmpty()) {
                         sortedEntries.add(
                             createForecastTimeEntry(
