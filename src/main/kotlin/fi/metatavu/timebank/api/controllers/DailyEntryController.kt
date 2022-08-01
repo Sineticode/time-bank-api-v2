@@ -101,7 +101,8 @@ class DailyEntryController {
      */
     suspend fun calculateDailyEntries(entriesOfDay: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
         var internalTime = 0
-        var projectTime = 0
+        var billableProjectTime = 0
+        var nonBillableProjectTime = 0
         var date = LocalDate.now()
         val worktimeCalendar = entriesOfDay.first().worktimeCalendar ?:
             throw Error("Missing WorktimeCalendar in TimeEntry.")
@@ -110,7 +111,8 @@ class DailyEntryController {
 
         entriesOfDay.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
-            projectTime += entry.projectTime ?: 0
+            billableProjectTime += entry.billableProjectTime ?: 0
+            nonBillableProjectTime += entry.nonBillableProjectTime ?: 0
             date = entry.date
             personId = entry.person!!
         }
@@ -121,13 +123,17 @@ class DailyEntryController {
             day = date
         )
 
+        val loggedProjectTime = billableProjectTime + nonBillableProjectTime
+
         return DailyEntry(
             person = personId,
             internalTime = internalTime,
-            projectTime = projectTime,
-            logged = internalTime + projectTime,
+            billableProjectTime = billableProjectTime,
+            nonBillableProjectTime = nonBillableProjectTime,
+            logged = internalTime + loggedProjectTime,
+            loggedProjectTime = loggedProjectTime,
             expected = expected,
-            balance = internalTime + projectTime - expected,
+            balance = internalTime + loggedProjectTime - expected,
             date = date,
             isVacation = isVacation
         )

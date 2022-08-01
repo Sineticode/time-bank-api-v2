@@ -3,6 +3,9 @@ package fi.metatavu.timebank.api.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.forecast.models.ForecastProject
+import fi.metatavu.timebank.api.forecast.models.ForecastTask
+import fi.metatavu.timebank.api.forecast.models.ForecastTaskResponse
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
@@ -49,12 +52,20 @@ class SynchronizeController {
     suspend fun synchronize(after: LocalDate?): List<TimeEntry> {
         return try {
             val forecastPersons = personsController.filterActivePersons(personsController.getPersonsFromForecast())
+            val forecastProjects = jacksonObjectMapper().readValue(forecastService.getProjects(), Array<ForecastProject>::class.java).toList()
+            val forecastTasks = retrieveAllTasks()
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
 
-            val entries = retrieveAllEntries(after, worktimeCalendars, forecastPersons)
+            val entries = retrieveAllEntries(
+                after = after,
+                worktimeCalendars = worktimeCalendars,
+                forecastPersons = forecastPersons,
+                forecastProjects = forecastProjects,
+                forecastTasks = forecastTasks
+            )
 
             val synchronized = mutableListOf<TimeEntry>()
             var duplicates = 0
@@ -89,7 +100,13 @@ class SynchronizeController {
      * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>, forecastPersons: List<ForecastPerson>): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(
+        after: LocalDate?,
+        worktimeCalendars: List<WorktimeCalendar>,
+        forecastPersons: List<ForecastPerson>,
+        forecastProjects: List<ForecastProject>,
+        forecastTasks: List<ForecastTask>
+    ): List<TimeEntry> {
         var retrievedAllEntries = false
         val forecastTimeEntries = mutableListOf<ForecastTimeEntry>()
         val translatedEntries = mutableListOf<TimeEntry>()
@@ -102,7 +119,7 @@ class SynchronizeController {
             val amountOfPages =
                 if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
                 else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
-            logger.info("Retrieved page $pageNumber/${amountOfPages} of time registrations from Forecast API!")
+            logger.info("Retrieved page $pageNumber/$amountOfPages of time registrations from Forecast API!")
 
             if (pageNumber * forecastTimeEntryResponse.pageSize < forecastTimeEntryResponse.totalObjectCount) {
                 pageNumber++
@@ -115,10 +132,42 @@ class SynchronizeController {
 
         translatedEntries.addAll(forecastTimeEntryTranslator.translate(
             entities = synchronizationDayValidator(forecastTimeEntries, forecastPersons),
-            worktimeCalendars = worktimeCalendars
+            worktimeCalendars = worktimeCalendars,
+            forecastProjects = forecastProjects,
+            forecastTasks = forecastTasks
         ))
 
         return translatedEntries
+    }
+
+    /**
+     * Loops through paginated API responses of varying sizes from Forecast API to get all Tasks
+     *
+     * @return List<ForecastTask>
+     */
+    private suspend fun retrieveAllTasks(): List<ForecastTask> {
+        var retrievedAllTasks = false
+        val forecastTasks = mutableListOf<ForecastTask>()
+        var pageNumber = 1
+
+        while (!retrievedAllTasks) {
+            val forecastTaskResponse =
+                jacksonObjectMapper().readValue(forecastService.getTasks(pageNumber = pageNumber), ForecastTaskResponse::class.java)
+            val amountOfPages =
+                if (forecastTaskResponse.totalObjectCount / forecastTaskResponse.pageSize < 1) 1
+                else forecastTaskResponse.totalObjectCount / forecastTaskResponse.pageSize
+            logger.info("Retrieved page $pageNumber/$amountOfPages of tasks from Forecast API!")
+
+            if (pageNumber * forecastTaskResponse.pageSize < forecastTaskResponse.totalObjectCount) {
+                pageNumber++
+            } else {
+                retrievedAllTasks = true
+            }
+
+            forecastTasks.addAll(forecastTaskResponse.pageContents!!)
+        }
+
+        return forecastTasks
     }
 
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {

@@ -80,4 +80,31 @@ class ForecastService {
     fun getHolidays(): String? {
         return doRequest("/v1/holiday_calendar_entries")
     }
+
+    /**
+     * Gets projects from Forecast
+     *
+     * @return Response with projects data
+     */
+    fun getProjects(): String? {
+        return doRequest("/v1/projects")
+    }
+
+    /**
+     * Gets tasks from Forecast
+     *
+     * @param pageNumber page of paginated response to request
+     * @return Response with tasks data
+     */
+    fun getTasks(pageNumber: Int): String? {
+        return doRequest("/v4/tasks?pageSize=1000&pageNumber=$pageNumber")
+    }
+
+    companion object {
+        const val NON_BILLABLE = "NON_BILLABLE"
+        const val FIXED_PRICE = "FIXED_PRICE"
+        const val FIXED_PRICE_V2 = "FIXED_PRICE_V2"
+        const val TIME_AND_MATERIALS = "TIME_AND_MATERIALS"
+        const val RETAINER = "RETAINER"
+    }
 }
