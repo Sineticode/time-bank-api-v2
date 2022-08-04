@@ -109,13 +109,13 @@ class PersonsController {
     }
 
     /**
-     * Filters inactive Forecast persons and system users
+     * Filters inactive Forecast persons, system users and clients
      *
      * @param persons List of ForecastPersons
      * @return List of Forecast persons
      */
-    fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
-        return persons.filter{ person -> person.active && !person.isSystemUser }
+    fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+        return persons.filter{ person -> person.active && !person.isSystemUser && person.clientId == null }
     }
 
     /**
@@ -140,7 +140,7 @@ class PersonsController {
         return if (active == false) {
             persons
         } else {
-            filterActivePersons(persons)
+            filterPersons(persons)
         }
     }
 
