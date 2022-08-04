@@ -46,17 +46,16 @@ class SynchronizeController {
      * Synchronizes time entries from Forecast to Time-bank
      *
      * @param after YYYY-MM-DD LocalDate
-     * @return Length of entries synchronized
      */
-    suspend fun synchronize(after: LocalDate?): List<TimeEntry> {
-        return try {
+    suspend fun synchronize(after: LocalDate?) {
+        try {
             var forecastPersons = personsController.getPersonsFromForecast()
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
 
-            forecastPersons = personsController.filterActivePersons(forecastPersons)
+            forecastPersons = personsController.filterPersons(forecastPersons)
 
             val entries = retrieveAllEntries(
                 after = after,
@@ -81,8 +80,6 @@ class SynchronizeController {
                 }
             }
             logger.info("Finished synchronization with: ${synchronized.size} entries synchronized... $duplicates entries NOT synchronized...")
-
-            synchronized
         } catch (e: Error) {
             logger.error("Error during synchronization: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -95,6 +92,7 @@ class SynchronizeController {
      *
      * @param after YYYY-MM-DD LocalDate'
      * @param worktimeCalendars List of WorktimeCalendars
+     * @param forecastPersons List of ForecastPersons
      * @return List of TimeEntries
      */
     private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>, forecastPersons: List<ForecastPerson>): List<TimeEntry> {
@@ -133,7 +131,7 @@ class SynchronizeController {
     /**
      * Loops through paginated API responses of varying sizes from Forecast API to get all Tasks
      *
-     * @return List<ForecastTask>
+     * @return List of ForecastTasks
      */
     private suspend fun retrieveAllTasks(): List<ForecastTask> {
         var retrievedAllTasks = false
@@ -160,6 +158,14 @@ class SynchronizeController {
         return forecastTasks
     }
 
+    /**
+     * Checks if each Person has TimeEntry for each day of synchronization.
+     * If not, creates TimeEntry with zero logged
+     *
+     * @param timeEntries timeEntries
+     * @param persons persons
+     * @return List of ForecastTimeEntries
+     */
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
         val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
         var firstDate = LocalDate.parse(sortedEntries.first().date)
@@ -206,6 +212,20 @@ class SynchronizeController {
         return sortedEntries
     }
 
+    /**
+     * Creates ForecastTimeEntry
+     *
+     * @param id id
+     * @param person person
+     * @param nonProjectTime nonProjectTime
+     * @param timeRegistered timeRegistered
+     * @param date date
+     * @param createdBy createdBy
+     * @param updatedBy updatedBy
+     * @param createdAt createdAt
+     * @param updatedAt updatedAt
+     * @return ForecastTimeEntry
+     */
     private fun createForecastTimeEntry(
         id: Int?,
         person: Int,
