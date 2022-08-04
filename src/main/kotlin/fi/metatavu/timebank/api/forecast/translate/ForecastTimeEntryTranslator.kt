@@ -26,25 +26,23 @@ class ForecastTimeEntryTranslator {
      * @param forecastTasks List of ForecastTasks
      * @return TimeEntry
      */
-    fun translate(
-        entity: ForecastTimeEntry,
-        worktimeCalendars: List<WorktimeCalendar>,
-        forecastTasks: List<ForecastTask>
+    fun translate(entity: ForecastTimeEntry, worktimeCalendars: List<WorktimeCalendar>, forecastTasks: List<ForecastTask>
     ): TimeEntry {
         val createdAt = LocalDateTime.parse(entity.createdAt.replace("Z", ""))
         val updatedAt = LocalDateTime.parse(entity.updatedAt.replace("Z", ""))
         val unBillableTask = forecastTasks.find { it.id == entity.task }?.unBillable ?: true
+        val internalTime = entity.nonProjectTime != null
         val translatedTimeEntry = TimeEntry()
         translatedTimeEntry.entryId = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
         translatedTimeEntry.person = entity.person
-        translatedTimeEntry.internalTime = if (entity.nonProjectTime != null) entity.timeRegistered else 0
+        translatedTimeEntry.internalTime = if (internalTime) entity.timeRegistered else 0
+        translatedTimeEntry.billableProjectTime = 0
+        translatedTimeEntry.nonBillableProjectTime = 0
 
-        if (!unBillableTask) {
+        if (!unBillableTask && !internalTime) {
             translatedTimeEntry.billableProjectTime = entity.timeRegistered
-            translatedTimeEntry.nonBillableProjectTime = 0
-        } else {
-            translatedTimeEntry.billableProjectTime = 0
+        } else if (unBillableTask && !internalTime) {
             translatedTimeEntry.nonBillableProjectTime = entity.timeRegistered
         }
 
@@ -63,10 +61,7 @@ class ForecastTimeEntryTranslator {
      * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    fun translate(
-        entities: List<ForecastTimeEntry>,
-        worktimeCalendars: List<WorktimeCalendar>,
-        forecastTasks: List<ForecastTask>
+    fun translate(entities: List<ForecastTimeEntry>, worktimeCalendars: List<WorktimeCalendar>, forecastTasks: List<ForecastTask>
     ): List<TimeEntry> {
         return entities.map { entity ->
             translate(entity, worktimeCalendars, forecastTasks)
