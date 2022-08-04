@@ -138,11 +138,11 @@ class DailyEntriesTest: AbstractTest() {
 
             setScenario(
                 scenario = PERSONS_SCENARIO,
-                state = UPDATE_STATE
+                state = UPDATE_STATE_ONE
             )
             setScenario(
                 scenario = TIMES_SCENARIO,
-                state = UPDATE_STATE
+                state = UPDATE_STATE_ONE
             )
 
             testBuilder.manager.synchronization.synchronizeEntries(

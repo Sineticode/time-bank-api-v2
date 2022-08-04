@@ -114,7 +114,8 @@ abstract class AbstractTest {
         const val TIMES_SCENARIO = "timesScenario"
         const val TASKS_SCENARIO = "tasksScenario"
         const val ERROR_STATE = "errorState"
-        const val UPDATE_STATE = "updateState"
+        const val UPDATE_STATE_ONE = "updateStateOne"
+        const val UPDATE_STATE_TWO = "updateStateTwo"
         const val YEAR_STATE = "yearState"
     }
 }

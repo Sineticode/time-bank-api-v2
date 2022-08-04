@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getSixtyDaysAgo
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import java.time.LocalDate
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 
 /**
  * Tests for Synchronization API
@@ -60,6 +62,37 @@ class SynchronizeTest: AbstractTest() {
 
             assertEquals(expectedFirst.toInt(), synchronizedFirst.size)
             assertEquals(expectedSecond.toInt(), synchronizedSecond.size)
+        }
+    }
+
+    /**
+     * Tests /v1/synchronize -endpoint
+     * when Forecast API response contains updated entry
+     */
+    @Test
+    fun testSynchronizationUpdate() {
+        createTestBuilder().use { testBuilder ->
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getThirtyDaysAgo().toString()
+            )
+            val synchronizedFirst = testBuilder.manager.timeEntries.getTimeEntries()
+            synchronizedFirst.forEach { testBuilder.manager.timeEntries.clean(it) }
+
+            setScenario(
+                scenario = TIMES_SCENARIO,
+                state = UPDATE_STATE_TWO
+            )
+
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = LocalDate.now().minusDays(1).toString()
+            )
+            val synchronizedSecond = testBuilder.manager.timeEntries.getTimeEntries()
+            synchronizedSecond.forEach { testBuilder.manager.timeEntries.clean(it) }
+
+            assertFalse(synchronizedFirst.first() == synchronizedSecond.first())
+
         }
     }
 }

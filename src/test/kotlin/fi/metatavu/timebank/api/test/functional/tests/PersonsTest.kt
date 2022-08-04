@@ -1,6 +1,5 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
@@ -83,7 +82,7 @@ class PersonsTest: AbstractTest() {
             val persons = testBuilder.manager.persons.getPersons()
 
             assertEquals(4, persons.size)
-            assertEquals(TestData.getPerson(id = 1).firstName, persons[0].firstName)
+            assertEquals("TesterA", persons[0].firstName)
             assertEquals(29, persons[0].unspentVacations)
             assertEquals(1, persons[0].spentVacations)
             assertEquals(10, persons[0].minimumBillableRate)

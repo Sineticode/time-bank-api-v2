@@ -80,16 +80,6 @@ class TestData {
         }
 
         /**
-         * Gets one mock person by id
-         *
-         * @param id personId
-         * @return ForecastPerson
-         */
-        fun getPerson(id: Int): ForecastPerson {
-            return TestPersonsData.getPersons().filter { it.id == id }[0]
-        }
-
-        /**
          * Gets all mock persons
          *
          * @return List of ForecastPerson
