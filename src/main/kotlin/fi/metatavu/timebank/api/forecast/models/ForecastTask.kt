@@ -10,8 +10,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ForecastTask {
-    var id: Int? = null
+    var id: Int = 0
     var title: String = ""
     @JsonProperty("un_billable")
-    var unBillable: Boolean? = null
+    var unBillable: Boolean = false
 }

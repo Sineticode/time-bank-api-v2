@@ -3,7 +3,10 @@ package fi.metatavu.timebank.api.test.functional.tests
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.logging.LoggerProducer
 import fi.metatavu.timebank.api.test.functional.TestBuilder
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils
 import io.quarkus.test.common.DevServicesContext
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import okhttp3.*
 import org.eclipse.microprofile.config.ConfigProvider
 import org.slf4j.LoggerFactory
@@ -12,6 +15,10 @@ import org.slf4j.LoggerFactory
  * Abstract Test class
  */
 abstract class AbstractTest {
+
+    val daysBetweenMonth = ChronoUnit.DAYS.between(TestDateUtils.getThirtyDaysAgo(), LocalDate.now().plusDays(1))
+    val daysBetweenTwoMonths = ChronoUnit.DAYS.between(TestDateUtils.getSixtyDaysAgo(), LocalDate.now().plusDays(1))
+    val daysBetweenYear = ChronoUnit.DAYS.between(TestDateUtils.getSixtyDaysAgo(), LocalDate.now().plusDays(1))
 
     private var devServicesContext: DevServicesContext? = null
 
@@ -105,10 +112,9 @@ abstract class AbstractTest {
         const val PERSONS_SCENARIO = "personsScenario"
         const val HOLIDAYS_SCENARIO = "holidaysScenario"
         const val TIMES_SCENARIO = "timesScenario"
+        const val TASKS_SCENARIO = "tasksScenario"
         const val ERROR_STATE = "errorState"
-        const val UPDATE_STATE_ONE = "updateStateOne"
-        const val UPDATE_STATE_TWO = "updateStateTwo"
-        const val GENERATED_STATE_ONE = "generatedStateOne"
-        const val GENERATED_STATE_TWO = "generatedStateTwo"
+        const val UPDATE_STATE = "updateState"
+        const val YEAR_STATE = "yearState"
     }
 }

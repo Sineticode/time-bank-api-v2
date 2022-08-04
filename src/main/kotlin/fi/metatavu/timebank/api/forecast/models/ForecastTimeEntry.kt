@@ -12,6 +12,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 class ForecastTimeEntry {
     var id: Int? = null
     var person: Int = 0
+    var task: Int? = null
     @JsonProperty("non_project_time")
     var nonProjectTime: Int? = null
     @JsonProperty("time_registered")

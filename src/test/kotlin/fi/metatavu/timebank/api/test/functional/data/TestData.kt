@@ -2,6 +2,8 @@ package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.forecast.models.ForecastTask
+import fi.metatavu.timebank.api.forecast.models.ForecastTaskResponse
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import java.time.LocalDate
@@ -20,10 +22,10 @@ class TestData {
          * @param after after LocalDate as string to filter time entries
          * @return ForecastTimeEntryResponse
          */
-        fun getForecastTimeEntryResponse(before: String? = null, after: String? = null): ForecastTimeEntryResponse {
+        fun getForecastTimeEntryResponse(before: LocalDate? = null, after: LocalDate? = null): ForecastTimeEntryResponse {
             return if (after != null) {
                 val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
-                    LocalDate.parse(forecastTimeEntry.date) > LocalDate.parse(after)
+                    LocalDate.parse(forecastTimeEntry.date) >= after
                 }
 
                 createForecastTimeEntryResponse(
@@ -33,7 +35,7 @@ class TestData {
                 )
             } else if (before != null) {
                 val pageContents = TestTimeEntriesData.getForecastTimeEntries().filter { forecastTimeEntry ->
-                    LocalDate.parse(forecastTimeEntry.date) < LocalDate.parse(before)
+                    LocalDate.parse(forecastTimeEntry.date) <= before
                 }
 
                 createForecastTimeEntryResponse(
@@ -51,6 +53,19 @@ class TestData {
         }
 
         /**
+         * Gets mock Forecast API response to /v4/tasks
+         *
+         * @return ForecastTaskResponse
+         */
+        fun getForecastTaskResponse(): ForecastTaskResponse {
+            return createForecastTaskResponse(
+                pageContents = TestTasksData.getForecastTasks(),
+                pageSize = TestTasksData.getForecastTasks().size,
+                totalObjectCount = TestTasksData.getForecastTasks().size
+            )
+        }
+
+        /**
          * Gets mock Forecast API response to /v4/time_registrations
          * with time entries with updated values
          *
@@ -61,21 +76,6 @@ class TestData {
                 pageContents = TestTimeEntriesData.getUpdatedForecastTimeEntry(),
                 pageSize = 1,
                 totalObjectCount = 1
-            )
-        }
-
-        /**
-         * Gets mock Forecast API response to /v4/time_registrations
-         * with 2000 random generated time entries
-         *
-         * @param pageNumber Integer 1 or 2
-         * @return ForecastTimeEntryResponse
-         */
-        fun getGeneratedForecastTimeEntryResponse(pageNumber: Int): ForecastTimeEntryResponse {
-            return createForecastTimeEntryResponse(
-                pageContents = TestTimeEntriesData.generateRandomForecastTimeEntries(pageNumber),
-                pageSize = 1000,
-                totalObjectCount = 1200
             )
         }
 
@@ -137,6 +137,10 @@ class TestData {
         }
 
         /**
+         * Gets
+         */
+
+        /**
          * Helper method for simplifying creating of ForecastTimeEntryResponse objects
          *
          * @param pageContents List of ForecastTimeEntries
@@ -155,6 +159,27 @@ class TestData {
             newForecastResponse.totalObjectCount = totalObjectCount
 
             return newForecastResponse
+        }
+
+        /**
+         * Helper method for simplifying creating of ForecastTaskResponse objects
+         *
+         * @param pageContents List of ForecastTasks
+         * @param pageSize Int
+         * @param totalObjectCount Int
+         * @return ForecastTaskResponse
+         */
+        private fun createForecastTaskResponse(
+            pageContents: List<ForecastTask>,
+            pageSize: Int,
+            totalObjectCount: Int
+        ): ForecastTaskResponse {
+            val newForecastTaskResponse = ForecastTaskResponse()
+            newForecastTaskResponse.pageContents = pageContents
+            newForecastTaskResponse.pageSize = pageSize
+            newForecastTaskResponse.totalObjectCount = totalObjectCount
+
+            return newForecastTaskResponse
         }
     }
 }

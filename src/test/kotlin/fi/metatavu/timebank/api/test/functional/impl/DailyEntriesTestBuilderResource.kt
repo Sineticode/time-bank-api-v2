@@ -6,6 +6,7 @@ import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.DailyEntriesApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
+import fi.metatavu.timebank.test.client.infrastructure.ServerException
 import fi.metatavu.timebank.test.client.models.DailyEntry
 import org.junit.Assert
 
@@ -60,8 +61,11 @@ class DailyEntriesTestBuilderResource(
                 vacation = false
             )
             Assert.fail(String.format("Expected fail with status, $expectedStatus"))
-        } catch (ex: ClientException) {
-            assertClientExceptionStatus(expectedStatus, ex)
+        } catch (ex: java.lang.RuntimeException) {
+            when (ex) {
+                is ClientException -> assertClientExceptionStatus(expectedStatus, ex)
+                is ServerException -> assertServerExceptionStatus(expectedStatus, ex)
+            }
         }
     }
 }

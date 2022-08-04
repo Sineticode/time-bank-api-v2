@@ -1,7 +1,5 @@
 package fi.metatavu.timebank.api.forecast.translate
 
-import fi.metatavu.timebank.api.forecast.ForecastService
-import fi.metatavu.timebank.api.forecast.models.ForecastProject
 import fi.metatavu.timebank.api.forecast.models.ForecastTask
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
@@ -31,20 +29,18 @@ class ForecastTimeEntryTranslator {
     fun translate(
         entity: ForecastTimeEntry,
         worktimeCalendars: List<WorktimeCalendar>,
-        forecastprojects: List<ForecastProject>,
         forecastTasks: List<ForecastTask>
     ): TimeEntry {
         val createdAt = LocalDateTime.parse(entity.createdAt.replace("Z", ""))
         val updatedAt = LocalDateTime.parse(entity.updatedAt.replace("Z", ""))
-        val billableProject = forecastprojects.find { it.id == entity.project }?.budgetType != ForecastService.NON_BILLABLE
-        val billableTask = forecastTasks.find { it.id == entity.task }?.unBillable
+        val unBillableTask = forecastTasks.find { it.id == entity.task }?.unBillable ?: true
         val translatedTimeEntry = TimeEntry()
         translatedTimeEntry.entryId = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
         translatedTimeEntry.person = entity.person
         translatedTimeEntry.internalTime = if (entity.nonProjectTime != null) entity.timeRegistered else 0
 
-        if (!billableTask!! && billableProject) {
+        if (!unBillableTask) {
             translatedTimeEntry.billableProjectTime = entity.timeRegistered
             translatedTimeEntry.nonBillableProjectTime = 0
         } else {
@@ -70,11 +66,10 @@ class ForecastTimeEntryTranslator {
     fun translate(
         entities: List<ForecastTimeEntry>,
         worktimeCalendars: List<WorktimeCalendar>,
-        forecastProjects: List<ForecastProject>,
         forecastTasks: List<ForecastTask>
     ): List<TimeEntry> {
         return entities.map { entity ->
-            translate(entity, worktimeCalendars, forecastProjects, forecastTasks)
+            translate(entity, worktimeCalendars, forecastTasks)
         }
     }
 }

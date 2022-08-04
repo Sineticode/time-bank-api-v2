@@ -5,6 +5,7 @@ import fi.metatavu.timebank.api.test.functional.TestBuilder
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.infrastructure.ServerException
+import java.util.concurrent.TimeUnit
 import org.junit.Assert
 
 /**
@@ -23,6 +24,12 @@ abstract class ApiTestBuilderResource<T, A>(
      * @return API client
      */
     override fun getApiClient(): ApiClient {
+        ApiClient.builder
+            .connectTimeout(Integer.MAX_VALUE.toLong(), TimeUnit.SECONDS)
+            .writeTimeout(Integer.MAX_VALUE.toLong(), TimeUnit.SECONDS)
+            .readTimeout(Integer.MAX_VALUE.toLong(), TimeUnit.SECONDS)
+            .callTimeout(Integer.MAX_VALUE.toLong(), TimeUnit.SECONDS)
+            .build()
         return apiClient
     }
 

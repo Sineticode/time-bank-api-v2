@@ -3,7 +3,6 @@ package fi.metatavu.timebank.api.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
-import fi.metatavu.timebank.api.forecast.models.ForecastProject
 import fi.metatavu.timebank.api.forecast.models.ForecastTask
 import fi.metatavu.timebank.api.forecast.models.ForecastTaskResponse
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
@@ -51,20 +50,18 @@ class SynchronizeController {
      */
     suspend fun synchronize(after: LocalDate?): List<TimeEntry> {
         return try {
-            val forecastPersons = personsController.filterActivePersons(personsController.getPersonsFromForecast())
-            val forecastProjects = jacksonObjectMapper().readValue(forecastService.getProjects(), Array<ForecastProject>::class.java).toList()
-            val forecastTasks = retrieveAllTasks()
+            var forecastPersons = personsController.getPersonsFromForecast()
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
 
+            forecastPersons = personsController.filterActivePersons(forecastPersons)
+
             val entries = retrieveAllEntries(
                 after = after,
                 worktimeCalendars = worktimeCalendars,
                 forecastPersons = forecastPersons,
-                forecastProjects = forecastProjects,
-                forecastTasks = forecastTasks
             )
 
             val synchronized = mutableListOf<TimeEntry>()
@@ -100,13 +97,7 @@ class SynchronizeController {
      * @param worktimeCalendars List of WorktimeCalendars
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(
-        after: LocalDate?,
-        worktimeCalendars: List<WorktimeCalendar>,
-        forecastPersons: List<ForecastPerson>,
-        forecastProjects: List<ForecastProject>,
-        forecastTasks: List<ForecastTask>
-    ): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>, forecastPersons: List<ForecastPerson>): List<TimeEntry> {
         var retrievedAllEntries = false
         val forecastTimeEntries = mutableListOf<ForecastTimeEntry>()
         val translatedEntries = mutableListOf<TimeEntry>()
@@ -133,8 +124,7 @@ class SynchronizeController {
         translatedEntries.addAll(forecastTimeEntryTranslator.translate(
             entities = synchronizationDayValidator(forecastTimeEntries, forecastPersons),
             worktimeCalendars = worktimeCalendars,
-            forecastProjects = forecastProjects,
-            forecastTasks = forecastTasks
+            forecastTasks = retrieveAllTasks()
         ))
 
         return translatedEntries

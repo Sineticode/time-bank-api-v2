@@ -1,8 +1,14 @@
 package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getLastYearToday
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getODT
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getSixtyDaysAgo
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgoFirstWeek
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgoSecondWeek
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgoThirdWeek
 import java.time.LocalDate
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 /**
  * Class for test time entries mock data
@@ -21,155 +27,172 @@ class TestTimeEntriesData {
                 createTestTimeEntry(
                     id = 0,
                     person = 2,
+                    task = 123,
                     nonProjectTime = 123,
                     timeRegistered = 435,
-                    date = "2021-07-31",
-                    createdAt = "2021-07-31T12:00:00Z",
-                    updatedAt = "2021-07-31T12:00:00Z"
+                    date = getLastYearToday().toString(),
+                    createdAt = getODT(getLastYearToday().atStartOfDay()),
+                    updatedAt = getODT(getLastYearToday().atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 1,
                     person = 1,
+                    task = 123,
                     nonProjectTime = 255455,
                     timeRegistered = 100,
-                    date = "2022-06-05",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek().first().toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek().first().atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek().first().atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 2,
                     person = 1,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 100,
-                    date = "2022-05-30",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek()[1].toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek()[1].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek()[1].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 3,
                     person = 2,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 400,
-                    date = "2022-05-12",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek()[2].toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek()[2].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek()[2].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 4,
                     person = 2,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 400,
-                    date = "2022-04-30",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek()[3].toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek()[3].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek()[3].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 5,
                     person = 3,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 122,
-                    date = "2022-04-02",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek()[4].toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek()[4].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek()[4].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 6,
                     person = 3,
+                    task = 123,
                     nonProjectTime = 255455,
                     timeRegistered = 372,
-                    date = "2022-03-28",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoFirstWeek()[5].toString(),
+                    createdAt = getODT(getThirtyDaysAgoFirstWeek()[5].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoFirstWeek()[5].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 7,
                     person = 3,
+                    task = 123,
                     nonProjectTime = 114753,
                     timeRegistered = 378,
-                    date = "2022-03-16",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek().first().toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek().first().atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek().first().atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 8,
                     person = 3,
+                    task = 789,
                     nonProjectTime = null,
                     timeRegistered = 122,
-                    date = "2022-03-14",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[1].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[1].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[1].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 9,
                     person = 3,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 52,
-                    date = "2022-01-03",
-                    createdAt = "2022-05-30T04:53:33Z",
-                    updatedAt = "2022-05-30T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[2].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[2].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[2].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 10,
                     person = 1,
+                    task = 123,
                     nonProjectTime = 12,
                     timeRegistered = 120,
-                    date = "2022-02-28",
-                    createdAt = "2022-02-28T04:53:33Z",
-                    updatedAt = "2022-03-01T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[3].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[3].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[3].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 11,
                     person = 2,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 400,
-                    date = "2022-06-07",
-                    createdAt = "2022-06-07T04:53:33Z",
-                    updatedAt = "2022-06-07T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[4].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[4].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[4].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 12,
                     person = 1,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 312,
-                    date = "2022-05-29",
-                    createdAt = "2022-05-29T04:53:33Z",
-                    updatedAt = "2022-05-29T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[5].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[5].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[5].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 13,
                     person = 2,
-                    nonProjectTime = 1,
+                    task = null,
+                    nonProjectTime = 228255,
                     timeRegistered = 213,
-                    date = "2022-06-10",
-                    createdAt = "2022-06-10T04:53:33Z",
-                    updatedAt = "2022-06-10T04:53:33Z"
+                    date = getThirtyDaysAgoSecondWeek()[6].toString(),
+                    createdAt = getODT(getThirtyDaysAgoSecondWeek()[6].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoSecondWeek()[6].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 14,
                     person = 5,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 435,
-                    date = "2022-06-30",
-                    createdAt = "2022-06-30T12:00:00Z",
-                    updatedAt = "2022-06-30T12:00:00Z"
+                    date = getThirtyDaysAgoThirdWeek().first().toString(),
+                    createdAt = getODT(getThirtyDaysAgoThirdWeek().first().atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoThirdWeek().first().atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 15,
                     person = 1,
+                    task = 123,
                     nonProjectTime = 228255,
                     timeRegistered = 435,
-                    date = "2022-07-04",
-                    createdAt = "2022-07-04T08:00:00Z",
-                    updatedAt = "2022-07-04T08:00:00Z"
+                    date = getThirtyDaysAgoThirdWeek()[1].toString(),
+                    createdAt = getODT(getThirtyDaysAgoThirdWeek()[1].atStartOfDay()),
+                    updatedAt = getODT(getThirtyDaysAgoThirdWeek()[1].atStartOfDay())
                 ),
                 createTestTimeEntry(
                     id = 16,
                     person = 1,
+                    task = 123,
                     nonProjectTime = null,
                     timeRegistered = 42,
-                    date = "2022-07-04",
-                    createdAt = "2022-07-04T11:00:00Z",
-                    updatedAt = "2022-07-04T11:00:00Z"
+                    date = getSixtyDaysAgo().toString(),
+                    createdAt = getODT(getSixtyDaysAgo().atStartOfDay()),
+                    updatedAt = getODT(getSixtyDaysAgo().atStartOfDay())
                 )
             )
         }
@@ -185,11 +208,12 @@ class TestTimeEntriesData {
                 createTestTimeEntry(
                     id = 14,
                     person = 5,
+                    task = 123,
                     nonProjectTime = 789,
                     timeRegistered = 435,
-                    date = "2022-06-30",
-                    createdAt = "2022-06-30T12:00:00Z",
-                    updatedAt = "2022-06-30T16:00:00Z"
+                    date = LocalDate.now().toString(),
+                    createdAt = getODT(LocalDateTime.now()),
+                    updatedAt = getODT(LocalDateTime.now().plusHours(3))
                 )
             )
         }
@@ -205,55 +229,14 @@ class TestTimeEntriesData {
                 createTestTimeEntry(
                     id = 15,
                     person = 5,
+                    task = 123,
                     nonProjectTime = 789,
                     timeRegistered = 435,
                     date = LocalDate.now().toString(),
-                    createdAt = getTodayODT(),
-                    updatedAt = getTodayODT()
+                    createdAt = getODT(LocalDate.now().atStartOfDay()),
+                    updatedAt = getODT(LocalDate.now().atStartOfDay().plusHours(1))
                 )
             )
-        }
-
-        /**
-         * Gets list of mock ForecastTimeEntries.
-         * Mocks paginated API response where is more than one page of entries.
-         *
-         * @return List of ForecastTimeEntries
-         */
-        fun generateRandomForecastTimeEntries(pageNumber: Int): List<ForecastTimeEntry> {
-            val generatedEntries = mutableListOf<ForecastTimeEntry>()
-            val amountToGenerate = if (pageNumber == 1) 1000 else 200
-            var id = pageNumber * 1000
-            while (generatedEntries.size < amountToGenerate) {
-                val year = (2021..2022).random()
-                val month = (1..12).random()
-                val day =
-                    if (month == 2) (1..28).random()
-                    else if (month % 2 != 0 && month < 8) (1..31).random()
-                    else if (month % 2 == 0 && month >= 8
-                    ) (1..31).random()
-                    else (1..30).random()
-                val monthString = if (month < 10) "0$month" else "$month"
-                val dayString = if (day < 10) "0$day" else "$day"
-                val date = "$year-$monthString-$dayString"
-                val person = (100000..900000).random()
-                if (generatedEntries.find { it.id == id } == null) {
-                    generatedEntries.add(createTestTimeEntry(
-                        id = id,
-                        person = person,
-                        nonProjectTime = if ((0..1).random() != 0) 1 else null,
-                        timeRegistered = (1..435).random(),
-                        date = date,
-                        createdAt = "${date}T12:00:00Z",
-                        updatedAt = "${date}T12:00:00Z"
-                    ))
-                } else {
-                    continue
-                }
-                id++
-            }
-
-            return generatedEntries
         }
 
         /**
@@ -271,6 +254,7 @@ class TestTimeEntriesData {
         private fun createTestTimeEntry(
             id: Int,
             person: Int,
+            task: Int?,
             nonProjectTime: Int?,
             timeRegistered: Int,
             date: String,
@@ -280,6 +264,7 @@ class TestTimeEntriesData {
             val newTimeEntry = ForecastTimeEntry()
             newTimeEntry.id = id
             newTimeEntry.person = person
+            newTimeEntry.task = task
             newTimeEntry.nonProjectTime = nonProjectTime
             newTimeEntry.timeRegistered = timeRegistered
             newTimeEntry.date = date
@@ -289,16 +274,6 @@ class TestTimeEntriesData {
             newTimeEntry.updatedAt = updatedAt
 
             return newTimeEntry
-        }
-
-        /**
-         * Gets today date as OffsetDateTime and removes time offset
-         *
-         * @return String OffsetDateTime without time offset
-         */
-        private fun getTodayODT(): String {
-            val dateString = OffsetDateTime.now().toString().split("+")
-            return "${dateString[0]}Z"
         }
     }
 }

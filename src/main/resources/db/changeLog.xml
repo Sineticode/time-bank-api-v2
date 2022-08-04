@@ -49,7 +49,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="seperate_project_times" author="Ville Juutila">
-        <renameColumn tableName="TimeEntry" oldColumnName="projectTime" newColumnName="billableProjectTime" />
+        <renameColumn tableName="TimeEntry" oldColumnName="projectTime" newColumnName="billableProjectTime" columnDataType="integer"/>
         <addColumn tableName="TimeEntry">
             <column name="nonBillableProjectTime" type="integer"/>
         </addColumn>

@@ -5,7 +5,17 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import fi.metatavu.timebank.api.test.functional.data.TestData
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.PERSONS_SCENARIO
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.HOLIDAYS_SCENARIO
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.TIMES_SCENARIO
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.ERROR_STATE
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.UPDATE_STATE
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getSixtyDaysAgo
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.TASKS_SCENARIO
+import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.YEAR_STATE
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
+import java.time.LocalDate
 
 /**
  * Wiremock to mock Forecast API
@@ -25,6 +35,7 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         personsStubs(wireMockServer)
         holidayCalendarStubs(wireMockServer)
         timeRegistrationStubs(wireMockServer)
+        tasksStubs(wireMockServer)
 
         return mapOf(
             "forecast.base.url" to  wireMockServer.baseUrl(),
@@ -38,14 +49,14 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
     private fun personsStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v2/persons"))
-                .inScenario("personsScenario")
+                .inScenario(PERSONS_SCENARIO)
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getPersons()), 200))
         )
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v2/persons"))
-                .inScenario("personsScenario")
-                .whenScenarioStateIs("errorState")
+                .inScenario(PERSONS_SCENARIO)
+                .whenScenarioStateIs(ERROR_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(ForecastErrorResponse(
                     status = 401,
@@ -54,8 +65,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         )
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v2/persons"))
-                .inScenario("personsScenario")
-                .whenScenarioStateIs("updateStateOne")
+                .inScenario(PERSONS_SCENARIO)
+                .whenScenarioStateIs(UPDATE_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedPersons()), 200))
         )
@@ -67,14 +78,14 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
     private fun holidayCalendarStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v1/holiday_calendar_entries"))
-                .inScenario("holidaysScenario")
+                .inScenario(HOLIDAYS_SCENARIO)
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getHolidays()), 200))
         )
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v1/holiday_calendar_entries"))
-                .inScenario("holidaysScenario")
-                .whenScenarioStateIs("errorState")
+                .inScenario(HOLIDAYS_SCENARIO)
+                .whenScenarioStateIs(ERROR_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(ForecastErrorResponse(
                     status = 401,
@@ -89,7 +100,7 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
     private fun timeRegistrationStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v4/time_registrations"))
-                .inScenario("timesScenario")
+                .inScenario(TIMES_SCENARIO)
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(
                     before = null,
@@ -98,63 +109,79 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         )
         wireMockServer.stubFor(
             get(urlPathEqualTo("/v4/time_registrations"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("errorState")
+                .inScenario(TIMES_SCENARIO)
+                .whenScenarioStateIs(YEAR_STATE)
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse()), 200))
+        )
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v4/time_registrations"))
+                .inScenario(TIMES_SCENARIO)
+                .whenScenarioStateIs(ERROR_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(ForecastErrorResponse(
                     status = 401,
                     message = "Failed to authenticate the request"
                 )), 401))
         )
+//        wireMockServer.stubFor(
+//            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(LocalDate.now().minusDays(1))}"))
+//                .inScenario("timesScenario")
+//                .whenScenarioStateIs("updateStateOne")
+//                .willSetStateTo(STARTED)
+//                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedForecastTimeEntryResponse()), 200))
+//        )
         wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("updateStateOne")
-                .willSetStateTo(STARTED)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedForecastTimeEntryResponse()), 200))
-        )
-        wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("updateStateTwo")
+            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(LocalDate.now().minusDays(1))}"))
+                .inScenario(TIMES_SCENARIO)
+                .whenScenarioStateIs(UPDATE_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponseForUpdatedPerson()), 200))
         )
+
         wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations"))
-                .withQueryParam("pageNumber", matching("1"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("generatedStateOne")
-                .willSetStateTo("generatedStateTwo")
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getGeneratedForecastTimeEntryResponse(pageNumber = 1)), 200))
-        )
-        wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations"))
-                .withQueryParam("pageNumber", matching("2"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("generatedStateTwo")
-                .willSetStateTo(STARTED)
-                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getGeneratedForecastTimeEntryResponse(pageNumber = 2)), 200))
-        )
-        wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations/updated_after/20220501T000000"))
-                .inScenario("timesScenario")
+            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(getThirtyDaysAgo())}"))
+                .inScenario(TIMES_SCENARIO)
                 .whenScenarioStateIs(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(
                     before = null,
-                    after = "2022-05-01"
+                    after = getThirtyDaysAgo()
                 )), 200))
         )
         wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations/updated_after/20220501T000000"))
-                .inScenario("timesScenario")
-                .whenScenarioStateIs("errorState")
+            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(getSixtyDaysAgo())}"))
+                .inScenario(TIMES_SCENARIO)
+                .whenScenarioStateIs(STARTED)
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTimeEntryResponse(
+                    before = null,
+                    after = getSixtyDaysAgo()
+                )), 200))
+        )
+    }
+
+    /**
+     * /v4/tasks -stubs
+     */
+    private fun tasksStubs(wireMockServer: WireMockServer) {
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v4/tasks"))
+                .inScenario(TASKS_SCENARIO)
+                .whenScenarioStateIs(STARTED)
+                .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getForecastTaskResponse()), 200))
+        )
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/v4/tasks"))
+                .inScenario(TASKS_SCENARIO)
+                .whenScenarioStateIs(ERROR_STATE)
                 .willSetStateTo(STARTED)
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(ForecastErrorResponse(
                     status = 401,
-                    message = "Failed to authenticate the request."
+                    message = "Failed to authenticate the request"
                 )), 401))
         )
+    }
+
+    private fun getPathParamDate(date: LocalDate): String {
+        return "${date.toString().replace("-", "")}T000000"
     }
 
     override fun stop() {

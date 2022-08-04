@@ -1,6 +1,7 @@
 package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getLastYearToday
 
 /**
  * Class for test persons mock data
@@ -31,8 +32,8 @@ class TestPersonsData {
                     active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2021-07-31",
-                    createdAt = "2021-07-31",
+                    startDate = "2021-01-01",
+                    createdAt = "2021-01-01",
                     isSystemUser = false
                 ),
                 createTestPerson(
@@ -47,11 +48,11 @@ class TestPersonsData {
                     friday = 435,
                     saturday = 0,
                     sunday = 0,
-                    active = false,
+                    active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-05",
-                    createdAt = "2022-05-05",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false
                 ),
                 createTestPerson(
@@ -66,11 +67,11 @@ class TestPersonsData {
                     friday = 435,
                     saturday = 0,
                     sunday = 0,
-                    active = false,
+                    active = true,
                     language = "FINNISH",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false
                 ),
                 createTestPerson(
@@ -87,8 +88,8 @@ class TestPersonsData {
                     active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = true
                 ),
                 createTestPerson(
@@ -106,8 +107,8 @@ class TestPersonsData {
                     active = true,
                     language = "RUSSIAN",
                     holidayCalendarId = 123456,
-                    startDate = "2022-06-30",
-                    createdAt = "2022-06-30",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false,
                 )
             )
@@ -135,8 +136,8 @@ class TestPersonsData {
                     active = true,
                     language = "RUSSIAN",
                     holidayCalendarId = 123456,
-                    startDate = "2022-06-30",
-                    createdAt = "2022-06-30",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false
                 )
             )
