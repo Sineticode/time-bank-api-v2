@@ -1,12 +1,9 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.forecast.models.ForecastTask
-import fi.metatavu.timebank.api.forecast.models.ForecastTaskResponse
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
-import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntryResponse
 import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
@@ -49,13 +46,11 @@ class SynchronizeController {
      */
     suspend fun synchronize(after: LocalDate?) {
         try {
-            var forecastPersons = personsController.getPersonsFromForecast()
+            val forecastPersons = personsController.getPersonsFromForecast()
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
-
-            forecastPersons = personsController.filterPersons(forecastPersons)
 
             val entries = retrieveAllEntries(
                 after = after,
@@ -102,9 +97,8 @@ class SynchronizeController {
         var pageNumber = 1
 
         while (!retrievedAllEntries) {
-            val resultString = forecastService.getTimeEntries(after, pageNumber)
 
-            val forecastTimeEntryResponse = jacksonObjectMapper().readValue(resultString, ForecastTimeEntryResponse::class.java)
+            val forecastTimeEntryResponse = forecastService.getTimeEntries(after, pageNumber)
             val amountOfPages =
                 if (forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize < 1) 1
                 else forecastTimeEntryResponse.totalObjectCount / forecastTimeEntryResponse.pageSize
@@ -139,8 +133,8 @@ class SynchronizeController {
         var pageNumber = 1
 
         while (!retrievedAllTasks) {
-            val forecastTaskResponse =
-                jacksonObjectMapper().readValue(forecastService.getTasks(pageNumber = pageNumber), ForecastTaskResponse::class.java)
+
+            val forecastTaskResponse = forecastService.getTasks(pageNumber = pageNumber)
             val amountOfPages =
                 if (forecastTaskResponse.totalObjectCount / forecastTaskResponse.pageSize < 1) 1
                 else forecastTaskResponse.totalObjectCount / forecastTaskResponse.pageSize
@@ -168,14 +162,17 @@ class SynchronizeController {
      */
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
         val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
-        var firstDate = LocalDate.parse(sortedEntries.first().date)
-        var daysBetween = ChronoUnit.DAYS.between(firstDate, LocalDate.now())
+        val firstEntryDate = LocalDate.parse(sortedEntries.first().date)
 
-        persons.forEach { forecastPerson ->
-            if (LocalDate.parse(forecastPerson.startDate) > firstDate) {
-                daysBetween = ChronoUnit.DAYS.between(LocalDate.parse(forecastPerson.startDate), LocalDate.now())
-                firstDate = LocalDate.parse(forecastPerson.startDate)
-            }
+        persons.filter { it.active && !it.isSystemUser && it.clientId == null }.forEach { forecastPerson ->
+            val personStartDate = LocalDate.parse(forecastPerson.startDate)
+            val firstDate = if (personStartDate >= firstEntryDate) personStartDate else firstEntryDate
+            val daysBetween =
+                if (personStartDate >= firstEntryDate) {
+                    ChronoUnit.DAYS.between(personStartDate, LocalDate.now())
+                } else {
+                    ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now())
+                }
 
             val personEntries = sortedEntries.filter { it.person == forecastPerson.id }
 
@@ -193,10 +190,7 @@ class SynchronizeController {
                     if (existingEntry.isEmpty()) {
                         sortedEntries.add(
                             createForecastTimeEntry(
-                                id = null,
                                 person = forecastPerson.id,
-                                nonProjectTime = 123456,
-                                timeRegistered = 0,
                                 date = currentDate.toString(),
                                 createdBy = forecastPerson.id,
                                 updatedBy = forecastPerson.id,
@@ -215,10 +209,7 @@ class SynchronizeController {
     /**
      * Creates ForecastTimeEntry
      *
-     * @param id id
      * @param person person
-     * @param nonProjectTime nonProjectTime
-     * @param timeRegistered timeRegistered
      * @param date date
      * @param createdBy createdBy
      * @param updatedBy updatedBy
@@ -227,10 +218,7 @@ class SynchronizeController {
      * @return ForecastTimeEntry
      */
     private fun createForecastTimeEntry(
-        id: Int?,
         person: Int,
-        nonProjectTime: Int,
-        timeRegistered: Int,
         date: String,
         createdBy: Int,
         updatedBy: Int,
@@ -238,10 +226,10 @@ class SynchronizeController {
         updatedAt: String
     ): ForecastTimeEntry {
         val newTimeEntry = ForecastTimeEntry()
-        newTimeEntry.id = id
+        newTimeEntry.id = null
         newTimeEntry.person = person
-        newTimeEntry.nonProjectTime = nonProjectTime
-        newTimeEntry.timeRegistered = timeRegistered
+        newTimeEntry.nonProjectTime = null
+        newTimeEntry.timeRegistered = 0
         newTimeEntry.date = date
         newTimeEntry.createdBy = createdBy
         newTimeEntry.updatedBy = updatedBy

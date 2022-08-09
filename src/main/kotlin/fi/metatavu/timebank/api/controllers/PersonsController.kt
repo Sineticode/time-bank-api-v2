@@ -1,9 +1,7 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
-import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.keycloak.KeycloakController
 import fi.metatavu.timebank.api.utils.VacationUtils
@@ -82,8 +80,7 @@ class PersonsController {
      */
     suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
-            val resultString = forecastService.getPersons()
-            jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
+            forecastService.getPersons()
         } catch (e: Error) {
             logger.error("Error when requesting persons from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -97,8 +94,7 @@ class PersonsController {
      */
     suspend fun getHolidaysFromForecast(): List<LocalDate> {
         return try {
-            val resultString = forecastService.getHolidays()
-            val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
+            val forecastHolidays = forecastService.getHolidays()
             forecastHolidays.map{ holiday ->
                 LocalDate.of(holiday.year, holiday.month, holiday.day)
             }
@@ -114,7 +110,7 @@ class PersonsController {
      * @param persons List of ForecastPersons
      * @return List of Forecast persons
      */
-    fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+    private fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
         return persons.filter{ person -> person.active && !person.isSystemUser && person.clientId == null }
     }
 
