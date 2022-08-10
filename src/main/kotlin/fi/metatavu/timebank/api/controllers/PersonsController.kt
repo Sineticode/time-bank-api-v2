@@ -110,7 +110,7 @@ class PersonsController {
      * @param persons List of ForecastPersons
      * @return List of Forecast persons
      */
-    private fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+    fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
         return persons.filter{ person -> person.active && !person.isSystemUser && person.clientId == null }
     }
 

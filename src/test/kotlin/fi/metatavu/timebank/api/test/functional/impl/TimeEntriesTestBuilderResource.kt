@@ -20,7 +20,7 @@ class TimeEntriesTestBuilderResource(
 ): ApiTestBuilderResource<TimeEntry, ApiClient?>(testBuilder, apiClient) {
 
     override fun clean(t: TimeEntry) {
-        api.deleteTimeEntry(t.entryId)
+        api.deleteTimeEntry(t.id)
     }
 
     override fun getApi(): TimeEntriesApi {
@@ -54,7 +54,7 @@ class TimeEntriesTestBuilderResource(
      */
     fun assertDeleteFail(expectedStatus: Int, id: UUID) {
         try {
-            api.deleteTimeEntry(entryId = id)
+            api.deleteTimeEntry(id = id)
             Assert.fail(String.format("Expected fail with status, $expectedStatus"))
         } catch (ex: ClientException) {
             assertClientExceptionStatus(expectedStatus, ex)

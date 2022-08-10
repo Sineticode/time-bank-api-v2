@@ -127,10 +127,6 @@ class TestData {
         }
 
         /**
-         * Gets
-         */
-
-        /**
          * Helper method for simplifying creating of ForecastTimeEntryResponse objects
          *
          * @param pageContents List of ForecastTimeEntries

@@ -16,7 +16,7 @@ class TimeEntry {
 
     @Id
     @Column
-    lateinit var entryId: UUID
+    lateinit var id: UUID
 
     @Column
     var forecastId: Int? = null

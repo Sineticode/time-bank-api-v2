@@ -11,7 +11,7 @@ class TimeEntryTranslator: AbstractTranslator<TimeEntry, fi.metatavu.timebank.mo
 
     override fun translate(entity: TimeEntry): fi.metatavu.timebank.model.TimeEntry {
         return fi.metatavu.timebank.model.TimeEntry(
-            entryId = entity.entryId,
+            id = entity.id,
             forecastId = entity.forecastId,
             person = entity.person!!,
             internalTime =  entity.internalTime!!,

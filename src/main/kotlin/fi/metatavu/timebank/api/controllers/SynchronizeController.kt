@@ -46,11 +46,13 @@ class SynchronizeController {
      */
     suspend fun synchronize(after: LocalDate?) {
         try {
-            val forecastPersons = personsController.getPersonsFromForecast()
+            var forecastPersons = personsController.getPersonsFromForecast()
 
             val worktimeCalendars = forecastPersons.map { person ->
                 worktimeCalendarController.checkWorktimeCalendar(person)
             }
+
+            forecastPersons = personsController.filterPersons(forecastPersons)
 
             val entries = retrieveAllEntries(
                 after = after,
@@ -164,7 +166,7 @@ class SynchronizeController {
         val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
         val firstEntryDate = LocalDate.parse(sortedEntries.first().date)
 
-        persons.filter { it.active && !it.isSystemUser && it.clientId == null }.forEach { forecastPerson ->
+        persons.forEach { forecastPerson ->
             val personStartDate = LocalDate.parse(forecastPerson.startDate)
             val firstDate = if (personStartDate >= firstEntryDate) personStartDate else firstEntryDate
             val daysBetween =

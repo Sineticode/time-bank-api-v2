@@ -1,7 +1,10 @@
 package fi.metatavu.timebank.api.test.functional.data
 
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 /**
  * Class for utility methods for Dates used in tests
@@ -11,12 +14,12 @@ class TestDateUtils {
     companion object {
 
         /**
-         * Gets given date as OffsetDateTime and removes time offset
+         * Gets given date as OffsetDateTime in timezone Z
          *
-         * @return String OffsetDateTime without time offset
+         * @return String OffsetDateTime
          */
         fun getODT(dateTime: LocalDateTime): String {
-            return "${dateTime}Z"
+            return OffsetDateTime.from(dateTime.atOffset(ZoneOffset.ofHours(0))).toString()
         }
 
         /**
@@ -25,7 +28,7 @@ class TestDateUtils {
          * @return LocalDate
          */
         fun getThirtyDaysAgo(): LocalDate {
-            return LocalDate.now().minusDays(30)
+            return LocalDate.now().minusDays(30).with(DayOfWeek.MONDAY)
         }
 
         /**
@@ -61,15 +64,6 @@ class TestDateUtils {
          */
         fun getThirtyDaysAgoThirdWeek(): List<LocalDate> {
             return getThirtyDaysAgoSecondWeek().map { it.plusWeeks(2) }
-        }
-
-        /**
-         * Gets fourth week Dates, starting from thirty days ago
-         *
-         * @return List of LocalDates
-         */
-        fun getThirtyDaysAgoFourthWeek(): List<LocalDate> {
-            return getThirtyDaysAgoThirdWeek().map { it.plusWeeks(3) }
         }
 
         /**

@@ -49,7 +49,7 @@ class TimeEntriesTest: AbstractTest() {
 
             assertEquals(expected.toInt(), timeEntries.size)
             assertEquals(2, vacations.size)
-            testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].entryId)
+            testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].id)
             timeEntries.forEach { timeEntry ->
                 testBuilder.manager.timeEntries.clean(timeEntry)
             }

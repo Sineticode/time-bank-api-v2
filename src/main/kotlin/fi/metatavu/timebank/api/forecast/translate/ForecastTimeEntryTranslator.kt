@@ -33,7 +33,7 @@ class ForecastTimeEntryTranslator {
         val unBillableTask = forecastTasks.find { it.id == entity.task }?.unBillable ?: true
         val internalTime = entity.nonProjectTime != null
         val translatedTimeEntry = TimeEntry()
-        translatedTimeEntry.entryId = UUID.randomUUID()
+        translatedTimeEntry.id = UUID.randomUUID()
         translatedTimeEntry.forecastId = entity.id
         translatedTimeEntry.person = entity.person
         translatedTimeEntry.internalTime = if (internalTime) entity.timeRegistered else 0

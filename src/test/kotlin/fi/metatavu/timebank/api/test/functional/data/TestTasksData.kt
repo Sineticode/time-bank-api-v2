@@ -19,17 +19,17 @@ class TestTasksData {
                 createTestTask(
                     id = 123,
                     title = "Basic Development",
-                    unBillable = false
+                    nonBillable = true
                 ),
                 createTestTask(
                     id = 456,
                     title = "DevOps",
-                    unBillable = false
+                    nonBillable = true
                 ),
                 createTestTask(
                     id = 789,
                     title = "In-House Development",
-                    unBillable = true
+                    nonBillable = false
                 )
             )
         }
@@ -39,18 +39,18 @@ class TestTasksData {
          *
          * @param id id
          * @param title title
-         * @param unBillable unBillable
+         * @param nonBillable nonBillable
          * @return ForecastTask
          */
         private fun createTestTask(
             id: Int,
             title: String,
-            unBillable: Boolean
+            nonBillable: Boolean
         ): ForecastTask {
             val newTask = ForecastTask()
             newTask.id = id
             newTask.title = title
-            newTask.unBillable = unBillable
+            newTask.unBillable = !nonBillable
 
             return newTask
         }

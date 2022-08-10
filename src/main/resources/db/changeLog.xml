@@ -54,4 +54,7 @@
             <column name="nonBillableProjectTime" type="integer"/>
         </addColumn>
     </changeSet>
+    <changeSet id="timeEntry_entryId_to_id" author="Ville Juutila">
+        <renameColumn tableName="TimeEntry" oldColumnName="entryId" newColumnName="id" columnDataType="binary(16)" />
+    </changeSet>
 </databaseChangeLog>

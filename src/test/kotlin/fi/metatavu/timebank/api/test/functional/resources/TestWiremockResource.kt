@@ -17,6 +17,9 @@ import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.TAS
 import fi.metatavu.timebank.api.test.functional.tests.AbstractTest.Companion.YEAR_STATE
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * Wiremock to mock Forecast API
@@ -46,6 +49,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
 
     /**
      * /v2/persons -stubs
+     *
+     * @param wireMockServer WireMockServer
      */
     private fun personsStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
@@ -75,6 +80,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
 
     /**
      * /v1/holiday_calendar_entries -stubs
+     *
+     * @param wireMockServer WireMockServer
      */
     private fun holidayCalendarStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
@@ -97,6 +104,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
 
     /**
      * /v4/time_registrations -stubs
+     *
+     * @param wireMockServer WireMockServer
      */
     private fun timeRegistrationStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
@@ -161,6 +170,8 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
 
     /**
      * /v4/tasks -stubs
+     *
+     * @param wireMockServer WireMockServer
      */
     private fun tasksStubs(wireMockServer: WireMockServer) {
         wireMockServer.stubFor(
@@ -181,8 +192,19 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
         )
     }
 
+    /**
+     * Converts given LocalDate to LocalDateTime at start of day.
+     * Used to match requests made to Forecast API in WireMockServer Stubs
+     * because WireMockServer requires the request path to be exact.
+     *
+     * @param date LocalDate
+     * @return String
+     */
     private fun getPathParamDate(date: LocalDate): String {
-        return "${date.toString().replace("-", "")}T000000"
+        val timeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
+        return timeFormatter.format(
+            OffsetDateTime.from(date.atStartOfDay().atOffset(ZoneOffset.ofHours(0)))
+        )
     }
 
     override fun stop() {
