@@ -4,10 +4,6 @@ import fi.metatavu.timebank.api.forecast.ForecastService
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.forecast.models.ForecastTask
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
-import fi.metatavu.timebank.api.forecast.translate.ForecastTimeEntryTranslator
-import fi.metatavu.timebank.api.persistence.model.TimeEntry
-import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
-import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -28,23 +24,22 @@ class SynchronizeController {
     lateinit var personsController: PersonsController
 
     @Inject
-    lateinit var timeEntryRepository: TimeEntryRepository
+    lateinit var timeEntryController: TimeEntryController
 
     @Inject
     lateinit var forecastService: ForecastService
 
     @Inject
-    lateinit var forecastTimeEntryTranslator: ForecastTimeEntryTranslator
-
-    @Inject
     lateinit var logger: Logger
+
+    private val oldestSyncDate = LocalDate.parse("2021-07-30")
 
     /**
      * Synchronizes time entries from Forecast to Time-bank
      *
      * @param after YYYY-MM-DD LocalDate
      */
-    suspend fun synchronize(after: LocalDate?) {
+    suspend fun synchronize(after: LocalDate? = oldestSyncDate) {
         try {
             var forecastPersons = personsController.getPersonsFromForecast()
 
@@ -54,13 +49,10 @@ class SynchronizeController {
 
             forecastPersons = personsController.filterPersons(forecastPersons)
 
-            val entries = retrieveAllEntries(
-                after = after,
-                worktimeCalendars = worktimeCalendars,
-                forecastPersons = forecastPersons,
-            )
+            val tasks = retrieveAllTasks()
+            val entries = retrieveAllEntries(after = after, forecastPersons = forecastPersons)
 
-            val synchronized = mutableListOf<TimeEntry>()
+            var synchronized = 0
             var duplicates = 0
 
             entries.forEachIndexed { idx, timeEntry ->
@@ -68,15 +60,15 @@ class SynchronizeController {
                 val personName = "${person?.lastName}, ${person?.firstName}"
                 logger.info("Synchronizing TimeEntry ${idx + 1}/${entries.size} of $personName...")
 
-                if (timeEntryRepository.persistEntry(timeEntry)) {
-                    synchronized.add(timeEntry)
+                if (timeEntryController.createEntry(timeEntry, worktimeCalendars, tasks)) {
+                    synchronized++
                     logger.info("Synchronized TimeEntry #${idx + 1}!")
                 } else {
                     duplicates++
                     logger.warn("Time Entry ${idx + 1}/${entries.size} already synchronized!")
                 }
             }
-            logger.info("Finished synchronization with: ${synchronized.size} entries synchronized... $duplicates entries NOT synchronized...")
+            logger.info("Finished synchronization with: $synchronized entries synchronized... $duplicates entries NOT synchronized...")
         } catch (e: Error) {
             logger.error("Error during synchronization: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -87,15 +79,13 @@ class SynchronizeController {
      * Loops through paginated API responses of varying sizes from Forecast API
      * and translates the received ForecastTimeEntries to TimeEntries.
      *
-     * @param after YYYY-MM-DD LocalDate'
-     * @param worktimeCalendars List of WorktimeCalendars
+     * @param after YYYY-MM-DD LocalDate
      * @param forecastPersons List of ForecastPersons
      * @return List of TimeEntries
      */
-    private suspend fun retrieveAllEntries(after: LocalDate?, worktimeCalendars: List<WorktimeCalendar>, forecastPersons: List<ForecastPerson>): List<TimeEntry> {
+    private suspend fun retrieveAllEntries(after: LocalDate?, forecastPersons: List<ForecastPerson>): List<ForecastTimeEntry> {
         var retrievedAllEntries = false
         val forecastTimeEntries = mutableListOf<ForecastTimeEntry>()
-        val translatedEntries = mutableListOf<TimeEntry>()
         var pageNumber = 1
 
         while (!retrievedAllEntries) {
@@ -115,13 +105,12 @@ class SynchronizeController {
             forecastTimeEntries.addAll(forecastTimeEntryResponse.pageContents!!)
         }
 
-        translatedEntries.addAll(forecastTimeEntryTranslator.translate(
-            entities = synchronizationDayValidator(forecastTimeEntries, forecastPersons),
-            worktimeCalendars = worktimeCalendars,
-            forecastTasks = retrieveAllTasks()
+        forecastTimeEntries.addAll(synchronizationDayValidator(
+            timeEntries = forecastTimeEntries,
+            persons = forecastPersons
         ))
 
-        return translatedEntries
+        return forecastTimeEntries
     }
 
     /**
@@ -182,7 +171,7 @@ class SynchronizeController {
                 val currentDate = firstDate.plusDays(dayNumber)
 
                 if (personEntries.find { LocalDate.parse(it.date) == currentDate } == null) {
-                    val existingEntry = timeEntryRepository.getAllEntries(
+                    val existingEntry = timeEntryController.getEntries(
                         personId = forecastPerson.id,
                         before = currentDate,
                         after = currentDate,

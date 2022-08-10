@@ -1,7 +1,6 @@
 package fi.metatavu.timebank.api.controllers
 
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
-import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import java.time.LocalDate
@@ -21,7 +20,7 @@ class DailyEntryController {
     lateinit var worktimeCalendarController: WorktimeCalendarController
 
     @Inject
-    lateinit var timeEntryRepository: TimeEntryRepository
+    lateinit var timeEntryController: TimeEntryController
 
     @Inject
     lateinit var personsController: PersonsController
@@ -61,7 +60,7 @@ class DailyEntryController {
             val persons = personsController.getPersonsFromForecast()
             val holidays = personsController.getHolidaysFromForecast()
 
-            val entries = timeEntryRepository.getAllEntries(
+            val entries = timeEntryController.getEntries(
                 personId = personId,
                 before = before,
                 after = after,
@@ -144,7 +143,7 @@ class DailyEntryController {
      *
      * @param worktimeCalendar WorkTimeCalendar
      * @param holidays List of LocalDate
-     * @return int minutes of expected work
+     * @return Int minutes of expected work
      */
     private suspend fun getDailyExpected(worktimeCalendar: WorktimeCalendar, holidays: List<LocalDate>, day: LocalDate): Int {
         if (holidays.contains(day)) return 0
