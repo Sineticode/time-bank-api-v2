@@ -16,15 +16,15 @@ import javax.enterprise.context.ApplicationScoped
 class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
-     * Lists all timeEntries
+     * Lists TimeEntries based on given parameters
      *
      * @param personId persons id in Forecast
      * @param before LocalDate to retrieve entries before given date
      * @param after LocalDate to retrieve entries after given date
      * @param vacation filter vacation days
-     * @return List of timeEntries
+     * @return List of TimeEntries
      */
-    suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
+    suspend fun getEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
         val stringBuilder = StringBuilder()
         val parameters = Parameters()
 

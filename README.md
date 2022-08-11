@@ -1,4 +1,6 @@
-# time-bank-api-v2
+# Timebank API
+
+#### API project for [Timebank](https://github.com/metatavu/time-bank-ui)
 
 ### Running the application locally
 

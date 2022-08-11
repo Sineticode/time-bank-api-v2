@@ -1,18 +1,18 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.test.client.models.Person
-import fi.metatavu.timebank.test.client.models.PersonTotalTime
 import fi.metatavu.timebank.test.client.models.Timespan
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
  * Tests for Person API
@@ -40,7 +40,10 @@ class PersonsTest: AbstractTest() {
     @BeforeAll
     fun synchronizeBeforeTests() {
         createTestBuilder().use { testBuilder ->
-            testBuilder.manager.synchronization.synchronizeEntries()
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getThirtyDaysAgo().toString()
+            )
         }
     }
 
@@ -78,12 +81,12 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons()
 
-            assertEquals(2, persons.size)
-            assertEquals(TestData.getPerson(id = 1).firstName, persons[0].firstName)
+            assertEquals(4, persons.size)
+            assertEquals("TesterA", persons[0].firstName)
             assertEquals(29, persons[0].unspentVacations)
             assertEquals(1, persons[0].spentVacations)
             assertEquals(10, persons[0].minimumBillableRate)
-            assertEquals(50, persons[1].minimumBillableRate)
+            assertEquals(25, persons[1].minimumBillableRate)
             testBuilder.notValid.persons.assertListFail(401)
         }
     }
@@ -145,57 +148,17 @@ class PersonsTest: AbstractTest() {
      * timespan defaults to ALL_TIME
      */
     @Test
-    fun listPersonTotalTimeForPersonAAllTime() {
+    fun listPersonTotalTimeForTesterBAllTime() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPerson(id = 2).id,
+                personId = 2,
                 timespan = null
             )
 
             assertEquals(1, personTotalTimes.size)
-            assertEquals(648, personTotalTimes[0].internalTime)
-            assertEquals(1200, personTotalTimes[0].projectTime)
-            assertEquals(1305, personTotalTimes[0].expected)
-            assertEquals(543, personTotalTimes[0].balance)
-            assertEquals(1848, personTotalTimes[0].logged)
-        }
-    }
-
-    /**
-     * Tests /v1/persons/2/total?timespan=YEAR
-     */
-    @Test
-    fun listPersonTotalTimeForPersonBYear() {
-        createTestBuilder().use { testBuilder ->
-            val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPerson(id = 2).id,
-                timespan = Timespan.YEAR
-            )
-            val refData = listOf(
-                PersonTotalTime(
-                    balance = 108,
-                    logged = 1413,
-                    expected = 1305,
-                    internalTime = 213,
-                    projectTime = 1200,
-                    personId = 2,
-                    timePeriod = "2022"
-                ),
-                PersonTotalTime(
-                    balance = 435,
-                    logged = 435,
-                    expected = 0,
-                    internalTime = 435,
-                    projectTime = 0,
-                    personId = 2,
-                    timePeriod = "2021"
-                )
-            )
-
-            assertEquals(2, personTotalTimes.size)
-            refData.forEachIndexed { index, personTotalTime ->
-                assertTrue(ReflectionEquals(personTotalTime, null).matches(personTotalTimes[index]))
-            }
+            assertEquals(213, personTotalTimes[0].internalTime)
+            assertEquals(1200, personTotalTimes[0].billableProjectTime)
+            assertEquals(1413, personTotalTimes[0].logged)
         }
     }
 
@@ -203,45 +166,22 @@ class PersonsTest: AbstractTest() {
      * Tests /v1/persons/3/total?timespan=MONTH
      */
     @Test
-    fun listPersonTotalTimeForPersonCMonth() {
+    fun listPersonTotalTimeForTesterCMonth() {
         createTestBuilder().use { testBuilder ->
+            val amountOfMonths = ChronoUnit.MONTHS.between(
+                getThirtyDaysAgo().withDayOfMonth(1),
+                LocalDate.now().plusMonths(1).withDayOfMonth(1)
+            )
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPerson(id = 3).id,
+                personId = 3,
                 timespan = Timespan.MONTH
             )
-            val refData = listOf(
-                PersonTotalTime(
-                    balance = 122,
-                    logged = 122,
-                    expected = 0,
-                    internalTime = 0,
-                    projectTime = 122,
-                    personId = 3,
-                    timePeriod = "2022,4"
-                ),
-                PersonTotalTime(
-                    balance = -433,
-                    logged = 872,
-                    expected = 1305,
-                    internalTime = 750,
-                    projectTime = 122,
-                    personId = 3,
-                    timePeriod = "2022,3"
-                ),
-                PersonTotalTime(
-                    balance = -383,
-                    logged = 52,
-                    expected = 435,
-                    internalTime = 0,
-                    projectTime = 52,
-                    personId = 3,
-                    timePeriod = "2022,1"
-                )
-            )
-            assertEquals(3, personTotalTimes.size)
-            refData.forEachIndexed { index, personTotalTime ->
-                assertTrue(ReflectionEquals(personTotalTime, null).matches(personTotalTimes[index]))
-            }
+
+            assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
+            assertEquals(122, personTotalTimes[1].nonBillableProjectTime)
+            assertEquals(174, personTotalTimes[1].billableProjectTime)
+            assertEquals(296, personTotalTimes[1].loggedProjectTime)
+            assertTrue(personTotalTimes[0].balance < 0)
         }
     }
 
@@ -249,45 +189,22 @@ class PersonsTest: AbstractTest() {
      * Tests /v1/persons/3/total?timespan=WEEK
      */
     @Test
-    fun listPersonTotalTimeForPersonCWeek() {
+    fun listPersonTotalTimeForTesterCWeek() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
-                personId = TestData.getPerson(id = 3).id,
+                personId = 3,
                 timespan = Timespan.WEEK
             )
-            val refData = listOf(
-                PersonTotalTime(
-                    balance = 59,
-                    logged = 494,
-                    expected = 435,
-                    internalTime = 372,
-                    projectTime = 122,
-                    personId = 3,
-                    timePeriod = "2022,3,13"
-                ),
-                PersonTotalTime(
-                    balance = -370,
-                    logged = 500,
-                    expected = 870,
-                    internalTime = 378,
-                    projectTime = 122,
-                    personId = 3,
-                    timePeriod = "2022,3,11"
-                ),
-                PersonTotalTime(
-                    balance = -383,
-                    logged = 52,
-                    expected = 435,
-                    internalTime = 0,
-                    projectTime = 52,
-                    personId = 3,
-                    timePeriod = "2022,1,1"
-                )
 
-            )
-            assertEquals(3, personTotalTimes.size)
-            refData.forEachIndexed { index, personTotalTime ->
-                assertTrue(ReflectionEquals(personTotalTime, null).matches(personTotalTimes[index]))
+            assertEquals(5, personTotalTimes.size)
+            assertEquals(372, personTotalTimes[4].internalTime)
+            assertEquals(122, personTotalTimes[4].billableProjectTime)
+            assertEquals(494, personTotalTimes[4].logged)
+            assertEquals(122, personTotalTimes[3].nonBillableProjectTime)
+            assertEquals(52, personTotalTimes[3].billableProjectTime)
+            assertEquals(378, personTotalTimes[3].internalTime)
+            personTotalTimes.forEach {
+                assertTrue(it.balance < 0)
             }
         }
     }

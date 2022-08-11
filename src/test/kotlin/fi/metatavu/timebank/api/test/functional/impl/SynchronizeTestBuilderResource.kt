@@ -6,7 +6,6 @@ import fi.metatavu.timebank.api.test.functional.settings.ApiTestSettings
 import fi.metatavu.timebank.test.client.apis.SynchronizeApi
 import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.models.TimeEntry
-import java.util.concurrent.TimeUnit
 
 /**
  * Test builder resource for Synchronize API
@@ -23,7 +22,6 @@ class SynchronizeTestBuilderResource(
 
     override fun getApi(): SynchronizeApi {
         ApiClient.accessToken = accessTokenProvider?.accessToken
-        ApiClient.builder.connectTimeout(0, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS).readTimeout(0, TimeUnit.SECONDS)
         return SynchronizeApi(ApiTestSettings.apiBasePath)
     }
 

@@ -28,7 +28,7 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
 
             createOk(entity = entries)
         } catch (e: Error) {
-            createBadRequest(e.localizedMessage)
+            createInternalServerError(e.localizedMessage)
         }
     }
 }

@@ -1,8 +1,13 @@
 package fi.metatavu.timebank.api.controllers
 
+import fi.metatavu.timebank.api.forecast.models.ForecastTask
+import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
+import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
+import fi.metatavu.timebank.api.utils.VacationUtils
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
@@ -17,7 +22,7 @@ class TimeEntryController {
     lateinit var timeEntryRepository: TimeEntryRepository
 
     /**
-     * Gets persisted timeEntries
+     * Gets persisted TimeEntries
      *
      * @param personId personId
      * @param before before
@@ -26,7 +31,7 @@ class TimeEntryController {
      * @return List of TimeEntries
      */
     suspend fun getEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
-        return timeEntryRepository.getAllEntries(
+        return timeEntryRepository.getEntries(
             personId = personId,
             before = before,
             after = after,
@@ -35,7 +40,45 @@ class TimeEntryController {
     }
 
     /**
-     * Deletes given persisted timeEntry
+     * Creates and persists new TimeEntry
+     *
+     * @param forecastTimeEntry ForecastTimeEntry
+     * @param worktimeCalendars List of WorktimeCalendars
+     * @param forecastTasks List of ForecastTasks
+     * @return boolean whether operation was successful
+     */
+    suspend fun createEntry(
+        forecastTimeEntry: ForecastTimeEntry,
+        worktimeCalendars: List<WorktimeCalendar>,
+        forecastTasks: List<ForecastTask>
+    ): Boolean {
+        val nonBillableTask = forecastTasks.find { it.id == forecastTimeEntry.task }?.unBillable ?: true
+        val internalTime = forecastTimeEntry.nonProjectTime != null
+        val newTimeEntry = TimeEntry()
+        newTimeEntry.id = UUID.randomUUID()
+        newTimeEntry.forecastId = forecastTimeEntry.id
+        newTimeEntry.person = forecastTimeEntry.person
+        newTimeEntry.internalTime = if (internalTime) forecastTimeEntry.timeRegistered else 0
+        newTimeEntry.billableProjectTime = 0
+        newTimeEntry.nonBillableProjectTime = 0
+
+        if (!nonBillableTask && !internalTime) {
+            newTimeEntry.billableProjectTime = forecastTimeEntry.timeRegistered
+        } else if (nonBillableTask && !internalTime) {
+            newTimeEntry.nonBillableProjectTime = forecastTimeEntry.timeRegistered
+        }
+
+        newTimeEntry.date = LocalDate.parse(forecastTimeEntry.date)
+        newTimeEntry.createdAt = OffsetDateTime.parse(forecastTimeEntry.createdAt)
+        newTimeEntry.updatedAt = OffsetDateTime.parse(forecastTimeEntry.updatedAt)
+        newTimeEntry.worktimeCalendar = worktimeCalendars.find { it.personId == forecastTimeEntry.person }
+        newTimeEntry.isVacation = forecastTimeEntry.nonProjectTime == VacationUtils.VACATION_ID
+
+        return timeEntryRepository.persistEntry(newTimeEntry)
+    }
+
+    /**
+     * Deletes given persisted TimeEntry
      *
      * @param entryId entryId
      */

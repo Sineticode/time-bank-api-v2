@@ -1,6 +1,5 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
-import fi.metatavu.timebank.api.test.functional.data.TestData
 import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
@@ -10,7 +9,11 @@ import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getSixtyDaysAgo
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import java.time.LocalDate
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 
 /**
  * Tests for Synchronization API
@@ -34,61 +37,62 @@ class SynchronizeTest: AbstractTest() {
 
     /**
      * Tests /v1/synchronize -endpoint
+     * with mock Forecast data from past 30 and 60 days.
      */
     @Test
     fun testSynchronization() {
         createTestBuilder().use { testBuilder ->
+            val amountOfPersons = testBuilder.manager.persons.getPersons().size
+
             testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
-                after = "2022-05-01"
+                after = getThirtyDaysAgo().toString()
             )
+            val synchronizedFirst = testBuilder.manager.timeEntries.getTimeEntries()
+            val expectedFirst = daysBetweenMonth * amountOfPersons
+            synchronizedFirst.forEach { testBuilder.manager.timeEntries.clean(it) }
 
-            val synchronizedAfter = testBuilder.manager.timeEntries.getTimeEntries()
-
-            synchronizedAfter.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
-            }
-
-            testBuilder.manager.synchronization.synchronizeEntries()
-
-            setScenario(
-                scenario = TIMES_SCENARIO,
-                state = UPDATE_STATE_ONE
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getSixtyDaysAgo().toString()
             )
+            val synchronizedSecond = testBuilder.manager.timeEntries.getTimeEntries()
+            val expectedSecond = daysBetweenTwoMonths * amountOfPersons
+            synchronizedSecond.forEach { testBuilder.manager.timeEntries.clean(it) }
 
-            testBuilder.manager.synchronization.synchronizeEntries()
-
-            val synchronizedAll = testBuilder.manager.timeEntries.getTimeEntries()
-
-            val expectedAfter = TestData.getForecastTimeEntryResponse().pageContents!!.filter { it.date > "2022-05-01" }.size
-            val expected = TestData.getForecastTimeEntryResponse().pageContents!!.size
-
-            assertEquals(expectedAfter, synchronizedAfter.size)
-            assertEquals(expected, synchronizedAll.size)
-            synchronizedAll.forEach { synchronizedEntry ->
-                testBuilder.manager.timeEntries.clean(synchronizedEntry)
-            }
+            assertEquals(expectedFirst.toInt(), synchronizedFirst.size)
+            assertEquals(expectedSecond.toInt(), synchronizedSecond.size)
         }
     }
 
     /**
-     * Tests /v1/synchronize -endpoint with 2000 random generated ForecastTimeEntries
+     * Tests /v1/synchronize -endpoint
+     * when Forecast API response contains updated entry
      */
     @Test
-    fun testSynchronizationLoop() {
-        setScenario(
-            scenario = TIMES_SCENARIO,
-            state = GENERATED_STATE_ONE
-        )
+    fun testSynchronizationUpdate() {
         createTestBuilder().use { testBuilder ->
-            testBuilder.manager.synchronization.synchronizeEntries()
-            val timeEntries = testBuilder.manager.timeEntries.getTimeEntries()
-            assertEquals(1200, timeEntries.size)
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getThirtyDaysAgo().toString()
+            )
+            val synchronizedFirst = testBuilder.manager.timeEntries.getTimeEntries()
+            synchronizedFirst.forEach { testBuilder.manager.timeEntries.clean(it) }
 
-            timeEntries.forEach { timeEntry ->
-                testBuilder.manager.timeEntries.clean(timeEntry)
-            }
+            setScenario(
+                scenario = TIMES_SCENARIO,
+                state = UPDATE_STATE_TWO
+            )
+
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = LocalDate.now().minusDays(1).toString()
+            )
+            val synchronizedSecond = testBuilder.manager.timeEntries.getTimeEntries()
+            synchronizedSecond.forEach { testBuilder.manager.timeEntries.clean(it) }
+
+            assertFalse(synchronizedFirst.first() == synchronizedSecond.first())
+
         }
-
     }
 }

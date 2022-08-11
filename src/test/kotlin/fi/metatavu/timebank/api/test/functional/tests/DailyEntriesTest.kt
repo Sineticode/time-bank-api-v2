@@ -12,6 +12,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import java.time.LocalDate
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /**
  * Tests for DailyEntries API
@@ -39,7 +42,10 @@ class DailyEntriesTest: AbstractTest() {
     @BeforeAll
     fun synchronizeBeforeTests() {
         createTestBuilder().use { testBuilder ->
-            testBuilder.manager.synchronization.synchronizeEntries()
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getThirtyDaysAgo().toString()
+            )
         }
     }
 
@@ -62,22 +68,68 @@ class DailyEntriesTest: AbstractTest() {
     @Test
     fun listDailyEntries() {
         createTestBuilder().use { testBuilder ->
-            val allEntries = testBuilder.manager.dailyEntries.getDailyEntries()
-            val entriesForPersonA = testBuilder.manager.dailyEntries.getDailyEntries(personId = 1)
-            val entriesBefore = testBuilder.manager.dailyEntries.getDailyEntries(before = "2022-04-30")
-            val entriesAfter = testBuilder.manager.dailyEntries.getDailyEntries(after = "2022-05-01")
+            val personA = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 1,
+                before = null,
+                after = null,
+                vacation = null
+            )
+            val personB = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 2,
+                before = null,
+                after = null,
+                vacation = true
+            )
+            val personC = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 3,
+                before = getThirtyDaysAgo().toString(),
+                after = null,
+                vacation = false
+            )
+            val personD = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 5,
+                before = null,
+                after = LocalDate.now().toString(),
+                vacation = false
+            )
 
-            assertEquals(16, allEntries.size)
-            assertEquals(5, entriesForPersonA.size)
-            assertEquals(8, entriesBefore.size)
-            assertEquals(8, entriesAfter.size)
-            assertEquals(true, entriesAfter[0].isVacation)
+            assertEquals(31, personA.size)
+            assertEquals(1, personB.size)
+            assertEquals(1, personC.size)
+            assertEquals(1, personD.size)
+
             testBuilder.manager.dailyEntries.assertListFail(404)
         }
     }
 
     /**
-     * Tests /v1/dailyEntries?personId=5 -endpoint
+     * Tests /v1/dailyEntries -endpoint when
+     * Forecast API cannot be reached via different requests
+     */
+    @Test
+    fun dailyEntriesErrorTest() {
+        createTestBuilder().use { testBuilder ->
+
+            setScenario(
+                scenario = PERSONS_SCENARIO,
+                state = ERROR_STATE
+            )
+
+            testBuilder.manager.dailyEntries.assertListFail(500)
+
+            setScenario(
+                scenario = HOLIDAYS_SCENARIO,
+                state = ERROR_STATE
+            )
+
+            testBuilder.manager.dailyEntries.assertListFail(500)
+
+        }
+    }
+
+    /**
+     * Tests WorktimeCalendars functionality
+     * when persons expected worktime has changed.
      */
     @Test
     fun testWorktimeCalendars() {
@@ -85,22 +137,23 @@ class DailyEntriesTest: AbstractTest() {
             val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
 
             setScenario(
-                scenario = "personsScenario",
-                state = "updateStateOne"
+                scenario = PERSONS_SCENARIO,
+                state = UPDATE_STATE_ONE
             )
             setScenario(
-                scenario = "timesScenario",
-                state = "updateStateTwo"
+                scenario = TIMES_SCENARIO,
+                state = UPDATE_STATE_ONE
             )
 
-            testBuilder.manager.synchronization.synchronizeEntries()
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = LocalDate.now().minusDays(1).toString()
+            )
             val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
 
-            assertEquals(1, firstEntries.size)
-            assertEquals(2, secondEntries.size)
-            assertEquals(435, firstEntries[0].expected)
-            assertEquals(435, secondEntries[1].expected)
-            assertEquals(217, secondEntries[0].expected)
+
+            firstEntries.forEach { assertTrue(it.expected == 435 || it.expected == 0) }
+            assertTrue(secondEntries.find { it.expected == 217 } != null)
         }
     }
 }
