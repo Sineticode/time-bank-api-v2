@@ -93,7 +93,7 @@ class DailyEntriesTest: AbstractTest() {
                 vacation = false
             )
 
-            assertEquals(31, personA.size)
+            assertEquals(daysBetweenMonth.toInt(), personA.size)
             assertEquals(1, personB.size)
             assertEquals(1, personC.size)
             assertEquals(1, personD.size)
