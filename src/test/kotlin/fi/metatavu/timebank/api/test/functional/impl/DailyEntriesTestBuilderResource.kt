@@ -8,6 +8,7 @@ import fi.metatavu.timebank.test.client.infrastructure.ApiClient
 import fi.metatavu.timebank.test.client.infrastructure.ClientException
 import fi.metatavu.timebank.test.client.infrastructure.ServerException
 import fi.metatavu.timebank.test.client.models.DailyEntry
+import java.util.concurrent.Callable
 import org.junit.Assert
 
 /**
@@ -66,6 +67,27 @@ class DailyEntriesTestBuilderResource(
                 is ClientException -> assertClientExceptionStatus(expectedStatus, ex)
                 is ServerException -> assertServerExceptionStatus(expectedStatus, ex)
             }
+        }
+    }
+
+    /**
+     * Checks if DailyEntries contains entry matching given details
+     *
+     * @param personId personId
+     * @param before before
+     * @param after after
+     * @param vacation vacation
+     * @param expected expected worktime
+     * @return Boolean whether criteria matched
+     */
+    fun checkDailyEntries(personId: Int?, before: String?, after: String?, vacation: Boolean?, expected: Int): Callable<Boolean> {
+        return Callable {
+            getDailyEntries(
+                personId = personId,
+                before = before,
+                after = after,
+                vacation = vacation
+            )[0].expected == expected
         }
     }
 }

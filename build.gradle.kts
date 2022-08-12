@@ -50,6 +50,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.17.2")
     testImplementation("org.testcontainers:mysql:1.17.2")
     testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
+    testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 group = "fi.metatavu.timebank"

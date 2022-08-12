@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.awaitility.Awaitility.*
 
 /**
  * Tests for DailyEntries API
@@ -134,7 +136,10 @@ class DailyEntriesTest: AbstractTest() {
     @Test
     fun testWorktimeCalendars() {
         createTestBuilder().use { testBuilder ->
-            val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
+            val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 5,
+                before = LocalDate.now().minusDays(1).toString()
+            )
 
             setScenario(
                 scenario = PERSONS_SCENARIO,
@@ -147,13 +152,26 @@ class DailyEntriesTest: AbstractTest() {
 
             testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
-                after = LocalDate.now().minusDays(1).toString()
+                after = LocalDate.now().toString()
             )
-            val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
 
+            await().atMost(1, TimeUnit.MINUTES).until(
+                testBuilder.manager.dailyEntries.checkDailyEntries(
+                    personId = 5,
+                    before = null,
+                    after = LocalDate.now().toString(),
+                    vacation = null,
+                    expected = 217
+                )
+            )
 
-            firstEntries.forEach { assertTrue(it.expected == 435 || it.expected == 0) }
-            assertTrue(secondEntries.find { it.expected == 217 } != null)
+            val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 5,
+                after = LocalDate.now().toString()
+            )
+
+            firstEntries.forEach{ assertTrue(it.expected == 435 || it.expected == 0) }
+            assertTrue(secondEntries.find{ it.expected == 217} != null)
         }
     }
 }
