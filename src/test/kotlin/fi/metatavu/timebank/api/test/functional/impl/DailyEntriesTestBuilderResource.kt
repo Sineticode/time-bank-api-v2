@@ -82,12 +82,13 @@ class DailyEntriesTestBuilderResource(
      */
     fun checkDailyEntries(personId: Int?, before: String?, after: String?, vacation: Boolean?, expected: Int): Callable<Boolean> {
         return Callable {
-            getDailyEntries(
+            val entries = getDailyEntries(
                 personId = personId,
                 before = before,
                 after = after,
                 vacation = vacation
-            )[0].expected == expected
+            )
+            entries[0].expected == expected && entries.size == 1
         }
     }
 }
