@@ -14,9 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.awaitility.Awaitility.*
 
 /**
  * Tests for DailyEntries API
@@ -153,16 +151,6 @@ class DailyEntriesTest: AbstractTest() {
             testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
                 after = LocalDate.now().toString()
-            )
-
-            await().atMost(1, TimeUnit.MINUTES).until(
-                testBuilder.manager.dailyEntries.checkDailyEntries(
-                    personId = 5,
-                    before = null,
-                    after = LocalDate.now().toString(),
-                    vacation = null,
-                    expected = 217
-                )
             )
 
             val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(

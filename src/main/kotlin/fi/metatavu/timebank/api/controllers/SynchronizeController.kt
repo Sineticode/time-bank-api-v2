@@ -43,9 +43,7 @@ class SynchronizeController {
         try {
             var forecastPersons = personsController.getPersonsFromForecast()
 
-            val worktimeCalendars = forecastPersons.map { person ->
-                worktimeCalendarController.checkWorktimeCalendar(person)
-            }
+            forecastPersons.forEach { worktimeCalendarController.checkWorktimeCalendar(it) }
 
             forecastPersons = personsController.filterPersons(forecastPersons)
 
@@ -60,7 +58,7 @@ class SynchronizeController {
                 val personName = "${person?.lastName}, ${person?.firstName}"
                 logger.info("Synchronizing TimeEntry ${idx + 1}/${entries.size} of $personName...")
 
-                if (timeEntryController.createEntry(timeEntry, worktimeCalendars, tasks)) {
+                if (timeEntryController.createEntry(timeEntry, tasks)) {
                     synchronized++
                     logger.info("Synchronized TimeEntry #${idx + 1}!")
                 } else {

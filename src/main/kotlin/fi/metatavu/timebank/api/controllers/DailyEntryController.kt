@@ -1,6 +1,5 @@
 package fi.metatavu.timebank.api.controllers
 
-import fi.metatavu.timebank.api.forecast.models.ForecastPerson
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
 import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import java.time.LocalDate
@@ -72,13 +71,17 @@ class DailyEntryController {
             val dailyEntries = mutableListOf<DailyEntry>()
 
             persons.forEach { person ->
+                val personsWorktimeCalendars = worktimeCalendarController.getAllWorktimeCalendarsByPerson(
+                    personId = person.id
+                )
                 entries
                     .filter { timeEntry -> timeEntry.person == person.id }
                     .groupBy { it.date }.values.map { entriesOfDay ->
                         dailyEntries.add(calculateDailyEntries(
                             entriesOfDay = entriesOfDay,
-                            person = person,
-                            holidays = holidays
+                            personId = person.id,
+                            holidays = holidays,
+                            personsWorktimeCalendars = personsWorktimeCalendars
                         ))
                     }
             }
@@ -94,30 +97,31 @@ class DailyEntryController {
      * Totals TimeEntries to DailyEntries
      *
      * @param entriesOfDay List of TimeEntries
-     * @param person ForecastPerson
+     * @param personId personId
      * @param holidays List of LocalDate
+     * @param personsWorktimeCalendars List of WorktimeCalendars
      * @return DailyEntry
      */
-    suspend fun calculateDailyEntries(entriesOfDay: List<TimeEntry>, person: ForecastPerson, holidays: List<LocalDate>): DailyEntry {
+    suspend fun calculateDailyEntries(entriesOfDay: List<TimeEntry>, personId: Int, holidays: List<LocalDate>, personsWorktimeCalendars: List<WorktimeCalendar>): DailyEntry {
         var internalTime = 0
         var billableProjectTime = 0
         var nonBillableProjectTime = 0
-        var date = LocalDate.now()
-        val worktimeCalendar = entriesOfDay.first().worktimeCalendar ?:
-            throw Error("Missing WorktimeCalendar in TimeEntry of person ${person.firstName} ${person.lastName}.")
-        var personId = entriesOfDay.first().person!!
+        val date = entriesOfDay.first().date!!
         val isVacation = entriesOfDay.any { it.isVacation!! }
+
+        val worktimeCalendar = personsWorktimeCalendars.find {
+            it.calendarStart!! <= date && it.calendarEnd == null ||
+            it.calendarStart!! <= date && it.calendarEnd!! >= date
+        }
 
         entriesOfDay.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
             billableProjectTime += entry.billableProjectTime ?: 0
             nonBillableProjectTime += entry.nonBillableProjectTime ?: 0
-            date = entry.date
-            personId = entry.person!!
         }
 
         val expected = getDailyExpected(
-            worktimeCalendar = worktimeCalendarController.getWorktimeCalendar(worktimeCalendar.id!!),
+            worktimeCalendar = worktimeCalendar!!,
             holidays = holidays,
             day = date
         )
@@ -139,10 +143,11 @@ class DailyEntryController {
     }
 
     /**
-     * Gets persons expected workhours (in minutes) per day
+     * Gets persons expected worktime (in minutes) per day
      *
      * @param worktimeCalendar WorkTimeCalendar
      * @param holidays List of LocalDate
+     * @param day LocalDate
      * @return Int minutes of expected work
      */
     private suspend fun getDailyExpected(worktimeCalendar: WorktimeCalendar, holidays: List<LocalDate>, day: LocalDate): Int {

@@ -3,7 +3,6 @@ package fi.metatavu.timebank.api.controllers
 import fi.metatavu.timebank.api.forecast.models.ForecastTask
 import fi.metatavu.timebank.api.forecast.models.ForecastTimeEntry
 import fi.metatavu.timebank.api.persistence.model.TimeEntry
-import fi.metatavu.timebank.api.persistence.model.WorktimeCalendar
 import fi.metatavu.timebank.api.persistence.repositories.TimeEntryRepository
 import fi.metatavu.timebank.api.utils.VacationUtils
 import java.time.LocalDate
@@ -43,15 +42,11 @@ class TimeEntryController {
      * Creates and persists new TimeEntry
      *
      * @param forecastTimeEntry ForecastTimeEntry
-     * @param worktimeCalendars List of WorktimeCalendars
      * @param forecastTasks List of ForecastTasks
      * @return boolean whether operation was successful
      */
     suspend fun createEntry(
-        forecastTimeEntry: ForecastTimeEntry,
-        worktimeCalendars: List<WorktimeCalendar>,
-        forecastTasks: List<ForecastTask>
-    ): Boolean {
+        forecastTimeEntry: ForecastTimeEntry, forecastTasks: List<ForecastTask>): Boolean {
         val nonBillableTask = forecastTasks.find { it.id == forecastTimeEntry.task }?.unBillable ?: true
         val internalTime = forecastTimeEntry.nonProjectTime != null
         val newTimeEntry = TimeEntry()
@@ -71,7 +66,6 @@ class TimeEntryController {
         newTimeEntry.date = LocalDate.parse(forecastTimeEntry.date)
         newTimeEntry.createdAt = OffsetDateTime.parse(forecastTimeEntry.createdAt)
         newTimeEntry.updatedAt = OffsetDateTime.parse(forecastTimeEntry.updatedAt)
-        newTimeEntry.worktimeCalendar = worktimeCalendars.find { it.personId == forecastTimeEntry.person }
         newTimeEntry.isVacation = forecastTimeEntry.nonProjectTime == VacationUtils.VACATION_ID
 
         return timeEntryRepository.persistEntry(newTimeEntry)

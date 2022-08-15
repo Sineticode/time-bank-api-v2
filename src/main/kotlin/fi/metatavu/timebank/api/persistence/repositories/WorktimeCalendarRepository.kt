@@ -15,40 +15,24 @@ import javax.enterprise.context.ApplicationScoped
 class WorktimeCalendarRepository: PanacheRepositoryBase<WorktimeCalendar, UUID> {
 
     /**
-     * Gets most up-to-date WorktimeCalendars for given person
+     * Gets all WorktimeCalendars for given Person
      *
-     * @param personId person id
-     * @return WorktimeCalendars
+     * @param personId
+     * @return List of WorktimeCalendars
      */
-    suspend fun getUpToDateWorktimeCalendar(personId: Int): WorktimeCalendar? {
-        return try {
-            find("personId = ?1 AND calendarEnd = NULL", personId).singleResult<WorktimeCalendar?>().awaitSuspending()
-        } catch (ex: Exception) {
-            null
-        }
-    }
-
-    /**
-     * Gets WorktimeCalendar based on id
-     *
-     * @param id id
-     * @return WorktimeCalendar
-     */
-    suspend fun getWorktimeCalendar(id: UUID): WorktimeCalendar {
-        return findById(id).awaitSuspending()
+    suspend fun getAllWorkTimeCalendarsByPerson(personId: Int): List<WorktimeCalendar>? {
+        return find("personId = ?1", personId).list<WorktimeCalendar?>().awaitSuspending()
     }
 
     /**
      * Updates persisted WorktimeCalendar
      *
      * @param id id
+     * @param calendarEnd calendarEnd
      */
-    suspend fun updateWorktimeCalendar(id: UUID) {
+    suspend fun updateWorktimeCalendar(id: UUID, calendarEnd: LocalDate) {
         Panache.withTransaction {
-            update(
-                "calendarEnd = ?1 WHERE id = ?2",
-                LocalDate.now().minusDays(1), id
-            )
+            update("calendarEnd = ?1 WHERE id = ?2", calendarEnd, id)
         }.awaitSuspending()
     }
 
@@ -56,7 +40,6 @@ class WorktimeCalendarRepository: PanacheRepositoryBase<WorktimeCalendar, UUID> 
      * Persists new WorktimeCalendar
      *
      * @param worktimeCalendar WorktimeCalendar
-     * @return worktimeCalendar WorktimeCalendar
      */
     suspend fun persistWorktimeCalendar(worktimeCalendar: WorktimeCalendar){
         Panache.withTransaction {
