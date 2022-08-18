@@ -75,12 +75,13 @@ class PersonsController {
 
     /**
      * List persons data from Forecast API
+     * Filters out system users since they should not be needed in this application
      *
      * @return List of ForecastPersons
      */
     suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
-            forecastService.getPersons()
+            forecastService.getPersons().filter { !it.isSystemUser }
         } catch (e: Error) {
             logger.error("Error when requesting persons from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -105,13 +106,13 @@ class PersonsController {
     }
 
     /**
-     * Filters inactive Forecast persons, system users and clients
+     * Filters inactive Forecast persons and clients
      *
      * @param persons List of ForecastPersons
      * @return List of Forecast persons
      */
     fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
-        return persons.filter{ person -> person.active && !person.isSystemUser && person.clientId == null }
+        return persons.filter{ person -> person.active &&  person.clientId == null }
     }
 
     /**

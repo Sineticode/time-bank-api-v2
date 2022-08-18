@@ -141,7 +141,7 @@ class TestWiremockResource: QuarkusTestResourceLifecycleManager {
                 .willReturn(jsonResponse(objectMapper.writeValueAsString(TestData.getUpdatedForecastTimeEntryResponse()), 200))
         )
         wireMockServer.stubFor(
-            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(LocalDate.now().minusDays(1))}"))
+            get(urlPathEqualTo("/v4/time_registrations/updated_after/${getPathParamDate(LocalDate.now())}"))
                 .inScenario(TIMES_SCENARIO)
                 .whenScenarioStateIs(UPDATE_STATE_ONE)
                 .willSetStateTo(STARTED)

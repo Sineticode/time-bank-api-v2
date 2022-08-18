@@ -57,4 +57,8 @@
     <changeSet id="timeEntry_entryId_to_id" author="Ville Juutila">
         <renameColumn tableName="TimeEntry" oldColumnName="entryId" newColumnName="id" columnDataType="binary(16)" />
     </changeSet>
+    <changeSet id="remove_worktimeCalendar_constraint" author="Ville Juutila">
+        <dropForeignKeyConstraint baseTableName="TimeEntry" constraintName="FK_TIME_ENTRY_WORKTIME_CALENDAR" />
+        <dropColumn tableName="TimeEntry" columnName="worktimeCalendar_id" />
+    </changeSet>
 </databaseChangeLog>

@@ -18,46 +18,54 @@ class WorktimeCalendarController {
     lateinit var worktimeCalendarRepository: WorktimeCalendarRepository
 
     /**
-     * Gets WorktimeCalendar based on ID
+     * Gets all WorktimeCalendars for given Person
      *
-     * @param id id
-     * @return WorktimeCalendar
+     * @param personId personId
+     * @return List of WorktimeCalendars
      */
-    suspend fun getWorktimeCalendar(id: UUID): WorktimeCalendar {
-        return worktimeCalendarRepository.getWorktimeCalendar(id)
+    suspend fun getAllWorktimeCalendarsByPerson(personId: Int): List<WorktimeCalendar> {
+        return worktimeCalendarRepository.getAllWorkTimeCalendarsByPerson(
+            personId = personId
+        )!!
     }
 
     /**
      * Checks if persisted WorktimeCalendar is up-to-date for given person.
-     * Returns most up-to-date WorktimeCalendar.
+     * If not, ends old WorktimeCalendar and starts a new one with updated worktimes.
      *
-     * @param person person
-     * @return WorktimeCalendar
+     * @param person ForecastPerson
      */
-    suspend fun checkWorktimeCalendar(person: ForecastPerson): WorktimeCalendar {
-        val worktimeCalendar = worktimeCalendarRepository.getUpToDateWorktimeCalendar(person.id)
-            ?: createWorktimeCalendar(person)
+    suspend fun checkWorktimeCalendar(person: ForecastPerson) {
+        val allWorktimeCalendars = worktimeCalendarRepository.getAllWorkTimeCalendarsByPerson(person.id)
+        if (allWorktimeCalendars.isNullOrEmpty()) {
+            createWorktimeCalendar(
+                person = person,
+                first = true
+            )
 
-        val updatedWorktimeCalendar = compareExpected(person, worktimeCalendar)
+            return
+        }
 
-        return if (updatedWorktimeCalendar == worktimeCalendar) {
-            worktimeCalendar
-        } else {
-            worktimeCalendarRepository.updateWorktimeCalendar(worktimeCalendar.id!!)
-            updatedWorktimeCalendar
+        val upToDateWorktimeCalendar = allWorktimeCalendars.find { it.calendarEnd == null }!!
+
+        if (!compareExpected(person, upToDateWorktimeCalendar)) {
+            updateWorktimeCalendar(
+                id = upToDateWorktimeCalendar.id!!,
+                calendarEnd = LocalDate.now().minusDays(1)
+            )
         }
     }
 
     /**
      * Compares most up-to-date WorktimeCalendar with
      * expected worktimes retrieved from Forecast.
-     * Returns a new WorktimeCalendar if old one has ended.
+     * Returns true if WorktimeCalendar is up-to-date
      *
      * @param person Person
      * @param worktimeCalendar WorktimeCalendar
-     * @return WorktimeCalendar
+     * @return Boolean whether WorktimeCalendar was up-to-date
      */
-    suspend fun compareExpected(person: ForecastPerson, worktimeCalendar: WorktimeCalendar): WorktimeCalendar {
+    suspend fun compareExpected(person: ForecastPerson, worktimeCalendar: WorktimeCalendar): Boolean {
         val isCalendarUpToDate =
             person.monday == worktimeCalendar.monday &&
             person.tuesday == worktimeCalendar.tuesday &&
@@ -68,9 +76,15 @@ class WorktimeCalendarController {
             person.sunday == worktimeCalendar.sunday
 
         return if (isCalendarUpToDate) {
-            worktimeCalendar
+
+            true
         } else {
-            createWorktimeCalendar(person)
+            createWorktimeCalendar(
+                person = person,
+                first = false
+            )
+
+            false
         }
     }
 
@@ -78,9 +92,10 @@ class WorktimeCalendarController {
      * Creates new WorktimeCalendar for given person
      *
      * @param person Person
+     * @param first whether this is the first WorktimeCalendar for given Person
      * @return WorktimeCalendar
      */
-    suspend fun createWorktimeCalendar(person: ForecastPerson): WorktimeCalendar {
+    suspend fun createWorktimeCalendar(person: ForecastPerson, first: Boolean): WorktimeCalendar {
         val newWorktimeCalendar = WorktimeCalendar(
             id = UUID.randomUUID(),
             personId = person.id,
@@ -91,10 +106,23 @@ class WorktimeCalendarController {
             friday = person.friday,
             saturday = person.saturday,
             sunday = person.sunday,
-            calendarStart = LocalDate.now()
+            calendarStart = if (first) LocalDate.parse(person.startDate) else LocalDate.now()
         )
         worktimeCalendarRepository.persistWorktimeCalendar(newWorktimeCalendar)
 
         return newWorktimeCalendar
+    }
+
+    /**
+     * Updates (e.g. ends) given WorktimeCalendar
+     *
+     * @param id id
+     * @param calendarEnd calendarEnd
+     */
+    suspend fun updateWorktimeCalendar(id: UUID, calendarEnd: LocalDate) {
+        worktimeCalendarRepository.updateWorktimeCalendar(
+            id = id,
+            calendarEnd = calendarEnd
+        )
     }
 }

@@ -134,7 +134,10 @@ class DailyEntriesTest: AbstractTest() {
     @Test
     fun testWorktimeCalendars() {
         createTestBuilder().use { testBuilder ->
-            val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
+            val firstEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 5,
+                before = LocalDate.now().minusDays(1).toString()
+            )
 
             setScenario(
                 scenario = PERSONS_SCENARIO,
@@ -147,13 +150,16 @@ class DailyEntriesTest: AbstractTest() {
 
             testBuilder.manager.synchronization.synchronizeEntries(
                 before = null,
-                after = LocalDate.now().minusDays(1).toString()
+                after = LocalDate.now().toString()
             )
-            val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(personId = 5)
 
+            val secondEntries = testBuilder.manager.dailyEntries.getDailyEntries(
+                personId = 5,
+                after = LocalDate.now().toString()
+            )
 
-            firstEntries.forEach { assertTrue(it.expected == 435 || it.expected == 0) }
-            assertTrue(secondEntries.find { it.expected == 217 } != null)
+            firstEntries.forEach{ assertTrue(it.expected == 435 || it.expected == 0) }
+            assertTrue(secondEntries.find{ it.expected == 217} != null)
         }
     }
 }

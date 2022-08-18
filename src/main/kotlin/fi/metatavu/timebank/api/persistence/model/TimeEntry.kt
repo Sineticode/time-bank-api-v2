@@ -6,7 +6,6 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
-import javax.persistence.ManyToOne
 
 /**
  * TimeEntry JPA entity
@@ -42,9 +41,6 @@ class TimeEntry {
     @Column
     var updatedAt: OffsetDateTime? = null
 
-    @ManyToOne
-    var worktimeCalendar: WorktimeCalendar? = null
-
     @Column
     var isVacation: Boolean? = false
 
@@ -61,7 +57,6 @@ class TimeEntry {
             nonBillableProjectTime == other.nonBillableProjectTime &&
             date == other.date &&
             createdAt == other.createdAt &&
-            updatedAt == other.updatedAt  &&
-            worktimeCalendar == other.worktimeCalendar
+            updatedAt == other.updatedAt
     }
 }

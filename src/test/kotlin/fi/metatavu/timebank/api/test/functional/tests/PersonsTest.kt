@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.*
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import kotlin.math.ceil
 
 /**
  * Tests for Person API
@@ -68,7 +69,7 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val persons = testBuilder.manager.persons.getPersons(active = false)
 
-            assertEquals(5, persons.size)
+            assertEquals(4, persons.size)
             testBuilder.notValid.persons.assertListFail(401)
         }
     }
@@ -196,13 +197,15 @@ class PersonsTest: AbstractTest() {
                 timespan = Timespan.WEEK
             )
 
-            assertEquals(5, personTotalTimes.size)
-            assertEquals(372, personTotalTimes[4].internalTime)
-            assertEquals(122, personTotalTimes[4].billableProjectTime)
-            assertEquals(494, personTotalTimes[4].logged)
-            assertEquals(122, personTotalTimes[3].nonBillableProjectTime)
-            assertEquals(52, personTotalTimes[3].billableProjectTime)
-            assertEquals(378, personTotalTimes[3].internalTime)
+            val expectedWeeks = ceil(daysBetweenMonth / 7.toDouble()).toInt()
+
+            assertEquals(expectedWeeks, personTotalTimes.size)
+            assertTrue(personTotalTimes.find { it.internalTime == 372 } != null)
+            assertTrue(personTotalTimes.find { it.billableProjectTime == 122 } != null)
+            assertTrue(personTotalTimes.find { it.logged == 494 } != null)
+            assertTrue(personTotalTimes.find { it.nonBillableProjectTime == 122 } != null)
+            assertTrue(personTotalTimes.find { it.billableProjectTime == 52 } != null)
+            assertTrue(personTotalTimes.find { it.internalTime == 378 } != null)
             personTotalTimes.forEach {
                 assertTrue(it.balance < 0)
             }
