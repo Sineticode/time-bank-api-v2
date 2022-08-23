@@ -103,12 +103,10 @@ class SynchronizeController {
             forecastTimeEntries.addAll(forecastTimeEntryResponse.pageContents!!)
         }
 
-        forecastTimeEntries.addAll(synchronizationDayValidator(
+        return synchronizationDayValidator(
             timeEntries = forecastTimeEntries,
             persons = forecastPersons
-        ))
-
-        return forecastTimeEntries
+        )
     }
 
     /**
@@ -151,7 +149,8 @@ class SynchronizeController {
      */
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
         val sortedEntries = timeEntries.sortedBy { it.date }.toMutableList()
-        val firstEntryDate = LocalDate.parse(sortedEntries.first().date)
+        var firstEntryDate = LocalDate.parse(sortedEntries.first().date)
+        if (firstEntryDate < oldestSyncDate) firstEntryDate = oldestSyncDate
 
         persons.forEach { forecastPerson ->
             val personStartDate = LocalDate.parse(forecastPerson.startDate)

@@ -92,9 +92,9 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     /**
      * Deletes persisted TimeEntry based on entryId
      *
-     * @param entryId id of time registration
+     * @param id id of time registration
      */
-    suspend fun deleteEntry(entryId: UUID) {
-        Panache.withTransaction { deleteById(entryId) }.awaitSuspending()
+    suspend fun deleteEntry(id: UUID) {
+        Panache.withTransaction { deleteById(id) }.awaitSuspending()
     }
 }
