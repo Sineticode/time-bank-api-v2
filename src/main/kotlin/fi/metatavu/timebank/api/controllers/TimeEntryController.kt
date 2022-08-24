@@ -74,9 +74,9 @@ class TimeEntryController {
     /**
      * Deletes given persisted TimeEntry
      *
-     * @param entryId entryId
+     * @param id id
      */
-    suspend fun deleteEntry(entryId: UUID) {
-        timeEntryRepository.deleteEntry(entryId = entryId)
+    suspend fun deleteEntry(id: UUID) {
+        timeEntryRepository.deleteEntry(id = id)
     }
 }

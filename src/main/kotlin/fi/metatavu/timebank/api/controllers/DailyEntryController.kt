@@ -112,7 +112,11 @@ class DailyEntryController {
         val worktimeCalendar = personsWorktimeCalendars.find {
             it.calendarStart!! <= date && it.calendarEnd == null ||
             it.calendarStart!! <= date && it.calendarEnd!! >= date
-        } ?: throw Error("Couldn't find WorktimeCalendar for person $personId at $date!")
+        } ?: if (date < LocalDate.parse("2021-07-31")) {
+            worktimeCalendarController.getDefaultWorktimeCalendar()
+        } else {
+            throw Error("Couldn't find WorktimeCalendar for person $personId at $date!")
+        }
 
         entriesOfDay.forEach{ entry ->
             internalTime += entry.internalTime ?: 0
