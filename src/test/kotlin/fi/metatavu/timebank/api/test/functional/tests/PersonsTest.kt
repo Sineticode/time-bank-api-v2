@@ -177,12 +177,23 @@ class PersonsTest: AbstractTest() {
                 personId = 3,
                 timespan = Timespan.MONTH
             )
-
+            personTotalTimes.forEach {
+                println("PersonTotalTime(" +
+                        "\n\tinternalTime: ${it.internalTime}" +
+                        "\n\tbillableProjectTime: ${it.billableProjectTime}" +
+                        "\n\tnonBillableProjectTime: ${it.nonBillableProjectTime}" +
+                        "\n\tloggedProjectTime: ${it.loggedProjectTime}" +
+                        "\n\tlogged: ${it.logged}" +
+                        "\n\texpected: ${it.expected}" +
+                        "\n\tbalance: ${it.balance}" +
+                        "\n\ttimePeriod: ${it.timePeriod})")
+            }
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
-            assertEquals(122, personTotalTimes[1].nonBillableProjectTime)
-            assertEquals(174, personTotalTimes[1].billableProjectTime)
-            assertEquals(296, personTotalTimes[1].loggedProjectTime)
-            assertTrue(personTotalTimes[0].balance < 0)
+            assertTrue(personTotalTimes.find { it.nonBillableProjectTime == 122 } != null)
+            assertTrue(personTotalTimes.find { it.internalTime == 372 } != null)
+            assertTrue(personTotalTimes.find { it.billableProjectTime == 52 } != null)
+            assertTrue(personTotalTimes.find { it.loggedProjectTime == 174 } != null)
+            assertTrue(personTotalTimes.all { it.balance < 0 } )
         }
     }
 
