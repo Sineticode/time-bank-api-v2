@@ -180,9 +180,9 @@ class PersonsTest: AbstractTest() {
 
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
             assertTrue(personTotalTimes.find { it.nonBillableProjectTime == 122 } != null)
-            assertTrue(personTotalTimes.find { it.internalTime == 372 } != null)
-            assertTrue(personTotalTimes.find { it.billableProjectTime == 52 } != null)
-            assertTrue(personTotalTimes.find { it.loggedProjectTime == 174 } != null)
+            assertTrue(personTotalTimes.find { it.internalTime == 750 } != null)
+            assertTrue(personTotalTimes.find { it.billableProjectTime == 174 } != null)
+            assertTrue(personTotalTimes.find { it.loggedProjectTime == 296 } != null)
             assertTrue(personTotalTimes.all { it.balance < 0 } )
         }
     }
