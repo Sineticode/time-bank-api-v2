@@ -21,22 +21,23 @@ class TimeEntriesApi: TimeEntriesApi, AbstractApi() {
     @Inject
     lateinit var timeEntryTranslator: TimeEntryTranslator
 
-    override suspend fun deleteTimeEntry(entryId: UUID): Response {
+    override suspend fun deleteTimeEntry(id: UUID): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
         if (!isAdmin()) return createUnauthorized(message = "Only admin is allowed to delete timeEntries!")
 
-        timeEntryController.deleteEntry(entryId = entryId)
+        timeEntryController.deleteEntry(id = id)
 
         return createNoContent()
     }
 
-    override suspend fun listTimeEntries(personId: Int?, before: LocalDate?, after: LocalDate?): Response {
+    override suspend fun listTimeEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
         val entries = timeEntryController.getEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
 
         if (entries.isEmpty()) {

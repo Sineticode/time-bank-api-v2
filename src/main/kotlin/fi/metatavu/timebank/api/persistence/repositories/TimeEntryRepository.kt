@@ -16,14 +16,15 @@ import javax.enterprise.context.ApplicationScoped
 class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
 
     /**
-     * Lists all timeEntries
+     * Lists TimeEntries based on given parameters
      *
      * @param personId persons id in Forecast
      * @param before LocalDate to retrieve entries before given date
      * @param after LocalDate to retrieve entries after given date
-     * @return List of timeEntries
+     * @param vacation filter vacation days
+     * @return List of TimeEntries
      */
-    suspend fun getAllEntries(personId: Int?, before: LocalDate?, after: LocalDate?): List<TimeEntry> {
+    suspend fun getEntries(personId: Int?, before: LocalDate?, after: LocalDate?, vacation: Boolean?): List<TimeEntry> {
         val stringBuilder = StringBuilder()
         val parameters = Parameters()
 
@@ -40,6 +41,11 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
         if (after != null) {
             stringBuilder.append(if (stringBuilder.isNotEmpty()) " and date >= :after" else "date >= :after")
             parameters.and("after", after)
+        }
+
+        if (vacation != null) {
+            stringBuilder.append(if (stringBuilder.isNotEmpty()) " and isVacation = :vacation" else "isVacation = :vacation")
+            parameters.and("vacation", vacation)
         }
 
         stringBuilder.append(" order by date DESC")
@@ -86,9 +92,9 @@ class TimeEntryRepository: PanacheRepositoryBase<TimeEntry, UUID> {
     /**
      * Deletes persisted TimeEntry based on entryId
      *
-     * @param entryId id of time registration
+     * @param id id of time registration
      */
-    suspend fun deleteEntry(entryId: UUID) {
-        Panache.withTransaction { deleteById(entryId) }.awaitSuspending()
+    suspend fun deleteEntry(id: UUID) {
+        Panache.withTransaction { deleteById(id) }.awaitSuspending()
     }
 }

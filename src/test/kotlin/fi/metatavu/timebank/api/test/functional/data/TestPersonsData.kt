@@ -1,6 +1,7 @@
 package fi.metatavu.timebank.api.test.functional.data
 
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getLastYearToday
 
 /**
  * Class for test persons mock data
@@ -20,6 +21,7 @@ class TestPersonsData {
                     id = 1,
                     firstName = "TesterA",
                     lastName = "TestA",
+                    email = "testerA@example.com",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -30,14 +32,15 @@ class TestPersonsData {
                     active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = "2021-01-01",
+                    createdAt = "2021-01-01",
                     isSystemUser = false
                 ),
                 createTestPerson(
                     id = 2,
                     firstName = "TesterB",
                     lastName = "TestB",
+                    email = "testerc@example.com",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -45,17 +48,18 @@ class TestPersonsData {
                     friday = 435,
                     saturday = 0,
                     sunday = 0,
-                    active = false,
+                    active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-05",
-                    createdAt = "2022-05-05",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false
                 ),
                 createTestPerson(
                     id = 3,
                     firstName = "TesterC",
                     lastName = "TestC",
+                    email = "testerd@example.com",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -63,11 +67,11 @@ class TestPersonsData {
                     friday = 435,
                     saturday = 0,
                     sunday = 0,
-                    active = false,
+                    active = true,
                     language = "FINNISH",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false
                 ),
                 createTestPerson(
@@ -84,14 +88,15 @@ class TestPersonsData {
                     active = true,
                     language = "ENGLISH_UK",
                     holidayCalendarId = 123456,
-                    startDate = "2022-05-11",
-                    createdAt = "2022-05-11",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = true
                 ),
                 createTestPerson(
                     id = 5,
                     firstName = "TesterE",
                     lastName = "Updater",
+                    email = "testerb@example.com",
                     monday = 435,
                     tuesday = 435,
                     wednesday = 435,
@@ -102,12 +107,40 @@ class TestPersonsData {
                     active = true,
                     language = "RUSSIAN",
                     holidayCalendarId = 123456,
-                    startDate = "2022-06-30",
-                    createdAt = "2022-06-30",
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
                     isSystemUser = false,
                 )
             )
+        }
 
+        /**
+         * Gets list of mock ForecastPersons
+         * Mocks person whose expected worktimes has changed.
+         *
+         * @return List of ForecastPersons
+         */
+        fun getUpdatedPersons(): List<ForecastPerson> {
+            return listOf(
+                createTestPerson(
+                    id = 5,
+                    firstName = "TesterE",
+                    lastName = "Updater",
+                    monday = 217,
+                    tuesday = 217,
+                    wednesday = 217,
+                    thursday = 217,
+                    friday = 217,
+                    saturday = 0,
+                    sunday = 0,
+                    active = true,
+                    language = "RUSSIAN",
+                    holidayCalendarId = 123456,
+                    startDate = getLastYearToday().toString(),
+                    createdAt = getLastYearToday().toString(),
+                    isSystemUser = false
+                )
+            )
         }
 
         /**
@@ -135,6 +168,7 @@ class TestPersonsData {
             id: Int,
             firstName: String,
             lastName: String,
+            email: String = "",
             monday: Int,
             tuesday: Int,
             wednesday: Int,
@@ -153,6 +187,7 @@ class TestPersonsData {
             newPerson.id = id
             newPerson.firstName = firstName
             newPerson.lastName = lastName
+            newPerson.email = email
             newPerson.monday = monday
             newPerson.tuesday = tuesday
             newPerson.wednesday = wednesday

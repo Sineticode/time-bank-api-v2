@@ -20,7 +20,7 @@ class TimeEntriesTestBuilderResource(
 ): ApiTestBuilderResource<TimeEntry, ApiClient?>(testBuilder, apiClient) {
 
     override fun clean(t: TimeEntry) {
-        api.deleteTimeEntry(t.id!!)
+        api.deleteTimeEntry(t.id)
     }
 
     override fun getApi(): TimeEntriesApi {
@@ -34,13 +34,15 @@ class TimeEntriesTestBuilderResource(
      * @param personId optional personId
      * @param before optional before date
      * @param after optional after date
+     * @param vacation optional vacation filter
      * @return List of TimeEntries
      */
-    fun getTimeEntries(personId: Int? = null, before: String? = null, after: String? = null): Array<TimeEntry> {
+    fun getTimeEntries(personId: Int? = null, before: String? = null, after: String? = null, vacation: Boolean? = null): Array<TimeEntry> {
         return api.listTimeEntries(
             personId = personId,
             before = before,
-            after = after
+            after = after,
+            vacation = vacation
         )
     }
 
@@ -52,7 +54,7 @@ class TimeEntriesTestBuilderResource(
      */
     fun assertDeleteFail(expectedStatus: Int, id: UUID) {
         try {
-            api.deleteTimeEntry(entryId = id)
+            api.deleteTimeEntry(id = id)
             Assert.fail(String.format("Expected fail with status, $expectedStatus"))
         } catch (ex: ClientException) {
             assertClientExceptionStatus(expectedStatus, ex)

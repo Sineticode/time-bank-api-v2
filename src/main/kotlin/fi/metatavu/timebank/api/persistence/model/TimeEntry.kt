@@ -15,7 +15,7 @@ class TimeEntry {
 
     @Id
     @Column
-    lateinit var entryId: UUID
+    lateinit var id: UUID
 
     @Column
     var forecastId: Int? = null
@@ -27,7 +27,10 @@ class TimeEntry {
     var internalTime: Int? = null
 
     @Column
-    var projectTime: Int? = null
+    var billableProjectTime: Int? = null
+
+    @Column
+    var nonBillableProjectTime: Int? = null
 
     @Column
     var date: LocalDate? = null
@@ -38,6 +41,9 @@ class TimeEntry {
     @Column
     var updatedAt: OffsetDateTime? = null
 
+    @Column
+    var isVacation: Boolean? = false
+
     /**
      * Compares object equality ignoring entryId
      */
@@ -47,7 +53,8 @@ class TimeEntry {
         return forecastId == other.forecastId &&
             person == other.person &&
             internalTime == other.internalTime &&
-            projectTime == other.projectTime &&
+            billableProjectTime == other.billableProjectTime &&
+            nonBillableProjectTime == other.nonBillableProjectTime &&
             date == other.date &&
             createdAt == other.createdAt &&
             updatedAt == other.updatedAt

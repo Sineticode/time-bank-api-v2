@@ -1,9 +1,12 @@
 package fi.metatavu.timebank.api.test.functional.tests
 
+import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import fi.metatavu.timebank.api.test.functional.resources.LocalTestProfile
 import fi.metatavu.timebank.api.test.functional.resources.TestMySQLResource
 import fi.metatavu.timebank.api.test.functional.resources.TestWiremockResource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.TestInstance
     QuarkusTestResource(TestMySQLResource::class),
     QuarkusTestResource(TestWiremockResource::class)
 )
+@TestProfile(LocalTestProfile::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TimeEntriesTest: AbstractTest() {
 
@@ -29,16 +33,23 @@ class TimeEntriesTest: AbstractTest() {
     }
 
     /**
-     * Tests /v1/timeEntries -endpoint DELETE method
+     * Tests /v1/timeEntries -endpoint
      */
     @Test
     fun testTimeEntries() {
         createTestBuilder().use { testBuilder ->
-            testBuilder.manager.synchronization.synchronizeEntries()
+            val amountOfPersons = testBuilder.manager.persons.getPersons().size
+            testBuilder.manager.synchronization.synchronizeEntries(
+                before = null,
+                after = getThirtyDaysAgo().toString()
+            )
             val timeEntries = testBuilder.manager.timeEntries.getTimeEntries()
+            val vacations = testBuilder.manager.timeEntries.getTimeEntries(vacation = true)
+            val expected = amountOfPersons * daysBetweenMonth
 
-            assertEquals(15, timeEntries.size)
-            testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].id!!)
+            assertEquals(expected.toInt(), timeEntries.size)
+            assertEquals(2, vacations.size)
+            testBuilder.userA.timeEntries.assertDeleteFail(401, timeEntries[0].id)
             timeEntries.forEach { timeEntry ->
                 testBuilder.manager.timeEntries.clean(timeEntry)
             }

@@ -1,12 +1,13 @@
 package fi.metatavu.timebank.api.controllers
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fi.metatavu.timebank.model.PersonTotalTime
 import fi.metatavu.timebank.api.forecast.ForecastService
-import fi.metatavu.timebank.api.forecast.models.ForecastHoliday
 import fi.metatavu.timebank.api.forecast.models.ForecastPerson
+import fi.metatavu.timebank.api.keycloak.KeycloakController
+import fi.metatavu.timebank.api.utils.VacationUtils
 import org.slf4j.Logger
 import fi.metatavu.timebank.model.DailyEntry
+import fi.metatavu.timebank.model.Person
 import fi.metatavu.timebank.model.Timespan
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -29,15 +30,58 @@ class PersonsController {
     @Inject
     lateinit var logger: Logger
 
+    @Inject
+    lateinit var vacationUtils: VacationUtils
+
+    @Inject
+    lateinit var keycloakController: KeycloakController
+
+    /**
+     * Updates Person minimumBillableRate in Keycloak
+     *
+     * @param person Person
+     * @return person Person
+     */
+    suspend fun updatePerson(person: Person): Person {
+        if (person.minimumBillableRate > 100 || person.minimumBillableRate < 0) {
+            throw Error("Invalid minimumBillableRate!")
+        }
+
+        val keycloakUser = keycloakController.getUsersResource()?.list()?.find { it.email == person.email.lowercase() }
+            ?: throw Error("Invalid e-mail!")
+
+        keycloakController.updateUsersMinimumBillableRate(keycloakUser, person.minimumBillableRate)
+
+        return Person(
+            id = person.id,
+            firstName = person.firstName,
+            lastName = person.firstName,
+            email = person.email,
+            monday = person.monday,
+            tuesday = person.tuesday,
+            wednesday = person.wednesday,
+            thursday = person.thursday,
+            friday = person.friday,
+            saturday = person.saturday,
+            sunday = person.sunday,
+            active = person.active,
+            unspentVacations = person.unspentVacations,
+            spentVacations = person.spentVacations,
+            minimumBillableRate = keycloakController.getUsersMinimumBillableRate(keycloakUser),
+            language = person.language,
+            startDate = person.startDate
+        )
+    }
+
     /**
      * List persons data from Forecast API
+     * Filters out system users since they should not be needed in this application
      *
      * @return List of ForecastPersons
      */
     suspend fun getPersonsFromForecast(): List<ForecastPerson> {
         return try {
-            val resultString = forecastService.getPersons()
-            jacksonObjectMapper().readValue(resultString, Array<ForecastPerson>::class.java).toList()
+            forecastService.getPersons().filter { !it.isSystemUser }
         } catch (e: Error) {
             logger.error("Error when requesting persons from Forecast API: ${e.localizedMessage}")
             throw Error(e.localizedMessage)
@@ -51,8 +95,7 @@ class PersonsController {
      */
     suspend fun getHolidaysFromForecast(): List<LocalDate> {
         return try {
-            val resultString = forecastService.getHolidays()
-            val forecastHolidays = jacksonObjectMapper().readValue(resultString, Array<ForecastHoliday>::class.java).toList()
+            val forecastHolidays = forecastService.getHolidays()
             forecastHolidays.map{ holiday ->
                 LocalDate.of(holiday.year, holiday.month, holiday.day)
             }
@@ -63,13 +106,13 @@ class PersonsController {
     }
 
     /**
-     * Filters inactive Forecast persons and system users
+     * Filters inactive Forecast persons and clients
      *
      * @param persons List of ForecastPersons
      * @return List of Forecast persons
      */
-    fun filterActivePersons(persons: List<ForecastPerson>): List<ForecastPerson> {
-        return persons.filter{ person -> person.active && !person.isSystemUser }
+    fun filterPersons(persons: List<ForecastPerson>): List<ForecastPerson> {
+        return persons.filter{ person -> person.active &&  person.clientId == null }
     }
 
     /**
@@ -80,11 +123,21 @@ class PersonsController {
      */
     suspend fun listPersons(active: Boolean? = true): List<ForecastPerson>? {
         val persons = getPersonsFromForecast()
+        val keycloakUsers = keycloakController.getUsersResource()?.list() ?: return null
+
+        persons.forEach { forecastPerson ->
+            val keycloakUser = keycloakUsers.find { it.email == forecastPerson.email.lowercase() }
+            val minimumBillableRate = if (keycloakUser == null) 50 else keycloakController.getUsersMinimumBillableRate(keycloakUser)
+            val vacationAmounts = vacationUtils.getPersonsVacations(forecastPerson)
+            forecastPerson.unspentVacations = vacationAmounts.first
+            forecastPerson.spentVacations = vacationAmounts.second
+            forecastPerson.minimumBillableRate = minimumBillableRate
+        }
 
         return if (active == false) {
             persons
         } else {
-            filterActivePersons(persons)
+            filterPersons(persons)
         }
     }
 
@@ -99,7 +152,8 @@ class PersonsController {
         val dailyEntries = dailyEntryController.makeDailyEntries(
             personId = personId,
             before = null,
-            after = null
+            after = null,
+            vacation = null
         ) ?: return null
 
         return when (timespan) {
@@ -153,7 +207,8 @@ class PersonsController {
     private suspend fun calculatePersonTotalTime(personId: Int, days: List<DailyEntry>, timespan: Timespan): PersonTotalTime {
         val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
         var internalTime = 0
-        var projectTime = 0
+        var billableProjectTime = 0
+        var nonBillableProjectTime = 0
         var expected = 0
         var year: Int? = null
         var month: Int? = null
@@ -163,7 +218,8 @@ class PersonsController {
 
         days.forEachIndexed{ idx, day ->
             internalTime += day.internalTime
-            projectTime += day.projectTime
+            billableProjectTime += day.billableProjectTime
+            nonBillableProjectTime += day.nonBillableProjectTime
             expected += day.expected
             year = if (timespan != Timespan.ALL_TIME) day.date.year else null
             month = if (timespan == Timespan.MONTH || timespan == Timespan.WEEK) day.date.monthValue else null
@@ -172,6 +228,7 @@ class PersonsController {
             if (idx == days.lastIndex) startDate = day.date
         }
 
+        val loggedProjectTime = billableProjectTime + nonBillableProjectTime
         val timePeriod = timespanDateStringBuilder(
             timespan = timespan,
             year = year,
@@ -182,11 +239,13 @@ class PersonsController {
         )
 
         return PersonTotalTime(
-            balance = internalTime + projectTime - expected,
-            logged = internalTime + projectTime,
+            balance = internalTime + loggedProjectTime - expected,
+            logged = internalTime + loggedProjectTime,
+            loggedProjectTime = loggedProjectTime,
             expected = expected,
             internalTime = internalTime,
-            projectTime = projectTime,
+            billableProjectTime = billableProjectTime,
+            nonBillableProjectTime = nonBillableProjectTime,
             personId = personId,
             timePeriod = timePeriod
         )

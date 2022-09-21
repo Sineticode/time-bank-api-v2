@@ -15,6 +15,8 @@ repositories {
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
+val jaxrsFunctionalTestBuilderVersion: String by project
+val wiremockVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -39,16 +41,17 @@ dependencies {
     implementation("io.quarkus:quarkus-oidc")
     implementation("io.quarkus:quarkus-jdbc-mysql")
     implementation("io.quarkus:quarkus-rest-client")
+    implementation("io.quarkus:quarkus-keycloak-admin-client")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.quarkus:quarkus-junit5-mockito")
     testImplementation("io.rest-assured:rest-assured")
-    testImplementation("com.github.tomakehurst:wiremock-jre8:2.33.2")
+    testImplementation("com.github.tomakehurst:wiremock-jre8:$wiremockVersion")
     testImplementation("io.quarkus:quarkus-test-keycloak-server")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    testImplementation("org.testcontainers:testcontainers:1.17.2")
-    testImplementation("org.testcontainers:mysql:1.17.2")
-    testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:1.0.6")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:mysql")
+    testImplementation("fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:$jaxrsFunctionalTestBuilderVersion")
 }
 
 group = "fi.metatavu.timebank"
@@ -108,4 +111,12 @@ val generateApiClient = tasks.register("generateApiClient",GenerateTask::class){
     this.configOptions.put("collectionType", "array")
     this.configOptions.put("serializationLibrary", "jackson")
     this.configOptions.put("enumPropertyNaming", "UPPERCASE")
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(generateApiSpec)
+}
+
+tasks.named("compileTestKotlin") {
+    dependsOn(generateApiClient)
 }

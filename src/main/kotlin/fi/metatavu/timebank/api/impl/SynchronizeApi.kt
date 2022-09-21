@@ -19,16 +19,12 @@ class SynchronizeApi: SynchronizeApi, AbstractApi() {
     override suspend fun synchronizeTimeEntries(before: LocalDate?, after: LocalDate?): Response {
         loggedUserId ?: return createUnauthorized(message = "Invalid token!")
 
-        try {
-            val synchronizedEntries = synchronizeController.synchronize(after)
+        return try {
+            synchronizeController.synchronize(after)
 
-            if (synchronizedEntries.isEmpty()) {
-                return createNoContent()
-            }
-
-            return createNoContent()
+            createNoContent()
         } catch (e: Error) {
-            return createBadRequest(message = e.localizedMessage)
+            createBadRequest(message = e.localizedMessage)
         }
     }
 }
