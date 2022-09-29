@@ -148,9 +148,14 @@ class SynchronizeController {
      * @return List of ForecastTimeEntries
      */
     private suspend fun synchronizationDayValidator(timeEntries: List<ForecastTimeEntry>, persons: List<ForecastPerson>): List<ForecastTimeEntry> {
+        println("oldestSyncDate: $oldestSyncDate")
+        println("timeEntries size: ${timeEntries.size}")
         val sortedEntries = timeEntries.sortedBy { it.date }.filter { LocalDate.parse(it.date) > oldestSyncDate }.toMutableList()
+        println("sortedEntries size: ${sortedEntries.size}")
         var firstEntryDate = LocalDate.parse(sortedEntries.first().date)
+        println("firstEntryDate at first: $firstEntryDate")
         if (firstEntryDate < oldestSyncDate) firstEntryDate = oldestSyncDate
+        println("firstEntryDate at second  : $firstEntryDate")
 
         persons.forEach { forecastPerson ->
             val personStartDate = LocalDate.parse(forecastPerson.startDate)
