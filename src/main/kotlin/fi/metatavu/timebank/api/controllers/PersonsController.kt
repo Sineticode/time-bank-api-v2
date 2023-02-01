@@ -15,6 +15,7 @@ import java.time.temporal.WeekFields
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
+
 /**
  * Controller for Person objects
  */
@@ -215,17 +216,21 @@ class PersonsController {
         var week: Int? = null
         var startDate: LocalDate? = null
         var endDate: LocalDate? = null
+        var latestDay = 0
+
 
         days.forEachIndexed{ idx, day ->
             internalTime += day.internalTime
             billableProjectTime += day.billableProjectTime
             nonBillableProjectTime += day.nonBillableProjectTime
+            if ( idx == 0) latestDay = day.expected
             expected += day.expected
             year = if (timespan != Timespan.ALL_TIME) day.date.year else null
             month = if (timespan == Timespan.MONTH || timespan == Timespan.WEEK) day.date.monthValue else null
             week = if (timespan == Timespan.WEEK) day.date.get(weekOfYear) else null
             if (idx == 0) endDate = day.date
             if (idx == days.lastIndex) startDate = day.date
+
         }
 
         val loggedProjectTime = billableProjectTime + nonBillableProjectTime
@@ -239,10 +244,10 @@ class PersonsController {
         )
 
         return PersonTotalTime(
-            balance = internalTime + loggedProjectTime - expected,
+            balance = internalTime + loggedProjectTime - expected + latestDay,
             logged = internalTime + loggedProjectTime,
             loggedProjectTime = loggedProjectTime,
-            expected = expected,
+            expected = expected - latestDay,
             internalTime = internalTime,
             billableProjectTime = billableProjectTime,
             nonBillableProjectTime = nonBillableProjectTime,

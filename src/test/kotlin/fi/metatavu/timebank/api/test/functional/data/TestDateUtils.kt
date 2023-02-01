@@ -67,6 +67,14 @@ class TestDateUtils {
         }
 
         /**
+         * Gets Fourth week Dates, starting from thirty days ago
+         *
+         * @return List of LocalDates
+         */
+        fun getThirtyDaysAgoFourthWeek(): List<LocalDate> {
+            return getThirtyDaysAgoThirdWeek().map { it.plusWeeks(3) }
+        }
+        /**
          * Gets LocalDate of 60 days ago
          *
          * @return LocalDate

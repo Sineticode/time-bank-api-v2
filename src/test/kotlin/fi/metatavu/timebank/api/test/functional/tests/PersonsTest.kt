@@ -178,13 +178,15 @@ class PersonsTest: AbstractTest() {
                 timespan = Timespan.MONTH
             )
 
+            personTotalTimes.forEach { println(it) }
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
             assertTrue(personTotalTimes.find { it.nonBillableProjectTime == 122 } != null)
             assertTrue(personTotalTimes.find { it.internalTime == 750 } != null)
             assertTrue(personTotalTimes.find { it.billableProjectTime == 174 } != null)
             assertTrue(personTotalTimes.find { it.loggedProjectTime == 296 } != null)
-            assertTrue(personTotalTimes.all { it.balance < 0 } )
+            assertTrue(personTotalTimes.all { it.balance <= 0 } )
         }
+
     }
 
     /**
@@ -199,6 +201,9 @@ class PersonsTest: AbstractTest() {
             )
 
             val expectedWeeks = ceil(daysBetweenMonth / 7.toDouble()).toInt()
+            println(expectedWeeks)
+            println(personTotalTimes.size)
+            personTotalTimes.forEach { println(it) }
 
             assertEquals(expectedWeeks, personTotalTimes.size)
             assertTrue(personTotalTimes.find { it.internalTime == 372 } != null)
@@ -208,7 +213,7 @@ class PersonsTest: AbstractTest() {
             assertTrue(personTotalTimes.find { it.billableProjectTime == 52 } != null)
             assertTrue(personTotalTimes.find { it.internalTime == 378 } != null)
             personTotalTimes.forEach {
-                assertTrue(it.balance < 0)
+                assertTrue(it.balance <= 0)
             }
         }
     }
