@@ -155,7 +155,6 @@ class PersonsTest: AbstractTest() {
                 personId = 2,
                 timespan = null
             )
-
             assertEquals(1, personTotalTimes.size)
             assertEquals(213, personTotalTimes[0].internalTime)
             assertEquals(1200, personTotalTimes[0].billableProjectTime)
@@ -177,7 +176,6 @@ class PersonsTest: AbstractTest() {
                 personId = 3,
                 timespan = Timespan.MONTH
             )
-
             personTotalTimes.forEach { println(it) }
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
             assertTrue(personTotalTimes.find { it.nonBillableProjectTime == 122 } != null)

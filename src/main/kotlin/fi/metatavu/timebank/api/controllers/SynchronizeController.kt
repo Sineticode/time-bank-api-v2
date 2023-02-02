@@ -157,9 +157,9 @@ class SynchronizeController {
             val firstDate = if (personStartDate >= firstEntryDate) personStartDate else firstEntryDate
             val daysBetween =
                 if (personStartDate >= firstEntryDate) {
-                    ChronoUnit.DAYS.between(personStartDate, LocalDate.now())
+                    ChronoUnit.DAYS.between(personStartDate, LocalDate.now().minusDays(1))
                 } else {
-                    ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now())
+                    ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now().minusDays(1))
                 }
 
             val personEntries = sortedEntries.filter { it.person == forecastPerson.id }
