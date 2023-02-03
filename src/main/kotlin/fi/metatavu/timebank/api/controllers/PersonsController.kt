@@ -15,7 +15,6 @@ import java.time.temporal.WeekFields
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
-
 /**
  * Controller for Person objects
  */
@@ -207,6 +206,7 @@ class PersonsController {
      */
     private suspend fun calculatePersonTotalTime(personId: Int, days: List<DailyEntry>, timespan: Timespan): PersonTotalTime {
         val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
+        val mutableDays = days.toMutableList().filter { it.date != LocalDate.now() }
         var internalTime = 0
         var billableProjectTime = 0
         var nonBillableProjectTime = 0
@@ -217,7 +217,7 @@ class PersonsController {
         var startDate: LocalDate? = null
         var endDate: LocalDate? = null
 
-        days.forEachIndexed{ idx, day ->
+        mutableDays.forEachIndexed{ idx, day ->
             internalTime += day.internalTime
             billableProjectTime += day.billableProjectTime
             nonBillableProjectTime += day.nonBillableProjectTime

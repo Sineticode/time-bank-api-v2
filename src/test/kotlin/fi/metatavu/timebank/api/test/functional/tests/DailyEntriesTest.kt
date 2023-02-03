@@ -92,6 +92,7 @@ class DailyEntriesTest: AbstractTest() {
                 after = LocalDate.now().toString(),
                 vacation = false
             )
+
             assertEquals(daysBetweenMonth.toInt(), personA.size)
             assertEquals(1, personB.size)
             assertEquals(1, personC.size)

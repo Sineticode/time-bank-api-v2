@@ -9,6 +9,7 @@ import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.get
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgoThirdWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 /**
  * Class for test time entries mock data
@@ -193,7 +194,16 @@ class TestTimeEntriesData {
                     date = getSixtyDaysAgo().toString(),
                     createdAt = getODT(getSixtyDaysAgo().atStartOfDay()),
                     updatedAt = getODT(getSixtyDaysAgo().atStartOfDay())
-                )
+                ),
+                createTestTimeEntry(
+                        id = 17,
+                        person = 2,
+                        task = 123,
+                        nonProjectTime = null,
+                        timeRegistered = 42,
+                        date = LocalDate.now().toString(),
+                        createdAt = OffsetDateTime.now().toString(),
+                        updatedAt = OffsetDateTime.now().toString())
             )
         }
 
