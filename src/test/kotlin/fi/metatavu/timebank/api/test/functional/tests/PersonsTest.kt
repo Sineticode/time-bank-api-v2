@@ -154,8 +154,8 @@ class PersonsTest: AbstractTest() {
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 2,
                 timespan = null,
-                before = "2023-02-07",
-                after = "2021-11-14"
+                before = LocalDate.now().minusDays(1).toString(),
+                after = null
             )
 
             assertEquals(1, personTotalTimes.size)
@@ -178,7 +178,7 @@ class PersonsTest: AbstractTest() {
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
                 timespan = Timespan.MONTH,
-                before = null,
+                before = LocalDate.now().minusDays(1).toString(),
                 after = null
             )
 
@@ -200,7 +200,7 @@ class PersonsTest: AbstractTest() {
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
                 timespan = Timespan.WEEK,
-                before = null,
+                before = LocalDate.now().minusDays(1).toString(),
                 after = null
             )
 

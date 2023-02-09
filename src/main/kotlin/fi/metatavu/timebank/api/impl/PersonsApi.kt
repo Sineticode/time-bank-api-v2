@@ -22,14 +22,14 @@ class PersonsApi: PersonsApi, AbstractApi() {
     @Inject
     lateinit var personsTranslator: PersonsTranslator
 
-    override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?, before: String?, after: String?): Response {
+    override suspend fun listPersonTotalTime(personId: Int, timespan: Timespan?, before: LocalDate?, after: LocalDate?): Response {
         loggedUserId ?: return createUnauthorized("Invalid token!")
 
         val entries = personsController.makePersonTotal(
             personId = personId,
             timespan = timespan ?: Timespan.ALL_TIME,
-            before = LocalDate.parse(before),
-            after = LocalDate.parse(after)
+            before = before,
+            after = after
         ) ?: return createNotFound("Cannot calculate totals for given person")
 
         return createOk(entity = entries)
