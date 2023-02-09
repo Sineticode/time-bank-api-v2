@@ -153,7 +153,9 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 2,
-                timespan = null
+                timespan = null,
+                before = "2023-02-07",
+                after = "2021-11-14"
             )
 
             assertEquals(1, personTotalTimes.size)
@@ -175,7 +177,9 @@ class PersonsTest: AbstractTest() {
             )
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
-                timespan = Timespan.MONTH
+                timespan = Timespan.MONTH,
+                before = null,
+                after = null
             )
 
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
@@ -195,7 +199,9 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
-                timespan = Timespan.WEEK
+                timespan = Timespan.WEEK,
+                before = null,
+                after = null
             )
 
             val expectedWeeks = ceil(daysBetweenMonth / 7.toDouble()).toInt()
