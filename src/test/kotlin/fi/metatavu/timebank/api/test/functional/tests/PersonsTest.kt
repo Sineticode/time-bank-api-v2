@@ -153,9 +153,26 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 2,
-                timespan = null,
-                before = LocalDate.now().minusDays(1).toString(),
-                after = null
+                timespan = null
+            )
+
+            assertEquals(1, personTotalTimes.size)
+            assertEquals(213, personTotalTimes[0].internalTime)
+            assertEquals(1500, personTotalTimes[0].billableProjectTime)
+            assertEquals(1713, personTotalTimes[0].logged)
+        }
+    }
+
+    /**
+     * Tests /v1/persons/2/total?timespan=ALL_TIME&before=yyyy-mm-dd
+     */
+    @Test
+    fun listPersonTotalTimeForTesterBAllTimeWithoutToday() {
+        createTestBuilder().use { testBuilder ->
+            val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
+                    personId = 2,
+                    timespan = Timespan.ALL_TIME,
+                    before = LocalDate.now().minusDays(1).toString()
             )
 
             assertEquals(1, personTotalTimes.size)
@@ -177,9 +194,7 @@ class PersonsTest: AbstractTest() {
             )
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
-                timespan = Timespan.MONTH,
-                before = LocalDate.now().minusDays(1).toString(),
-                after = null
+                timespan = Timespan.MONTH
             )
 
             assertEquals(amountOfMonths.toInt(), personTotalTimes.size)
@@ -199,9 +214,7 @@ class PersonsTest: AbstractTest() {
         createTestBuilder().use { testBuilder ->
             val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
                 personId = 3,
-                timespan = Timespan.WEEK,
-                before = LocalDate.now().minusDays(1).toString(),
-                after = null
+                timespan = Timespan.WEEK
             )
 
             val expectedWeeks = ceil(daysBetweenMonth / 7.toDouble()).toInt()

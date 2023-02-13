@@ -49,7 +49,7 @@ class PersonsTestBuilderResource(
      * @param timespan timespan
      * @return person's total time
      */
-    fun getPersonTotal(personId: Int, timespan: Timespan? = Timespan.ALL_TIME, before: String?, after: String?): Array<PersonTotalTime> {
+    fun getPersonTotal(personId: Int, timespan: Timespan? = Timespan.ALL_TIME, before: String? = null, after: String? = null): Array<PersonTotalTime> {
         return api.listPersonTotalTime(
             personId = personId,
             timespan = timespan,
