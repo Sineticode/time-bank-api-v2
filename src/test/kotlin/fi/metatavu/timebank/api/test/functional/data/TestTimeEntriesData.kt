@@ -17,11 +17,11 @@ class TestTimeEntriesData {
 
     companion object {
 
-    /**
-     * Gets list of mock ForecastTimeEntries
-     *
-     * @return List of ForecastTimeEntries
-     */
+        /**
+         * Gets list of mock ForecastTimeEntries
+         *
+         * @return List of ForecastTimeEntries
+         */
         fun getForecastTimeEntries(): List<ForecastTimeEntry> {
             val entries = mutableListOf(
                 createTestTimeEntry(
@@ -194,20 +194,20 @@ class TestTimeEntriesData {
                     createdAt = getODT(getSixtyDaysAgo().atStartOfDay()),
                     updatedAt = getODT(getSixtyDaysAgo().atStartOfDay())
                 )
-        )
+            )
         entries.addAll(createTodaysEntries(entries.last().id!!))
 
         return entries
-    }
+        }
 
-    /**
-     * Gets list of mock ForecastTimeEntries.
-     * Mocks that an existing entry has been updated.
-     *
-     * @return List of ForecastTimeEntries
-     */
-    fun getUpdatedForecastTimeEntry(): List<ForecastTimeEntry> {
-        return listOf(
+        /**
+         * Gets list of mock ForecastTimeEntries.
+         * Mocks that an existing entry has been updated.
+         *
+         * @return List of ForecastTimeEntries
+         */
+        fun getUpdatedForecastTimeEntry(): List<ForecastTimeEntry> {
+            return listOf(
                 createTestTimeEntry(
                     id = 14,
                     person = 5,
@@ -218,17 +218,17 @@ class TestTimeEntriesData {
                     createdAt = getODT(LocalDateTime.now()),
                     updatedAt = getODT(LocalDateTime.now().plusHours(3))
                 )
-        )
-    }
+            )
+        }
 
-    /**
-     * Gets list of mock ForecastTimeEntries.
-     * Contains entry for person whose expected worktime has changed.
-     *
-     * @return List of ForecastTimeEntries
-     */
-    fun getForecastTimeEntryForUpdatedPerson(): List<ForecastTimeEntry> {
-        return listOf(
+        /**
+         * Gets list of mock ForecastTimeEntries.
+         * Contains entry for person whose expected worktime has changed.
+         *
+         * @return List of ForecastTimeEntries
+         */
+        fun getForecastTimeEntryForUpdatedPerson(): List<ForecastTimeEntry> {
+            return listOf(
                 createTestTimeEntry(
                     id = 17,
                     person = 5,
@@ -239,20 +239,20 @@ class TestTimeEntriesData {
                     createdAt = getODT(LocalDate.now().atStartOfDay()),
                     updatedAt = getODT(LocalDate.now().atStartOfDay().plusHours(1))
                 )
-        )
-    }
+            )
+        }
 
-    /**
-     * Makes a mock ForecastTimeEntry for each active person for current day
-     *
-     *  @return List of mock ForecastTimeEntries
-     */
-    private fun createTodaysEntries(highestId: Int): List<ForecastTimeEntry> {
-        val persons = TestPersonsData.getPersons().filter { it.active && !it.isSystemUser }
+        /**
+         * Makes a mock ForecastTimeEntry for each active person for current day
+         *
+         *  @return List of mock ForecastTimeEntries
+         */
+        private fun createTodaysEntries(highestId: Int): List<ForecastTimeEntry> {
+            val persons = TestPersonsData.getPersons().filter { it.active && !it.isSystemUser }
 
-        return persons.mapIndexed { index, person ->
-            val currentId = highestId + index + 1
-            createTestTimeEntry(
+            return persons.mapIndexed { index, person ->
+                val currentId = highestId + index + 1
+                createTestTimeEntry(
                     id = currentId,
                     person = person.id,
                     task = 123,
@@ -261,46 +261,46 @@ class TestTimeEntriesData {
                     date = LocalDate.now().toString(),
                     createdAt = getODT(LocalDate.now().atStartOfDay()),
                     updatedAt = getODT(LocalDate.now().atStartOfDay().plusHours(1))
-            )
+                )
+            }
         }
-    }
 
 
-    /**
-     * Helper method for simplifying creating of ForecastTimeEntry objects
-     *
-     * @param id id
-     * @param person person
-     * @param nonProjectTime nonProjectTime
-     * @param timeRegistered timeRegistered
-     * @param date date
-     * @param createdAt createdAt
-     * @param updatedAt
-     * @return ForecastTimeEntry
-     */
-    private fun createTestTimeEntry(
-        id: Int,
-        person: Int,
-        task: Int?,
-        nonProjectTime: Int?,
-        timeRegistered: Int,
-        date: String,
-        createdAt: String,
-        updatedAt: String
-    ): ForecastTimeEntry {
-        val newTimeEntry = ForecastTimeEntry()
-        newTimeEntry.id = id
-        newTimeEntry.person = person
-        newTimeEntry.task = task
-        newTimeEntry.nonProjectTime = nonProjectTime
-        newTimeEntry.timeRegistered = timeRegistered
-        newTimeEntry.date = date
-        newTimeEntry.createdBy = person
-        newTimeEntry.updatedBy = person
-        newTimeEntry.createdAt = createdAt
-        newTimeEntry.updatedAt = updatedAt
+        /**
+         * Helper method for simplifying creating of ForecastTimeEntry objects
+         *
+         * @param id id
+         * @param person person
+         * @param nonProjectTime nonProjectTime
+         * @param timeRegistered timeRegistered
+         * @param date date
+         * @param createdAt createdAt
+         * @param updatedAt
+         * @return ForecastTimeEntry
+         */
+        private fun createTestTimeEntry(
+            id: Int,
+            person: Int,
+            task: Int?,
+            nonProjectTime: Int?,
+            timeRegistered: Int,
+            date: String,
+            createdAt: String,
+            updatedAt: String
+        ): ForecastTimeEntry {
+            val newTimeEntry = ForecastTimeEntry()
+            newTimeEntry.id = id
+            newTimeEntry.person = person
+            newTimeEntry.task = task
+            newTimeEntry.nonProjectTime = nonProjectTime
+            newTimeEntry.timeRegistered = timeRegistered
+            newTimeEntry.date = date
+            newTimeEntry.createdBy = person
+            newTimeEntry.updatedBy = person
+            newTimeEntry.createdAt = createdAt
+            newTimeEntry.updatedAt = updatedAt
 
-        return newTimeEntry
-      }
+            return newTimeEntry
+        }
     }
 }
