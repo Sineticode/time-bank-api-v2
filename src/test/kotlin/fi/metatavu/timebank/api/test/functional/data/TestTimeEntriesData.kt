@@ -243,7 +243,9 @@ class TestTimeEntriesData {
         }
 
         /**
+         * Makes a mock ForecastTimeEntry for each active person for current day
          *
+         *  @return List of mock ForecastTimeEntries
          */
         private fun createTodaysEntries(highestId: Int): List<ForecastTimeEntry> {
             val persons = TestPersonsData.getPersons().filter { it.active && !it.isSystemUser }
