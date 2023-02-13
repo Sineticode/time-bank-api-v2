@@ -195,9 +195,9 @@ class TestTimeEntriesData {
                     updatedAt = getODT(getSixtyDaysAgo().atStartOfDay())
                 )
             )
-        entries.addAll(createTodaysEntries(entries.last().id!!))
+            entries.addAll(createTodaysEntries(entries.last().id!!))
 
-        return entries
+            return entries
         }
 
         /**
