@@ -27,7 +27,7 @@ class PersonsApi: PersonsApi, AbstractApi() {
         val entries = personsController.makePersonTotal(
             personId = personId,
             timespan = timespan ?: Timespan.ALL_TIME
-        ) ?: return createNotFound("Cannot calculate totals for given person")
+        )
 
         return createOk(entity = entries)
     }

@@ -11,6 +11,8 @@ import io.quarkus.test.junit.TestProfile
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import fi.metatavu.timebank.api.test.functional.data.TestDateUtils.Companion.getThirtyDaysAgo
+import fi.metatavu.timebank.api.utils.VacationUtils
+import org.junit.Assert
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import kotlin.math.ceil
@@ -217,12 +219,12 @@ class PersonsTest: AbstractTest() {
      * Tests listing total time entries for a non-existing person
      */
     @Test
-    fun listNonExistingPersonTimeEntries() {
+    fun getPersonTotalReturnEmptyListWhenNonExistingPersonId() {
         createTestBuilder().use { testBuilder ->
-            testBuilder.manager.persons.assertTotalsFail(
-                expectedStatus = 404,
-                personId = 123
+            val personTotal = testBuilder.manager.persons.getPersonTotal(
+                    personId = 125363
             )
+            assertEquals(0, personTotal.size)
         }
     }
 
