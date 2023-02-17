@@ -31,4 +31,5 @@ class DailyEntriesApi: DailyEntriesApi, AbstractApi() {
             createInternalServerError(e.localizedMessage)
         }
     }
+
 }

@@ -1,0 +1,20 @@
+@startuml
+
+boundary "timebank" as timebank
+boundary "forecast-api" as forecastapi
+database "timebank-db" as db
+
+== Kun timebank käynnistyy ==
+
+note over timebank : esim URL == http://otson_kono.com/timebank/api/on_delete_event
+timebank --> forecastapi : register webhook(url timebankkiin)
+timebank <-- forecastapi : JSON register OK
+
+== tapahtuu sitten taustalla joskus ==
+
+forecastapi --> timebank : Delete Event happened webhook urliin
+timebank --> db : Deletoi timebank kannasta entry
+timebank <-- db : ok deletoitu
+
+
+@enduml

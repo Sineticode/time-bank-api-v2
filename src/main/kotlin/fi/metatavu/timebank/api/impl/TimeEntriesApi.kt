@@ -43,4 +43,9 @@ class TimeEntriesApi: TimeEntriesApi, AbstractApi() {
             entity = timeEntryTranslator.translate(entries)
         )
     }
+
+    override suspend fun onDeleteEvent(): Response {
+        TODO("Not yet implemented")
+    }
+
 }
