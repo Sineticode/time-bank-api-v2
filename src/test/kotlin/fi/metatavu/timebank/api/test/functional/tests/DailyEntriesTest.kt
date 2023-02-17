@@ -162,6 +162,7 @@ class DailyEntriesTest: AbstractTest() {
     }
     /**
      * Tests if person has no vacations returns empty list
+     * using a nonexisting person id
      */
     @Test
     fun getVacationsIfEmptyReturnsEmptyList() {

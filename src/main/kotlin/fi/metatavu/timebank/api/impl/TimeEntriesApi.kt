@@ -39,7 +39,6 @@ class TimeEntriesApi: TimeEntriesApi, AbstractApi() {
             after = after,
             vacation = vacation
         )
-
         return createOk(
             entity = timeEntryTranslator.translate(entries)
         )

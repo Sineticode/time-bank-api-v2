@@ -148,15 +148,13 @@ class PersonsController {
      * @param timespan Timespan
      * @return List of PersonTotalTimes
      */
-    suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime> {
+    suspend fun makePersonTotal(personId: Int, timespan: Timespan): List<PersonTotalTime>? {
         val dailyEntries = dailyEntryController.makeDailyEntries(
             personId = personId,
             before = null,
             after = null,
             vacation = null
-        )
-        if (dailyEntries.isEmpty())
-            return emptyList()
+        ) ?: return null
 
         return when (timespan) {
             Timespan.ALL_TIME -> {
@@ -206,7 +204,7 @@ class PersonsController {
      * @param timespan timespan
      * @return PersonTotalTime
      */
-    private suspend fun calculatePersonTotalTime(personId: Int, days: List<DailyEntry>, timespan: Timespan): PersonTotalTime{
+    private suspend fun calculatePersonTotalTime(personId: Int, days: List<DailyEntry>, timespan: Timespan): PersonTotalTime {
         val weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
         var internalTime = 0
         var billableProjectTime = 0
