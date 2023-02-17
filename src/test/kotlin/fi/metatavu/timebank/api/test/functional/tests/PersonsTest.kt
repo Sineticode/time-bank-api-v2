@@ -158,6 +158,25 @@ class PersonsTest: AbstractTest() {
 
             assertEquals(1, personTotalTimes.size)
             assertEquals(213, personTotalTimes[0].internalTime)
+            assertEquals(1500, personTotalTimes[0].billableProjectTime)
+            assertEquals(1713, personTotalTimes[0].logged)
+        }
+    }
+
+    /**
+     * Tests /v1/persons/2/total?timespan=ALL_TIME&before=yyyy-mm-dd
+     */
+    @Test
+    fun listPersonTotalTimeForTesterBAllTimeWithoutToday() {
+        createTestBuilder().use { testBuilder ->
+            val personTotalTimes = testBuilder.manager.persons.getPersonTotal(
+                    personId = 2,
+                    timespan = Timespan.ALL_TIME,
+                    before = LocalDate.now().minusDays(1).toString()
+            )
+
+            assertEquals(1, personTotalTimes.size)
+            assertEquals(213, personTotalTimes[0].internalTime)
             assertEquals(1200, personTotalTimes[0].billableProjectTime)
             assertEquals(1413, personTotalTimes[0].logged)
         }
